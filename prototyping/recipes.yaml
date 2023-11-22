@@ -1,0 +1,11 @@
+
+prepare_madx_HL_sequence:
+    - build_madx_sequence
+    - apply_fix_asca_madx_sequence
+    - slice_madx_sequence
+    - provide_beam_madx_sequence
+    - install_errors_placeholders_hllhc
+    - cycle_madx_sequence
+    - install_cc_madx_sequence
+    - set_twiss_madx_sequence
+

@@ -1,0 +1,14 @@
+gen1:
+  script:
+    - load_optics
+    - check_observables
+#   parameters_scanned:
+# gen2:
+#   script:
+#     - load_collider
+#     - track
+
+
+
+    
+
