@@ -29,6 +29,9 @@ power = Block(power_function, dic_imports=dic_imports)
 # --- Script ---
 # ==================================================================================================
 # This is only for testing purposes
+# Need to be run from the root directory with
+# python -m prototyping_simple.src.blocks.power
+# To prevent warning, comment out the corresponding import line in __init__.py
 if __name__ == "__main__":
     print(power)
     print(power.function(2, 3))
