@@ -1,0 +1,8 @@
+do_operations:
+  script:
+    - add
+    - multiply
+    - power
+print_output:
+  script:
+    - print_result

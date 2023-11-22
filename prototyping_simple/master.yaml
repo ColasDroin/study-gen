@@ -1,0 +1,4 @@
+gen1:
+  script:
+    - do_operations
+    - print_output
