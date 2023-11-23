@@ -1,6 +1,8 @@
 # ==================================================================================================
 # --- Imports ---
 # ==================================================================================================
+from collections import OrderedDict
+
 from ..block import Block
 
 
@@ -17,4 +19,4 @@ def add_function(a: int, b: int) -> int:
 # --- Block object ---
 # ==================================================================================================
 
-add = Block(add_function)
+add = Block(add_function, output=OrderedDict([("output_add", int)]))

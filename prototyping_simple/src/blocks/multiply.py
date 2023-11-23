@@ -1,6 +1,8 @@
 # ==================================================================================================
 # --- Imports ---
 # ==================================================================================================
+from collections import OrderedDict
+
 from ..block import Block
 
 
@@ -17,4 +19,4 @@ def multiply_function(a: int, b: int) -> int:
 # --- Block object ---
 # ==================================================================================================
 
-multiply = Block(multiply_function)
+multiply = Block(multiply_function, output=OrderedDict([("output_multiply", int)]))

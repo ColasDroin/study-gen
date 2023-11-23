@@ -2,6 +2,7 @@
 # --- Import statements ---
 # ==================================================================================================
 import importlib
+from collections import OrderedDict
 
 from ..block import Block
 
@@ -23,7 +24,7 @@ def power_function(a: int, b: int) -> int:
 # --- Block ---
 # ==================================================================================================
 
-power = Block(power_function, dic_imports=dic_imports)
+power = Block(power_function, dic_imports=dic_imports, output=OrderedDict([("output_power", int)]))
 
 # ==================================================================================================
 # --- Script ---
