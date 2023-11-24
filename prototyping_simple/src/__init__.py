@@ -1,1 +1,1 @@
-from .blocks import add, multiply, power, print_result
+from .blocks import add, factorial, multiply, power, print_result

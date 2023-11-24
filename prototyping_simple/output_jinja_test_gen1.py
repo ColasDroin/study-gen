@@ -1,18 +1,4 @@
-def add(a: int, b: int) -> int:
-    """Dummy docstring"""
-    # Add a and b
-    return a + b
-
-def multiply(a: int, b: int) -> int:
-
-    # Multiply a and b
-    return a * b
-
-def power(a: int, b: int) -> int:
-    import numpy as np
-
-    # Returns a at the power of b
-    return np.power(a, b)
-
-def print_result(result: int) -> None:
-    print(f"Result: {result}")
+<src.block.Block object at 0x7f8ecc5c9c10>
+<src.block.Block object at 0x7f8e0990d910>
+<src.block.Block object at 0x7f8e094c5190>
+<src.block.Block object at 0x7f8e09464c10>
