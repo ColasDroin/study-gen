@@ -1,9 +1,10 @@
+import importlib.util
 import inspect
 import logging
+import sys
+import tempfile
 from collections import OrderedDict
 from typing import Callable, Self
-
-from matplotlib.pylab import f
 
 
 class Block:
@@ -189,6 +190,24 @@ class Block:
 
         return dic_imports
 
+    @staticmethod
+    def write_temp_block(function_str: str, name_function: str) -> Callable:
+
+        # Write string to temporary file
+        tmp = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
+
+        # Open the file for writing.
+        with open(tmp.name, "w") as f:
+            f.write(function_str)
+            tmp.flush()
+
+        spec = importlib.util.spec_from_file_location("mod", tmp.name)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules["mod"] = mod
+        spec.loader.exec_module(mod)
+
+        return getattr(mod, name_function)
+
     def merge_block(
         self: Self,
         block: Self,
@@ -196,24 +215,16 @@ class Block:
         docstring: str = "",
         output: OrderedDict[str, type] = OrderedDict(),
     ) -> Self:
-        print("ICICCI", name_function)
 
         # Build function string
         function_str = self.get_merge_str(block, name_function, docstring, output)
 
-        print("ICICCI2", name_function)
-        print(function_str)
+        # Write string to temporary file
+        function = self.write_temp_block(function_str, name_function)
 
-        print(locals().keys())
-        # Convert into Python function
-        exec(function_str, globals())
-
-        print("ICICCI3", name_function)
-        # add_multiply(2, 3)
-        print(locals().keys())
-        # print("ici", locals()[name_function](2, 3))
+        function(4, 5)
 
         # Merge imports
         dic_imports = self.merge_imports(block)
 
-        return Block(function=globals()[name_function], dic_imports=dic_imports, output=output)
+        return Block(function=function, dic_imports=dic_imports, output=output)
