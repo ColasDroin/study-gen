@@ -1,4 +1,16 @@
-<src.block.Block object at 0x7f0f5c1e3810>
-<src.block.Block object at 0x7f0f5c1ea450>
-<src.block.Block object at 0x7f0f5c1ea850>
-<src.block.Block object at 0x7f0f5c1eb310>
+def add_function(a: int, b: int) -> int:
+    """Dummy docstring"""
+    # Add a and b
+    return a + b
+
+def multiply_function(a: int, b: int) -> int:
+
+    # Multiply a and b
+    return a * b
+
+def power_function(a: int, b: int) -> int:
+    # Returns a at the power of b
+    return np.power(a, b)
+
+def print_result_function(result: int) -> None:
+    print(f"Result: {result}")

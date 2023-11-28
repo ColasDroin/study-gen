@@ -16,7 +16,15 @@ class Block:
     ):
         self.function = function
         self.dic_imports = dic_imports
-        self.output = output
+        self._output = output
+
+    @property
+    def output(self: Self):
+        return self._output
+
+    @output.setter
+    def output(self: Self, value: OrderedDict[str, type]):
+        self._output = value
 
     def get_str(self: Self) -> str:
         if self.function is None:
@@ -25,18 +33,21 @@ class Block:
         else:
             return inspect.getsource(self.function)
 
-    @staticmethod
-    def get_output_str(output: OrderedDict[str, type] = OrderedDict()) -> str:
-        if len(output) == 0:
+    def get_output_str(self: Self) -> str:
+        if len(self.output) == 0:
             return ""
         else:
-            if len(output) == 1:
-                return list(output.keys())[0]
+            if len(self.output) == 1:
+                return list(self.output.keys())[0]
             else:
-                return ", ".join([x for x in output.keys()])
+                return ", ".join([x for x in self.output.keys()])
 
+    def get_output_type_hint_str(self: Self):
+        return self.get_external_output_type_hint_str(self.output)
+
+    # Static needed here when the output comes from a merge
     @staticmethod
-    def get_output_type_hint_str(output: OrderedDict[str, type] = OrderedDict()) -> str:
+    def get_external_output_type_hint_str(output: OrderedDict[str, type] = OrderedDict()) -> str:
 
         if len(output) == 0:
             output_hint_str = "None"
@@ -58,7 +69,7 @@ class Block:
 
     def get_assignation_call_str(self: Self) -> str:
         function_call_str = self.get_call_str()
-        output_str = self.get_output_str(self.output)
+        output_str = self.get_output_str()
 
         if output_str == "":
             return function_call_str
@@ -140,13 +151,18 @@ class Block:
     ) -> str:
 
         # Get output type hint string
-        output_str = self.get_output_type_hint_str(output)
+        output_str = self.get_external_output_type_hint_str(output)
 
         # Get function header with the merged parameters
         parameters_header = ", ".join(
             [f"{parameter}: {parameters[parameter].__name__}" for parameter in parameters]
         )
         function_header = f"def {name_function}({parameters_header}) -> {output_str}:"
+
+        # Write docstring
+        docstring = (
+            '''\t"""''' + "\n".join([f"\t{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
+        )
 
         # Write function body: call the two functions
         function_body = f"\t{self.get_assignation_call_str()}\n\t{block.get_assignation_call_str()}"
@@ -221,8 +237,6 @@ class Block:
 
         # Write string to temporary file
         function = self.write_temp_block(function_str, name_function)
-
-        function(4, 5)
 
         # Merge imports
         dic_imports = self.merge_imports(block)
