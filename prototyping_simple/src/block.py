@@ -23,8 +23,24 @@ class Block:
         return self._output
 
     @output.setter
-    def output(self: Self, value: OrderedDict[str, type]):
-        self._output = value
+    def output(self: Self, dict_output: OrderedDict[str, type]):
+        # Ensure that the number of arguments is the same
+        if len(dict_output) != len(self._output):
+            raise ValueError(
+                f"Number of outputs is different. Previous: {len(self._output)}. New:"
+                f" {len(dict_output)}"
+            )
+        # Ensure that the provided output(s) have the correct type
+        for (new_output, new_type), (previous_output, previous_type) in zip(
+            dict_output.items(), self._output.items()
+        ):
+            if new_type != previous_type:
+                raise ValueError(
+                    f"Output {new_output} has a different type. Previous type:"
+                    f" {previous_type.__name__}. New type: {new_type.__name__}"
+                )
+        # Update output
+        self._output = dict_output
 
     def get_str(self: Self) -> str:
         if self.function is None:
