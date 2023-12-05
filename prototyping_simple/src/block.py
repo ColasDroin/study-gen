@@ -126,49 +126,87 @@ class Block:
             )
             return dict_parameters
 
-    def get_merge_parameters(
-        self: Self, block: Self, output: OrderedDict[str, type] = OrderedDict()
+    @classmethod
+    def get_multiple_merge_parameters(
+        cls, l_blocks: list[Self], output: OrderedDict[str, type] = OrderedDict()
+    ) -> OrderedDict[str, type]:
+
+        # Start with empty dictionnary of parameters
+        dict_parameters = OrderedDict()
+
+        # Progressively merge all parameters (two by two)
+        for block1, block2 in zip(l_blocks[:-1], l_blocks[1:]):
+            dict_parameters = dict_parameters | cls.get_external_merge_parameters(
+                block1, block2, output
+            )
+
+        # Return the merged parameters
+        return dict_parameters
+
+    @classmethod
+    def get_external_merge_parameters(
+        cls, block1: Self, block2: Self, output: OrderedDict[str, type] = OrderedDict()
     ) -> OrderedDict[str, type]:
 
         ### Establish complete list of parameters
-        self_parameters = self.get_parameters().copy()
-        block_parameters = block.get_parameters()
+        dict_block1_parameters = block1.get_parameters()
+        dict_block2_parameters = block2.get_parameters()
 
         # First check that identical parameters have identical type
-        for key in set(self_parameters).intersection(block_parameters):
-            if self_parameters[key] != block_parameters[key]:
+        for key in set(dict_block1_parameters).intersection(dict_block2_parameters):
+            if dict_block1_parameters[key] != dict_block2_parameters[key]:
                 raise ValueError(f"Parameter {key} has different types in the two blocks")
 
         # Then merge parameters
-        parameters = self_parameters | block_parameters
+        dict_parameters = dict_block1_parameters | dict_block2_parameters
 
         # If an output has been provided, remove it from the list of parameters
         # Except if it's modified inplace (inside of a block)
-        # Start with self block
-        for key in self.output:
-            if key not in self_parameters and key in parameters:
-                del parameters[key]
-        # Then do the same for the argument block
-        for key in block.output:
-            if key not in block_parameters and key in parameters:
-                del parameters[key]
+        # Start with block1
+        for key in block1.output:
+            if key not in dict_block1_parameters and key in dict_parameters:
+                del dict_parameters[key]
 
-        return parameters
+        # Then do the same for the block2
+        for key in block2.output:
+            if key not in dict_block2_parameters and key in dict_parameters:
+                del dict_parameters[key]
 
-    def check_merge_output(
+        return dict_parameters
+
+    def get_merge_parameters(
         self: Self, block: Self, output: OrderedDict[str, type] = OrderedDict()
-    ) -> None:
+    ) -> OrderedDict[str, type]:
+        return self.get_external_merge_parameters(self, block, output)
+
+    @classmethod
+    def check_external_merge_output(
+        cls,
+        l_blocks: list[Self],
+        dict_parameters: OrderedDict[str, type],
+        output: OrderedDict[str, type],
+    ):
         # If the output is not None, ensure that the elements in it are either
         # - in the parameters (inplace operation)
         # - in the outputs
         if len(output) > 0:
-            for key in output:
-                if (
-                    key not in self.get_parameters()
-                    and key not in self.output
-                    and key not in block.output
-                ):
-                    raise ValueError(f"Output {key} is not in the parameters or the outputs")
+            # Merge all output and parameters
+            dic_block_parameters_and_outputs = copy.deepcopy(dict_parameters)
+
+            for block in l_blocks:
+                dic_block_parameters_and_outputs = dic_block_parameters_and_outputs | block.output
+
+                for key in output:
+                    if key not in dic_block_parameters_and_outputs:
+                        raise ValueError(f"Output {key} is not in the parameters or the outputs")
+
+    def check_merge_output(
+        self: Self,
+        block: Self,
+        dict_parameters: OrderedDict[str, type],
+        output: OrderedDict[str, type] = OrderedDict(),
+    ) -> None:
+        self.check_external_merge_output([self, block], dict_parameters, output)
 
     def build_merge_str(
         self: Self,
@@ -176,7 +214,7 @@ class Block:
         name_function: str,
         docstring: str = "",
         output: OrderedDict[str, type] = OrderedDict(),
-        parameters: OrderedDict[str, type] = OrderedDict(),
+        dict_parameters: OrderedDict[str, type] = OrderedDict(),
     ) -> str:
 
         # Get output type hint string
@@ -187,7 +225,7 @@ class Block:
 
         # Get function header with the merged parameters
         parameters_header = ", ".join(
-            [f"{parameter}: {parameters[parameter].__name__}" for parameter in parameters]
+            [f"{parameter}: {dict_parameters[parameter].__name__}" for parameter in dict_parameters]
         )
         function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
 
@@ -212,50 +250,72 @@ class Block:
         docstring: str = "",
         output: OrderedDict[str, type] = OrderedDict(),
     ) -> str:
+        return self.get_multiple_merge_str([self, block], name_function, docstring, output)
+
+        # # Get merged parameters
+        # parameters = self.get_merge_parameters(block)
+
+        # # Ensure that the output is accessible
+        # self.check_merge_output(block, output)
+
+        # # Build function string
+        # function_str = self.build_merge_str(block, name_function, docstring, output, parameters)
+
+        # return function_str
+
+    @classmethod
+    def get_multiple_merge_str(
+        cls,
+        l_blocks: list[Self],
+        name_function: str,
+        docstring: str = "",
+        output: OrderedDict[str, type] = OrderedDict(),
+    ) -> str:
 
         # Get merged parameters
-        parameters = self.get_merge_parameters(block)
+        dict_parameters = cls.get_multiple_merge_parameters(l_blocks, output)
 
         # Ensure that the output is accessible
         self.check_merge_output(block, output)
 
         # Build function string
-        function_str = self.build_merge_str(block, name_function, docstring, output, parameters)
+        function_str = self.build_merge_str(
+            block, name_function, docstring, output, dict_parameters
+        )
 
         return function_str
-    
-    # ! TO FINISH
-    # @classmethod
-    # def get_multiple_merge_str(
-    #     cls,
-    #     l_blocks: Self,
-    #     name_function: str,
-    #     docstring: str = "",
-    #     output: OrderedDict[str, type] = OrderedDict(),
-    # ) -> str:
 
-    #     # Get merged parameters
-    #     parameters = self.get_merge_parameters(block)
-
-    #     # Ensure that the output is accessible
-    #     self.check_merge_output(block, output)
-
-    #     # Build function string
-    #     function_str = self.build_merge_str(block, name_function, docstring, output, parameters)
-
-    #     return function_str
-
-    def merge_imports(self: Self, block: Self) -> dict[str, str]:
+    # Class method could be replaced by staticmethod but allows for better type hinting here
+    @classmethod
+    def merge_multiple_imports(cls, l_blocks: list[Self]) -> dict[str, str]:
 
         # Merge imports, ensuring that there are no conflicts
-        dic_imports = self.dic_imports.copy()
-        for module, alias in block.dic_imports.items():
-            if module in dic_imports and dic_imports[module] != alias:
-                raise ValueError(f"Import conflict for module {module}. Aliases are not consistent")
-            else:
-                dic_imports[module] = alias
+        dic_imports = OrderedDict()
+        for block in l_blocks:
+            for module, alias in block.dic_imports.items():
+                if module in dic_imports:
+                    if dic_imports[module] != alias:
+                        raise ValueError(
+                            f"Import conflict for module {module}. Aliases are not consistent"
+                        )
+                else:
+                    dic_imports[module] = alias
 
         return dic_imports
+
+    def merge_imports(self: Self, block: Self) -> dict[str, str]:
+        return self.merge_multiple_imports([self, block])
+
+    # Class method could be replaced by staticmethod but allows for better type hinting here
+    @classmethod
+    def merge_multiple_dependencies(cls, l_blocks: list[Self]) -> set[str]:
+        set_imports = set()
+        for block in l_blocks:
+            set_imports.add(block.get_name_str())
+        return set_imports
+
+    def merge_dependencies(self: Self, block: Self) -> set[str]:
+        return self.merge_multiple_dependencies([self, block])
 
     @staticmethod
     def write_temp_block(function_str: str, name_function: str) -> Callable:
@@ -294,7 +354,7 @@ class Block:
         dic_imports = self.merge_imports(block)
 
         # Add dependencies
-        set_deps = set((self.get_name_str(), block.get_name_str()))
+        set_deps = self.merge_dependencies(block)
 
         return Block(function=function, dic_imports=dic_imports, set_deps=set_deps, output=output)
 
@@ -302,6 +362,5 @@ class Block:
     # def merge_blocks(
     #     cls, l_blocks: list[Self], name_function: str, docstring: str = "", output=OrderedDict()
     # ) -> Self:
-        
+
     #     # Build function string
-        
