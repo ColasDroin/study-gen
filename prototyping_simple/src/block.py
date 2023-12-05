@@ -4,7 +4,6 @@ import inspect
 import logging
 import sys
 import tempfile
-from calendar import c
 from collections import OrderedDict
 from typing import Callable, Self
 
@@ -69,6 +68,7 @@ class Block:
                 f"Number of parameters is different. Previous: {len(self.parameters)}. New:"
                 f" {len(dict_parameters)}"
             )
+
         # Ensure that the provided parameters have the correct type
         for (new_parameter, new_type), (previous_parameter, previous_type) in zip(
             dict_parameters.items(), self.parameters.items()
@@ -78,6 +78,7 @@ class Block:
                     f"Parameter {new_parameter} has a different type. Previous type:"
                     f" {previous_type.__name__}. New type: {new_type.__name__}"
                 )
+
         # Update callable function
         function_str = self.prepare_function_str(dict_parameters=dict_parameters)
 
@@ -97,6 +98,34 @@ class Block:
             return ""
         else:
             return self.function.__name__
+
+    def get_docstring(self: Self) -> str:
+        if self.function is None:
+            logging.warning("No function defined for this block")
+            return ""
+        else:
+            doc = inspect.getdoc(self.function)
+            if doc is None:
+                return ""
+            else:
+                return doc
+
+    def get_body_str(self: Self) -> str:
+        if self.function is None:
+            logging.warning("No function defined for this block")
+            return ""
+        else:
+            body = inspect.getsource(self.function)
+            # Remove header
+            body = "\n".join(body.split(":\n")[1:])
+            if self.get_docstring() != "":
+                # Remove docstring
+                body = body.replace(self.get_docstring(), "")
+                # Remove remaining quotes
+                body = body.replace('"""', "")
+                body = body.replace("'''", "")
+
+            return body
 
     def get_output_str(self: Self) -> str:
         return self.get_external_output_str(self.output)
@@ -152,6 +181,16 @@ class Block:
         else:
             return inspect.signature(self.function)
 
+    def get_parameters_assignation_str(self: Self, dict_parameters: OrderedDict[str, type]) -> str:
+        old_dict_parameters = self.parameters
+        return "\n".join(
+            [
+                f"\t{old_name} = {name}"
+                for old_name, name in zip(old_dict_parameters, dict_parameters)
+                if old_name != name
+            ]
+        )
+
     @classmethod
     def get_multiple_merge_parameters(
         cls, l_blocks: list[Self], output: OrderedDict[str, type] = OrderedDict()
@@ -161,43 +200,24 @@ class Block:
         dict_parameters = OrderedDict()
 
         # Progressively merge all parameters (two by two)
-        for block1, block2 in zip(l_blocks[:-1], l_blocks[1:]):
-            dict_parameters = dict_parameters | cls.get_external_merge_parameters(
-                block1, block2, output
-            )
+        for idx, block1 in enumerate(l_blocks):
+            for block2 in l_blocks[idx + 1 :]:
 
-        # Return the merged parameters
-        return dict_parameters
+                # Check that identical parameters have identical type
+                for key in set(block1.parameters).intersection(block2.parameters):
+                    if block1.parameters[key] != block2.parameters[key]:
+                        raise ValueError(f"Parameter {key} has different types in the two blocks")
 
-    @classmethod
-    def get_external_merge_parameters(
-        cls, block1: Self, block2: Self, output: OrderedDict[str, type] = OrderedDict()
-    ) -> OrderedDict[str, type]:
-
-        ### Establish complete list of parameters
-        dict_block1_parameters = block1.parameters
-        dict_block2_parameters = block2.parameters
-
-        # First check that identical parameters have identical type
-        for key in set(dict_block1_parameters).intersection(dict_block2_parameters):
-            if dict_block1_parameters[key] != dict_block2_parameters[key]:
-                raise ValueError(f"Parameter {key} has different types in the two blocks")
-
-        # Then merge parameters
-        dict_parameters = dict_block1_parameters | dict_block2_parameters
+                dict_parameters = dict_parameters | block1.parameters | block2.parameters
 
         # If an output has been provided, remove it from the list of parameters
         # Except if it's modified inplace (inside of a block)
-        # Start with block1
-        for key in block1.output:
-            if key not in dict_block1_parameters and key in dict_parameters:
-                del dict_parameters[key]
+        for block in l_blocks:
+            for key in block.output:
+                if key not in block.parameters and key in dict_parameters:
+                    del dict_parameters[key]
 
-        # Then do the same for the block2
-        for key in block2.output:
-            if key not in dict_block2_parameters and key in dict_parameters:
-                del dict_parameters[key]
-
+        # Return the merged parameters
         return dict_parameters
 
     @classmethod
@@ -223,20 +243,37 @@ class Block:
 
     @classmethod
     def build_funtion_str(
-        cls, l_blocks: list[Self], function_header: str, docstring: str = "", output_str: str = ""
+        cls,
+        l_blocks: list[Self],
+        function_header: str,
+        parameters_assignation_str: str = "",
+        function_body: str | None = None,
+        docstring: str = "",
+        output_str: str | None = None,
     ):
 
         # Write docstring
         docstring = '''\t"""''' + "\n".join([f"{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
 
         # Write function body: call all functions successively
-        function_body = "\n".join([f"\t{block.get_assignation_call_str()}" for block in l_blocks])
+        if function_body is None:
+            function_body = "\n".join(
+                [f"\t{block.get_assignation_call_str()}" for block in l_blocks]
+            )
 
         # Write function output
-        function_output = f"\treturn {output_str}"
+        if output_str is not None:
+            function_output = f"\treturn {output_str}"
+        else:
+            function_output = ""
 
         # Write full function
-        function_str = "\n".join([function_header, docstring, function_body, function_output])
+        function_str = "\n".join(
+            [function_header, docstring, parameters_assignation_str, function_body, function_output]
+        )
+
+        # Replace tabs by spaces to prevent inconsistent indentation
+        function_str = function_str.replace("\t", "    ")
 
         return function_str
 
@@ -250,13 +287,18 @@ class Block:
         # Get output type hint string and output name (can't modify the output type, and output name
         # must be modified through the corresponding setter)
         output_type_hint_str = self.get_output_type_hint_str()
-        output_str = self.get_output_str()
 
-        # Get function header with the (potentially updated) function name and parameters
+        # Get function names and parameters, with a flag for the updated parameters
         if name_function is None:
             name_function = self.get_name_str()
         if dict_parameters is None:
+            parameters_assignation_str = ""
             dict_parameters = self.parameters
+        else:
+            # Update parameters assignation at the beginning of the function body
+            parameters_assignation_str = self.get_parameters_assignation_str(dict_parameters)
+
+        # Get function header with the (potentially updated) function name and parameters
         parameters_header = ", ".join(
             [f"{parameter}: {dict_parameters[parameter].__name__}" for parameter in dict_parameters]
         )
@@ -264,10 +306,20 @@ class Block:
 
         # Get potentially updated docstring
         if docstring is None:
-            docstring = self.get_str()
+            docstring = self.get_docstring()
+
+        # Get function body (including return statement)
+        function_body = self.get_body_str()
 
         # Build function string
-        function_str = self.build_funtion_str([self], function_header, docstring, output_str)
+        function_str = self.build_funtion_str(
+            [self],
+            function_header,
+            parameters_assignation_str=parameters_assignation_str,
+            function_body=function_body,
+            docstring=docstring,
+            output_str=None,
+        )
 
         return function_str
 
@@ -294,7 +346,9 @@ class Block:
         function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
 
         # Build function string
-        function_str = cls.build_funtion_str(l_blocks, function_header, docstring, output_str)
+        function_str = cls.build_funtion_str(
+            l_blocks, function_header, docstring=docstring, output_str=output_str
+        )
 
         return function_str
 
