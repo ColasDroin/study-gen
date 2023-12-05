@@ -1,3 +1,4 @@
+import copy
 import importlib.util
 import inspect
 import logging
@@ -174,11 +175,6 @@ class Block:
 
         return dict_parameters
 
-    def get_merge_parameters(
-        self: Self, block: Self, output: OrderedDict[str, type] = OrderedDict()
-    ) -> OrderedDict[str, type]:
-        return self.get_external_merge_parameters(self, block, output)
-
     @classmethod
     def check_external_merge_output(
         cls,
@@ -192,25 +188,18 @@ class Block:
         if len(output) > 0:
             # Merge all output and parameters
             dic_block_parameters_and_outputs = copy.deepcopy(dict_parameters)
-
             for block in l_blocks:
                 dic_block_parameters_and_outputs = dic_block_parameters_and_outputs | block.output
 
-                for key in output:
-                    if key not in dic_block_parameters_and_outputs:
-                        raise ValueError(f"Output {key} is not in the parameters or the outputs")
+            # Check that all outputs are in the parameters or the outputs
+            for key in output:
+                if key not in dic_block_parameters_and_outputs:
+                    raise ValueError(f"Output {key} is not in the parameters nor the outputs")
 
-    def check_merge_output(
-        self: Self,
-        block: Self,
-        dict_parameters: OrderedDict[str, type],
-        output: OrderedDict[str, type] = OrderedDict(),
-    ) -> None:
-        self.check_external_merge_output([self, block], dict_parameters, output)
-
-    def build_merge_str(
-        self: Self,
-        block: Self,
+    @classmethod
+    def build_external_merge_str(
+        cls,
+        l_blocks: list[Self],
         name_function: str,
         docstring: str = "",
         output: OrderedDict[str, type] = OrderedDict(),
@@ -218,10 +207,10 @@ class Block:
     ) -> str:
 
         # Get output type hint string
-        output_type_hint_str = self.get_external_output_type_hint_str(output)
+        output_type_hint_str = cls.get_external_output_type_hint_str(output)
 
         # Get output string
-        output_str = self.get_output_str()
+        output_str = cls.get_external_output_str(output)
 
         # Get function header with the merged parameters
         parameters_header = ", ".join(
@@ -232,8 +221,8 @@ class Block:
         # Write docstring
         docstring = '''\t"""''' + "\n".join([f"{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
 
-        # Write function body: call the two functions
-        function_body = f"\t{self.get_assignation_call_str()}\n\t{block.get_assignation_call_str()}"
+        # Write function body: call all functions successively
+        function_body = "\n".join([f"\t{block.get_assignation_call_str()}" for block in l_blocks])
 
         # Write function output
         function_output = f"\treturn {output_str}"
@@ -242,26 +231,6 @@ class Block:
         function_str = "\n".join([function_header, docstring, function_body, function_output])
 
         return function_str
-
-    def get_merge_str(
-        self: Self,
-        block: Self,
-        name_function: str,
-        docstring: str = "",
-        output: OrderedDict[str, type] = OrderedDict(),
-    ) -> str:
-        return self.get_multiple_merge_str([self, block], name_function, docstring, output)
-
-        # # Get merged parameters
-        # parameters = self.get_merge_parameters(block)
-
-        # # Ensure that the output is accessible
-        # self.check_merge_output(block, output)
-
-        # # Build function string
-        # function_str = self.build_merge_str(block, name_function, docstring, output, parameters)
-
-        # return function_str
 
     @classmethod
     def get_multiple_merge_str(
@@ -276,16 +245,15 @@ class Block:
         dict_parameters = cls.get_multiple_merge_parameters(l_blocks, output)
 
         # Ensure that the output is accessible
-        self.check_merge_output(block, output)
+        cls.check_external_merge_output(l_blocks, dict_parameters, output)
 
         # Build function string
-        function_str = self.build_merge_str(
-            block, name_function, docstring, output, dict_parameters
+        function_str = cls.build_external_merge_str(
+            l_blocks, name_function, docstring, output, dict_parameters
         )
 
         return function_str
 
-    # Class method could be replaced by staticmethod but allows for better type hinting here
     @classmethod
     def merge_multiple_imports(cls, l_blocks: list[Self]) -> dict[str, str]:
 
@@ -303,19 +271,12 @@ class Block:
 
         return dic_imports
 
-    def merge_imports(self: Self, block: Self) -> dict[str, str]:
-        return self.merge_multiple_imports([self, block])
-
-    # Class method could be replaced by staticmethod but allows for better type hinting here
     @classmethod
     def merge_multiple_dependencies(cls, l_blocks: list[Self]) -> set[str]:
         set_imports = set()
         for block in l_blocks:
             set_imports.add(block.get_name_str())
         return set_imports
-
-    def merge_dependencies(self: Self, block: Self) -> set[str]:
-        return self.merge_multiple_dependencies([self, block])
 
     @staticmethod
     def write_temp_block(function_str: str, name_function: str) -> Callable:
@@ -343,24 +304,23 @@ class Block:
         docstring: str = "",
         output: OrderedDict[str, type] = OrderedDict(),
     ) -> Self:
+        return self.merge_blocks([self, block], name_function, docstring, output)
+
+    @classmethod
+    def merge_blocks(
+        cls, l_blocks: list[Self], name_function: str, docstring: str = "", output=OrderedDict()
+    ) -> Self:
 
         # Build function string
-        function_str = self.get_merge_str(block, name_function, docstring, output)
+        function_str = cls.get_multiple_merge_str(l_blocks, name_function, docstring, output)
 
         # Write string to temporary file
-        function = self.write_temp_block(function_str, name_function)
+        function = cls.write_temp_block(function_str, name_function)
 
         # Merge imports
-        dic_imports = self.merge_imports(block)
+        dic_imports = cls.merge_multiple_imports(l_blocks)
 
         # Add dependencies
-        set_deps = self.merge_dependencies(block)
+        set_deps = cls.merge_multiple_dependencies(l_blocks)
 
         return Block(function=function, dic_imports=dic_imports, set_deps=set_deps, output=output)
-
-    # @classmethod
-    # def merge_blocks(
-    #     cls, l_blocks: list[Self], name_function: str, docstring: str = "", output=OrderedDict()
-    # ) -> Self:
-
-    #     # Build function string

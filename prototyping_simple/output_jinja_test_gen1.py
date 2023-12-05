@@ -12,5 +12,10 @@ def power_function(b: int, c: int) -> int:
     # Returns a at the power of b
     return np.power(b, c)
 
-def print_result_function(result: int) -> None:
-    print(f"Result: {result}")
+def factorial_function(a: int) -> int:
+    """Dummy docstring"""
+    # Compute factorial of a
+    return math.factorial(a)
+
+def print_result_function(d: int) -> None:
+    print(f"Result: {d}")

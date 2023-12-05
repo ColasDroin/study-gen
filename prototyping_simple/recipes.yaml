@@ -3,6 +3,7 @@ do_operations:
     - add
     - multiply
     - power
+    - factorial
 print_output:
   script:
     - print_result
