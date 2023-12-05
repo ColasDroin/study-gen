@@ -4,6 +4,7 @@ import inspect
 import logging
 import sys
 import tempfile
+from calendar import c
 from collections import OrderedDict
 from typing import Callable, Self
 
@@ -44,6 +45,44 @@ class Block:
                 )
         # Update output
         self._output = dict_output
+
+    @property
+    def parameters(self: Self) -> OrderedDict[str, type]:
+        if self.function is None:
+            logging.warning("No function defined for this block")
+            return OrderedDict()
+        else:
+            signature = self.get_signature()
+            dict_parameters = OrderedDict(
+                [
+                    (parameter, signature.parameters[parameter].annotation)
+                    for parameter in signature.parameters
+                ]
+            )
+            return dict_parameters
+
+    @parameters.setter
+    def parameters(self: Self, dict_parameters: OrderedDict[str, type]):
+        # Ensure that the number of arguments is the same
+        if len(dict_parameters) != len(self.parameters):
+            raise ValueError(
+                f"Number of parameters is different. Previous: {len(self.parameters)}. New:"
+                f" {len(dict_parameters)}"
+            )
+        # Ensure that the provided parameters have the correct type
+        for (new_parameter, new_type), (previous_parameter, previous_type) in zip(
+            dict_parameters.items(), self.parameters.items()
+        ):
+            if new_type != previous_type:
+                raise ValueError(
+                    f"Parameter {new_parameter} has a different type. Previous type:"
+                    f" {previous_type.__name__}. New type: {new_type.__name__}"
+                )
+        # Update callable function
+        function_str = self.prepare_function_str(dict_parameters=dict_parameters)
+
+        # Write string to temporary file and update
+        self.function = self.write_temp_block(function_str, self.get_name_str())
 
     def get_str(self: Self) -> str:
         if self.function is None:
@@ -95,7 +134,7 @@ class Block:
             logging.warning("No function defined for this block")
             return ""
         else:
-            return f"{self.function.__name__}({', '.join(self.get_parameters().keys())})"
+            return f"{self.function.__name__}({', '.join(self.parameters.keys())})"
 
     def get_assignation_call_str(self: Self) -> str:
         function_call_str = self.get_call_str()
@@ -112,20 +151,6 @@ class Block:
             return inspect.Signature()
         else:
             return inspect.signature(self.function)
-
-    def get_parameters(self: Self) -> OrderedDict[str, type]:
-        if self.function is None:
-            logging.warning("No function defined for this block")
-            return OrderedDict()
-        else:
-            signature = self.get_signature()
-            dict_parameters = OrderedDict(
-                [
-                    (parameter, signature.parameters[parameter].annotation)
-                    for parameter in signature.parameters
-                ]
-            )
-            return dict_parameters
 
     @classmethod
     def get_multiple_merge_parameters(
@@ -150,8 +175,8 @@ class Block:
     ) -> OrderedDict[str, type]:
 
         ### Establish complete list of parameters
-        dict_block1_parameters = block1.get_parameters()
-        dict_block2_parameters = block2.get_parameters()
+        dict_block1_parameters = block1.parameters
+        dict_block2_parameters = block2.parameters
 
         # First check that identical parameters have identical type
         for key in set(dict_block1_parameters).intersection(dict_block2_parameters):
@@ -197,6 +222,56 @@ class Block:
                     raise ValueError(f"Output {key} is not in the parameters nor the outputs")
 
     @classmethod
+    def build_funtion_str(
+        cls, l_blocks: list[Self], function_header: str, docstring: str = "", output_str: str = ""
+    ):
+
+        # Write docstring
+        docstring = '''\t"""''' + "\n".join([f"{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
+
+        # Write function body: call all functions successively
+        function_body = "\n".join([f"\t{block.get_assignation_call_str()}" for block in l_blocks])
+
+        # Write function output
+        function_output = f"\treturn {output_str}"
+
+        # Write full function
+        function_str = "\n".join([function_header, docstring, function_body, function_output])
+
+        return function_str
+
+    def prepare_function_str(
+        self,
+        name_function: str | None = None,
+        docstring: str | None = None,
+        dict_parameters: OrderedDict[str, type] | None = None,
+    ) -> str:
+
+        # Get output type hint string and output name (can't modify the output type, and output name
+        # must be modified through the corresponding setter)
+        output_type_hint_str = self.get_output_type_hint_str()
+        output_str = self.get_output_str()
+
+        # Get function header with the (potentially updated) function name and parameters
+        if name_function is None:
+            name_function = self.get_name_str()
+        if dict_parameters is None:
+            dict_parameters = self.parameters
+        parameters_header = ", ".join(
+            [f"{parameter}: {dict_parameters[parameter].__name__}" for parameter in dict_parameters]
+        )
+        function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
+
+        # Get potentially updated docstring
+        if docstring is None:
+            docstring = self.get_str()
+
+        # Build function string
+        function_str = self.build_funtion_str([self], function_header, docstring, output_str)
+
+        return function_str
+
+    @classmethod
     def build_external_merge_str(
         cls,
         l_blocks: list[Self],
@@ -218,17 +293,8 @@ class Block:
         )
         function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
 
-        # Write docstring
-        docstring = '''\t"""''' + "\n".join([f"{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
-
-        # Write function body: call all functions successively
-        function_body = "\n".join([f"\t{block.get_assignation_call_str()}" for block in l_blocks])
-
-        # Write function output
-        function_output = f"\treturn {output_str}"
-
-        # Write full function
-        function_str = "\n".join([function_header, docstring, function_body, function_output])
+        # Build function string
+        function_str = cls.build_funtion_str(l_blocks, function_header, docstring, output_str)
 
         return function_str
 
