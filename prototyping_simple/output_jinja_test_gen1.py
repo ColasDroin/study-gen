@@ -8,9 +8,9 @@ def multiply_function(a: int, b: int) -> int:
     # Multiply a and b
     return a * b
 
-def power_function(a: int, b: int) -> int:
+def power_function(b: int, c: int) -> int:
     # Returns a at the power of b
-    return np.power(a, b)
+    return np.power(b, c)
 
 def print_result_function(result: int) -> None:
     print(f"Result: {result}")

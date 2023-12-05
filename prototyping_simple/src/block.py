@@ -12,10 +12,12 @@ class Block:
         self,
         function: Callable | None = None,
         dic_imports: dict[str, str] = OrderedDict(),
+        set_deps: set[str] = set(),
         output: OrderedDict[str, type] = OrderedDict(),
     ):
         self.function = function
         self.dic_imports = dic_imports
+        self.set_deps = set_deps
         self._output = output
 
     @property
@@ -49,14 +51,25 @@ class Block:
         else:
             return inspect.getsource(self.function)
 
-    def get_output_str(self: Self) -> str:
-        if len(self.output) == 0:
+    def get_name_str(self: Self) -> str:
+        if self.function is None:
+            logging.warning("No function defined for this block")
             return ""
         else:
-            if len(self.output) == 1:
-                return list(self.output.keys())[0]
+            return self.function.__name__
+
+    def get_output_str(self: Self) -> str:
+        return self.get_external_output_str(self.output)
+
+    @staticmethod
+    def get_external_output_str(output: OrderedDict[str, type] = OrderedDict()) -> str:
+        if len(output) == 0:
+            return ""
+        else:
+            if len(output) == 1:
+                return list(output.keys())[0]
             else:
-                return ", ".join([x for x in self.output.keys()])
+                return ", ".join([x for x in output.keys()])
 
     def get_output_type_hint_str(self: Self):
         return self.get_external_output_type_hint_str(self.output)
@@ -134,11 +147,11 @@ class Block:
         # Start with self block
         for key in self.output:
             if key not in self_parameters and key in parameters:
-                del self_parameters[key]
+                del parameters[key]
         # Then do the same for the argument block
         for key in block.output:
             if key not in block_parameters and key in parameters:
-                del block_parameters[key]
+                del parameters[key]
 
         return parameters
 
@@ -167,18 +180,19 @@ class Block:
     ) -> str:
 
         # Get output type hint string
-        output_str = self.get_external_output_type_hint_str(output)
+        output_type_hint_str = self.get_external_output_type_hint_str(output)
+
+        # Get output string
+        output_str = self.get_output_str()
 
         # Get function header with the merged parameters
         parameters_header = ", ".join(
             [f"{parameter}: {parameters[parameter].__name__}" for parameter in parameters]
         )
-        function_header = f"def {name_function}({parameters_header}) -> {output_str}:"
+        function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
 
         # Write docstring
-        docstring = (
-            '''\t"""''' + "\n".join([f"\t{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
-        )
+        docstring = '''\t"""''' + "\n".join([f"{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
 
         # Write function body: call the two functions
         function_body = f"\t{self.get_assignation_call_str()}\n\t{block.get_assignation_call_str()}"
@@ -209,6 +223,27 @@ class Block:
         function_str = self.build_merge_str(block, name_function, docstring, output, parameters)
 
         return function_str
+    
+    # ! TO FINISH
+    # @classmethod
+    # def get_multiple_merge_str(
+    #     cls,
+    #     l_blocks: Self,
+    #     name_function: str,
+    #     docstring: str = "",
+    #     output: OrderedDict[str, type] = OrderedDict(),
+    # ) -> str:
+
+    #     # Get merged parameters
+    #     parameters = self.get_merge_parameters(block)
+
+    #     # Ensure that the output is accessible
+    #     self.check_merge_output(block, output)
+
+    #     # Build function string
+    #     function_str = self.build_merge_str(block, name_function, docstring, output, parameters)
+
+    #     return function_str
 
     def merge_imports(self: Self, block: Self) -> dict[str, str]:
 
@@ -233,6 +268,7 @@ class Block:
             f.write(function_str)
             tmp.flush()
 
+        # Load the function
         spec = importlib.util.spec_from_file_location("mod", tmp.name)
         mod = importlib.util.module_from_spec(spec)
         sys.modules["mod"] = mod
@@ -257,4 +293,15 @@ class Block:
         # Merge imports
         dic_imports = self.merge_imports(block)
 
-        return Block(function=function, dic_imports=dic_imports, output=output)
+        # Add dependencies
+        set_deps = set((self.get_name_str(), block.get_name_str()))
+
+        return Block(function=function, dic_imports=dic_imports, set_deps=set_deps, output=output)
+
+    # @classmethod
+    # def merge_blocks(
+    #     cls, l_blocks: list[Self], name_function: str, docstring: str = "", output=OrderedDict()
+    # ) -> Self:
+        
+    #     # Build function string
+        
