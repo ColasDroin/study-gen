@@ -191,10 +191,12 @@ class Block:
         )
 
     def get_l_imports_str(self: Self) -> str:
+        return self.get_external_l_imports_str(self.dic_imports)
+
+    @staticmethod
+    def get_external_l_imports_str(dic_imports: dict[str, str]) -> str:
         # Write import statements (do not check for import repetitions across blocks)
-        return "\n".join(
-            [f"import {package} as {alias}" for package, alias in self.dic_imports.items()]
-        )
+        return "\n".join([f"import {package} as {alias}" for package, alias in dic_imports.items()])
 
     @classmethod
     def build_function_str(
