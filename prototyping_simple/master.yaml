@@ -3,10 +3,10 @@
 gen1:
   script:
     multiply:
-      args: (b, c)
+      args: [b, c]
       output: bc
     add:
-      args: (a, bc)
+      args: [a, bc]
       output: a_bc
     factorial:
       args: a_bc
@@ -28,30 +28,30 @@ gen1:
 
 #   new_blocks:
 #     add_power:
-#       params: (x, y, z)
+#       params: [x, y, z]
 #       blocks:
 #         power:
-#           params: (x, y)
+#           params: [x, y]
 #           output: x_y
 #         add:
-#           params: (x_y, z)
+#           params: [x_y, z]
 #           output: x_y_z # This is optional
 
 #   script:
 #     add_power:
-#       args: (b, c, c)
+#       args: [b, c, c]
 #       output: bc_c
 #     multiply:
-#       args: (a, bc_c)
+#       args: [a, bc_c]
 #       output: a_bc_c
 #     add_power:
-#       args: (c, c, d)
+#       args: [c, c, d]
 #       output: c_c_d
 #     add:
-#       args: (a_bc_c, c_c_d)
+#       args: [a_bc_c, c_c_d]
 #       output: a_bc_c_c_d
 #     multiply:
-#       args: (fact_a_bc, a_bc_c_c_d)
+#       args: [fact_a_bc, a_bc_c_c_d]
 #       output: result
 
 # parameters:

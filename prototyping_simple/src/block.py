@@ -126,20 +126,20 @@ class Block:
 
             return body
 
-    def get_output_str(self: Self, dict_output: dict[str, Any] | None = None) -> str:
-        if dict_output is None:
-            dict_output = self.dict_output
-        return self.get_external_output_str(dict_output)
+    def get_output_str(self: Self, l_outputs: list[str] | None = None) -> str:
+        if l_outputs is None:
+            l_outputs = list(self.dict_output.keys())
+        return self.get_external_output_str(l_outputs)
 
     @staticmethod
-    def get_external_output_str(dict_output: dict[str, Any] = OrderedDict()) -> str:
-        if len(dict_output) == 0:
+    def get_external_output_str(l_outputs: list[str] = []) -> str:
+        if len(l_outputs) == 0:
             return ""
         else:
-            if len(dict_output) == 1:
-                return list(dict_output.keys())[0]
+            if len(l_outputs) == 1:
+                return l_outputs[0]
             else:
-                return ", ".join([x for x in dict_output.keys()])
+                return ", ".join(l_outputs)
 
     def get_output_type_hint_str(self: Self):
         return self.get_external_output_type_hint_str(self.dict_output)
@@ -161,22 +161,22 @@ class Block:
 
         return output_hint_str
 
-    def get_call_str(self: Self, dict_arguments: dict[str, Any] | None = None) -> str:
+    def get_call_str(self: Self, l_arguments: list[str] | None = None) -> str:
         if self.function is None:
             logging.warning("No function defined for this block")
             return ""
         else:
-            if dict_arguments is None:
-                dict_arguments = self.parameters
-            return f"{self.function.__name__}({', '.join(dict_arguments.keys())})"
+            if l_arguments is None:
+                l_arguments = list(self.parameters.keys())
+            return f"{self.function.__name__}({', '.join(l_arguments)})"
 
     def get_assignation_call_str(
         self: Self,
-        dict_arguments: dict[str, Any] | None = None,
-        dict_output: dict[str, Any] | None = None,
+        l_arguments: list[str] | None = None,
+        l_outputs: list[str] | None = None,
     ) -> str:
-        function_call_str = self.get_call_str(dict_arguments)
-        output_str = self.get_output_str(dict_output)
+        function_call_str = self.get_call_str(l_arguments)
+        output_str = self.get_output_str(l_outputs)
 
         if output_str == "":
             return function_call_str

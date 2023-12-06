@@ -28,7 +28,17 @@ def factorial_function(a: int) -> int:
 # --- Main
 # ==================================================================================================
 
-test
+def main():
+	# Declare parameters
+	a = 2
+	b = 10
+	c = 4
+
+	# Declare blocks
+	bc = multiply_function(b, c)
+	a_bc = add_function(a, bc)
+	fact_a_bc = factorial_function(a_bc)
+
 
 # ==================================================================================================
 # --- Script
