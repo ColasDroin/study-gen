@@ -9,7 +9,7 @@ from ..block import Block
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def add_function(a: int, b: int) -> int:
+def add_function(a: float, b: float) -> float:
     """Dummy docstring"""
     # Add a and b
     return a + b
@@ -19,4 +19,4 @@ def add_function(a: int, b: int) -> int:
 # --- Block object ---
 # ==================================================================================================
 
-add = Block(add_function, output=OrderedDict([("output_add", int)]))
+add = Block(add_function, output=OrderedDict([("output_add", float)]))

@@ -9,7 +9,7 @@ from ..block import Block
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def multiply_function(a: int, b: int) -> int:
+def multiply_function(a: float, b: float) -> float:
 
     # Multiply a and b
     return a * b
@@ -19,4 +19,4 @@ def multiply_function(a: int, b: int) -> int:
 # --- Block object ---
 # ==================================================================================================
 
-multiply = Block(multiply_function, output=OrderedDict([("output_multiply", int)]))
+multiply = Block(multiply_function, output=OrderedDict([("output_multiply", float)]))

@@ -15,7 +15,7 @@ for module, alias in dic_imports.items():
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def power_function(b: int, c: int) -> int:
+def power_function(b: float, c: float) -> float:
     # Returns a at the power of b
     return np.power(b, c)
 
@@ -24,7 +24,9 @@ def power_function(b: int, c: int) -> int:
 # --- Block ---
 # ==================================================================================================
 
-power = Block(power_function, dic_imports=dic_imports, output=OrderedDict([("output_power", int)]))
+power = Block(
+    power_function, dic_imports=dic_imports, output=OrderedDict([("output_power", float)])
+)
 
 # ==================================================================================================
 # --- Script ---
