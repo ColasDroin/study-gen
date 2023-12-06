@@ -1,7 +1,6 @@
 # Compute (a+b*c)!
 # Scan a and b from 0 to 100
 gen1:
-
   script:
     multiply:
       args: (b, c)
@@ -23,43 +22,42 @@ gen1:
 
   # save:
   #   fact_a_bc: npy
-
 # Compute fact_a_bc * (a * (b**c + c) + (d + c**c))
 # Scan d from 0 to 1
-gen2:
+# gen2:
 
-  new_blocks:
-    add_power:
-      params: (x, y, z)
-      blocks:
-        power:
-          params: (x, y)
-          output: x_y
-        add:
-          params: (x_y, z)
-          output: x_y_z # This is optional
+#   new_blocks:
+#     add_power:
+#       params: (x, y, z)
+#       blocks:
+#         power:
+#           params: (x, y)
+#           output: x_y
+#         add:
+#           params: (x_y, z)
+#           output: x_y_z # This is optional
 
-  script:
-    add_power:
-      args: (b, c, c)
-      output: bc_c
-    multiply:
-      args: (a, bc_c)
-      output: a_bc_c
-    add_power:
-      args: (c, c, d)
-      output: c_c_d
-    add:
-      args: (a_bc_c, c_c_d)
-      output: a_bc_c_c_d
-    multiply:
-      args: (fact_a_bc, a_bc_c_c_d)
-      output: result
-  
-  # parameters:
-  #   d:
-  #     range: [0, 1]
-  #     steps: 4
+#   script:
+#     add_power:
+#       args: (b, c, c)
+#       output: bc_c
+#     multiply:
+#       args: (a, bc_c)
+#       output: a_bc_c
+#     add_power:
+#       args: (c, c, d)
+#       output: c_c_d
+#     add:
+#       args: (a_bc_c, c_c_d)
+#       output: a_bc_c_c_d
+#     multiply:
+#       args: (fact_a_bc, a_bc_c_c_d)
+#       output: result
 
-  # save:
-  #   result: npy
+# parameters:
+#   d:
+#     range: [0, 1]
+#     steps: 4
+
+# save:
+#   result: npy
