@@ -44,6 +44,19 @@ class Block:
         # Update output
         self._dict_output = dict_output
 
+    def set_outputs_names(self: Self, l_outputs_names: list[str]):
+        # Ensure that l_outputs_names is not just a string
+        if not isinstance(l_outputs_names, list):
+            l_outputs_names = [l_outputs_names]
+
+        # Only update the names of the outputs, not types
+        self.dict_output = OrderedDict(
+            [
+                (output, type_output)
+                for output, type_output in zip(l_outputs_names, self.dict_output.values())
+            ]
+        )
+
     @property
     def parameters(self: Self) -> OrderedDict[str, type]:
         if self.function is None:
@@ -82,7 +95,20 @@ class Block:
         function_str = self.prepare_function_str(dict_parameters=dict_parameters)
 
         # Write string to temporary file and update
-        self.function = self.write_temp_block(function_str, self.get_name_str())
+        self.function = self.write_and_load_temp_block(function_str, self.get_name_str())
+
+    def set_parameters_names(self: Self, l_parameters_names: list[str]):
+        # Ensure that l_parameters_names is not just a string
+        if not isinstance(l_parameters_names, list):
+            l_parameters_names = [l_parameters_names]
+
+        # Only update the names of the parameters, not types
+        self.parameters = OrderedDict(
+            [
+                (param, type_param)
+                for param, type_param in zip(l_parameters_names, self.parameters.values())
+            ]
+        )
 
     def get_str(self: Self) -> str:
         if self.function is None:
@@ -293,7 +319,7 @@ class Block:
         return function_str
 
     @staticmethod
-    def write_temp_block(function_str: str, name_function: str) -> Callable:
+    def write_and_load_temp_block(function_str: str, name_function: str) -> Callable:
 
         # Write string to temporary file
         tmp = tempfile.NamedTemporaryFile(suffix=".py", delete=False)

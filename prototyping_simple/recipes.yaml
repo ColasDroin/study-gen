@@ -1,9 +1,0 @@
-do_operations:
-  script:
-    - add
-    - multiply
-    - power
-    - factorial
-print_output:
-  script:
-    - print_result

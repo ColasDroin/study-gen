@@ -25,20 +25,22 @@ gen1:
 # Compute fact_a_bc * (a * (b**c + c) + (d + c**c))
 # Scan d from 0 to 1
 gen2:
-
   new_blocks:
     add_power:
       docstring: "This is a merge test."
       #params: [x, y, z]
       blocks:
         power:
-          params: [x, y] 
-          output: x_y 
+          params: [x, y]
+          output: x_y
         add:
-          params: [x_y, z] 
-          output: x_y_z 
-      output: x_y_z 
+          params: [x_y, z]
+          output: x_y_z
+      output: x_y_z
 
+  # ! Some blocks are repeated... How to handle this?
+  # ! Use ruaml + annotate repeated blocks
+  # ! In the end, I can automatize the process of annotation
   script:
     add_power:
       args: [b, c, c]
@@ -46,20 +48,20 @@ gen2:
     multiply:
       args: [a, bc_c]
       output: a_bc_c
-    add_power:
+    add_power__2:
       args: [c, c, d]
       output: c_c_d
     add:
       args: [a_bc_c, c_c_d]
       output: a_bc_c_c_d
-    multiply:
+    multiply__2:
       args: [fact_a_bc, a_bc_c_c_d]
       output: result
 
-# parameters:
-#   d:
-#     range: [0, 1]
-#     steps: 4
+  # parameters:
+  #   d:
+  #     range: [0, 1]
+  #     steps: 4
 
-save:
-  result: pickle
+  save:
+    result: pkl

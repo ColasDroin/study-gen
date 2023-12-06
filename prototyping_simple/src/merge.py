@@ -32,7 +32,7 @@ def merge_blocks(
     function_str = get_multiple_merge_str(l_blocks, name_function, docstring, dict_output)
 
     # Write string to temporary file
-    function = Block.write_temp_block(function_str, name_function)
+    function = Block.write_and_load_temp_block(function_str, name_function)
 
     # Merge imports
     dict_imports = merge_imports(l_blocks)

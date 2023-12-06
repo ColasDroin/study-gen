@@ -63,7 +63,7 @@ def _build_external_merge_str(
     output_type_hint_str = Block.get_external_output_type_hint_str(dict_output)
 
     # Get output string
-    output_str = Block.get_external_output_str(dict_output)
+    output_str = Block.get_external_output_str(list(dict_output.keys()))
 
     # Get function header with the merged parameters
     parameters_header = ", ".join(
