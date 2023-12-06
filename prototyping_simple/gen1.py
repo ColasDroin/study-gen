@@ -1,20 +1,23 @@
 # ==================================================================================================
-# --- Imports ---
+# --- Imports
 # ==================================================================================================
-import importlib
-from collections import OrderedDict
 
-from ..block import Block
-
-# This is needed to get the import and the import alias for code generation
-dict_imports = {"math": "math"}
-for module, alias in dict_imports.items():
-    vars()[alias] = importlib.import_module(module)
-
+import math as math
 
 # ==================================================================================================
-# --- Block function ---
+# --- Blocks
 # ==================================================================================================
+
+def multiply_function(a: float, b: float) -> float:
+
+    # Multiply a and b
+    return a * b
+
+def add_function(a: float, b: float) -> float:
+    """Dummy docstring"""
+    # Add a and b
+    return a + b
+
 def factorial_function(a: int) -> int:
     """Dummy docstring"""
     # Compute factorial of a
@@ -22,11 +25,14 @@ def factorial_function(a: int) -> int:
 
 
 # ==================================================================================================
-# --- Block object ---
+# --- Main
 # ==================================================================================================
 
-factorial = Block(
-    factorial_function,
-    dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_factorial", int)]),
-)
+test
+
+# ==================================================================================================
+# --- Script
+# ==================================================================================================
+
+if __name__ == "__main__":
+    main()

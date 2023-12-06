@@ -4,37 +4,37 @@ import logging
 import sys
 import tempfile
 from collections import OrderedDict
-from typing import Callable, Self
+from typing import Any, Callable, Self
 
 
 class Block:
     def __init__(
         self,
         function: Callable | None = None,
-        dic_imports: dict[str, str] = OrderedDict(),
+        dict_imports: dict[str, str] = OrderedDict(),
         set_deps: set[str] = set(),
-        output: OrderedDict[str, type] = OrderedDict(),
+        dict_output: OrderedDict[str, type] = OrderedDict(),
     ):
         self.function = function
-        self.dic_imports = dic_imports
+        self.dict_imports = dict_imports
         self.set_deps = set_deps
-        self._output = output
+        self._dict_output = dict_output
 
     @property
-    def output(self: Self):
-        return self._output
+    def dict_output(self: Self):
+        return self._dict_output
 
-    @output.setter
-    def output(self: Self, dict_output: OrderedDict[str, type]):
+    @dict_output.setter
+    def dict_output(self: Self, dict_output: OrderedDict[str, type]):
         # Ensure that the number of arguments is the same
-        if len(dict_output) != len(self._output):
+        if len(dict_output) != len(self._dict_output):
             raise ValueError(
-                f"Number of outputs is different. Previous: {len(self._output)}. New:"
+                f"Number of outputs is different. Previous: {len(self._dict_output)}. New:"
                 f" {len(dict_output)}"
             )
         # Ensure that the provided output(s) have the correct type
         for (new_output, new_type), (previous_output, previous_type) in zip(
-            dict_output.items(), self._output.items()
+            dict_output.items(), self._dict_output.items()
         ):
             if new_type != previous_type:
                 raise ValueError(
@@ -42,7 +42,7 @@ class Block:
                     f" {previous_type.__name__}. New type: {new_type.__name__}"
                 )
         # Update output
-        self._output = dict_output
+        self._dict_output = dict_output
 
     @property
     def parameters(self: Self) -> OrderedDict[str, type]:
@@ -126,47 +126,57 @@ class Block:
 
             return body
 
-    def get_output_str(self: Self) -> str:
-        return self.get_external_output_str(self.output)
+    def get_output_str(self: Self, dict_output: dict[str, Any] | None = None) -> str:
+        if dict_output is None:
+            dict_output = self.dict_output
+        return self.get_external_output_str(dict_output)
 
     @staticmethod
-    def get_external_output_str(output: OrderedDict[str, type] = OrderedDict()) -> str:
-        if len(output) == 0:
+    def get_external_output_str(dict_output: dict[str, Any] = OrderedDict()) -> str:
+        if len(dict_output) == 0:
             return ""
         else:
-            if len(output) == 1:
-                return list(output.keys())[0]
+            if len(dict_output) == 1:
+                return list(dict_output.keys())[0]
             else:
-                return ", ".join([x for x in output.keys()])
+                return ", ".join([x for x in dict_output.keys()])
 
     def get_output_type_hint_str(self: Self):
-        return self.get_external_output_type_hint_str(self.output)
+        return self.get_external_output_type_hint_str(self.dict_output)
 
     # Static needed here when the output comes from a merge
     @staticmethod
-    def get_external_output_type_hint_str(output: OrderedDict[str, type] = OrderedDict()) -> str:
+    def get_external_output_type_hint_str(
+        dict_output: OrderedDict[str, type] = OrderedDict()
+    ) -> str:
 
-        if len(output) == 0:
+        if len(dict_output) == 0:
             output_hint_str = "None"
         else:
-            if len(output) > 1:
-                output_str = ", ".join([x.__name__ for x in output.values()])
+            if len(dict_output) > 1:
+                output_str = ", ".join([x.__name__ for x in dict_output.values()])
                 output_hint_str = f"tuple[{output_str}]"
             else:
-                output_hint_str = list(output.values())[0].__name__
+                output_hint_str = list(dict_output.values())[0].__name__
 
         return output_hint_str
 
-    def get_call_str(self: Self) -> str:
+    def get_call_str(self: Self, dict_arguments: dict[str, Any] | None = None) -> str:
         if self.function is None:
             logging.warning("No function defined for this block")
             return ""
         else:
-            return f"{self.function.__name__}({', '.join(self.parameters.keys())})"
+            if dict_arguments is None:
+                dict_arguments = self.parameters
+            return f"{self.function.__name__}({', '.join(dict_arguments.keys())})"
 
-    def get_assignation_call_str(self: Self) -> str:
-        function_call_str = self.get_call_str()
-        output_str = self.get_output_str()
+    def get_assignation_call_str(
+        self: Self,
+        dict_arguments: dict[str, Any] | None = None,
+        dict_output: dict[str, Any] | None = None,
+    ) -> str:
+        function_call_str = self.get_call_str(dict_arguments)
+        output_str = self.get_output_str(dict_output)
 
         if output_str == "":
             return function_call_str
@@ -191,12 +201,14 @@ class Block:
         )
 
     def get_l_imports_str(self: Self) -> str:
-        return self.get_external_l_imports_str(self.dic_imports)
+        return self.get_external_l_imports_str(self.dict_imports)
 
     @staticmethod
-    def get_external_l_imports_str(dic_imports: dict[str, str]) -> str:
+    def get_external_l_imports_str(dict_imports: dict[str, str]) -> str:
         # Write import statements (do not check for import repetitions across blocks)
-        return "\n".join([f"import {package} as {alias}" for package, alias in dic_imports.items()])
+        return "\n".join(
+            [f"import {package} as {alias}" for package, alias in dict_imports.items()]
+        )
 
     @classmethod
     def build_function_str(

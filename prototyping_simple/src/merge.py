@@ -7,34 +7,39 @@ from .block import Block
 def merge_imports(l_blocks: list[Block]) -> dict[str, str]:
 
     # Merge imports, ensuring that there are no conflicts
-    dic_imports = OrderedDict()
+    dict_imports = OrderedDict()
     for block in l_blocks:
-        for module, alias in block.dic_imports.items():
-            if module in dic_imports:
-                if dic_imports[module] != alias:
+        for module, alias in block.dict_imports.items():
+            if module in dict_imports:
+                if dict_imports[module] != alias:
                     raise ValueError(
                         f"Import conflict for module {module}. Aliases are not consistent"
                     )
             else:
-                dic_imports[module] = alias
+                dict_imports[module] = alias
 
-    return dic_imports
+    return dict_imports
 
 
 def merge_blocks(
-    l_blocks: list[Block], name_function: str, docstring: str = "", output=OrderedDict()
+    l_blocks: list[Block],
+    name_function: str,
+    docstring: str = "",
+    dict_output: OrderedDict[str, type] = OrderedDict(),
 ) -> Block:
 
     # Build function string
-    function_str = get_multiple_merge_str(l_blocks, name_function, docstring, output)
+    function_str = get_multiple_merge_str(l_blocks, name_function, docstring, dict_output)
 
     # Write string to temporary file
     function = Block.write_temp_block(function_str, name_function)
 
     # Merge imports
-    dic_imports = merge_imports(l_blocks)
+    dict_imports = merge_imports(l_blocks)
 
     # Add dependencies
     set_deps = merge_dependencies(l_blocks)
 
-    return Block(function=function, dic_imports=dic_imports, set_deps=set_deps, output=output)
+    return Block(
+        function=function, dict_imports=dict_imports, set_deps=set_deps, dict_output=dict_output
+    )

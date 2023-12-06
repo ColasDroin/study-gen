@@ -7,8 +7,8 @@ from collections import OrderedDict
 from ..block import Block
 
 # This is needed to get the import and the import alias for code generation
-dic_imports = {"numpy": "np"}
-for module, alias in dic_imports.items():
+dict_imports = {"numpy": "np"}
+for module, alias in dict_imports.items():
     vars()[alias] = importlib.import_module(module)
 
 
@@ -25,7 +25,7 @@ def power_function(b: float, c: float) -> float:
 # ==================================================================================================
 
 power = Block(
-    power_function, dic_imports=dic_imports, output=OrderedDict([("output_power", float)])
+    power_function, dict_imports=dict_imports, dict_output=OrderedDict([("output_power", float)])
 )
 
 # ==================================================================================================
