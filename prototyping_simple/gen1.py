@@ -3,6 +3,7 @@
 # ==================================================================================================
 
 import math as math
+import numpy as np
 
 # ==================================================================================================
 # --- Blocks
@@ -18,10 +19,10 @@ def add_function(a: float, b: float) -> float:
     # Add a and b
     return a + b
 
-def factorial_function(a: int) -> int:
+def gamma_function(a: float) -> float:
     """Dummy docstring"""
     # Compute factorial of a
-    return math.factorial(a)
+    return math.gamma(a)
 
 
 # ==================================================================================================
@@ -29,15 +30,18 @@ def factorial_function(a: int) -> int:
 # ==================================================================================================
 
 def main():
-	# Declare parameters
-	a = 2
-	b = 10
-	c = 4
+    # Declare parameters
+    a = 2
+    b = 10
+    c = 4
 
-	# Declare blocks
-	bc = multiply_function(b, c)
-	a_bc = add_function(a, bc)
-	fact_a_bc = factorial_function(a_bc)
+    # Declare blocks
+    bc = multiply_function(b, c)
+    a_bc = add_function(a, bc)
+    fact_a_bc = gamma_function(a_bc)
+
+    # Save output
+    np.save('fact_a_bc', fact_a_bc)
 
 
 # ==================================================================================================

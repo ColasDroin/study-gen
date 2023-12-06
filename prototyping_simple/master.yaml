@@ -15,13 +15,13 @@ gen1:
   # parameters:
   #   a:
   #     range: [1, 100]
-  #     steps: 10
+  #     steps: 3
   #   b:
   #     range: [10, 20]
-  #     steps: 6
+  #     steps: 2
 
-  # save:
-  #   fact_a_bc: npy
+  save:
+    fact_a_bc: npy
 # Compute fact_a_bc * (a * (b**c + c) + (d + c**c))
 # Scan d from 0 to 1
 # gen2:

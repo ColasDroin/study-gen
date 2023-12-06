@@ -15,10 +15,10 @@ for module, alias in dict_imports.items():
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def factorial_function(a: int) -> int:
+def gamma_function(a: float) -> float:
     """Dummy docstring"""
     # Compute factorial of a
-    return math.factorial(a)
+    return math.gamma(a)
 
 
 # ==================================================================================================
@@ -26,7 +26,7 @@ def factorial_function(a: int) -> int:
 # ==================================================================================================
 
 factorial = Block(
-    factorial_function,
+    gamma_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_factorial", int)]),
+    dict_output=OrderedDict([("output_factorial", float)]),
 )
