@@ -70,63 +70,56 @@ class StudyGen:
 
         return dict_blocks
 
-    def get_dict_imports_merge(
-        self: Self, gen: str, dict_blocks: OrderedDict[str, Block]
-    ) -> OrderedDict[str, str]:
+    def build_merged_blocks(
+        self: Self,
+        new_block_name: str,
+        new_block: OrderedDict[str, Any],
+        dict_blocks: OrderedDict[str, Block],
+    ) -> Block:
 
-        # Merge all imports
-        dict_imports_merge = merge.merge_imports(list(dict_blocks.values()))
+        # Update parameters of each block to match the merged block specification
+        l_blocks = []
+        for block in new_block["blocks"]:
+            block_to_update = copy.deepcopy(dict_blocks[block])
+            l_params = new_block["blocks"][block]["params"]
+            l_outputs = new_block["blocks"][block]["output"]
+            block_to_update.set_parameters_names(l_params)
+            block_to_update.set_outputs_names(l_outputs)
+            l_blocks.append(block_to_update)
 
-        # Add the imports for save methods
-        if "save" in self.master[gen]:
-            for save_method in self.master[gen]["save"].values():
-                if save_method == "npy" and "numpy" not in dict_imports_merge:
-                    dict_imports_merge["numpy"] = "np"
-                if save_method == "pkl" and "pickle" not in dict_imports_merge:
-                    dict_imports_merge["pickle"] = "pickle"
+        # Get the dict of final output (with undefined type for now)
+        output_final = new_block["output"]
+        if not isinstance(output_final, list):
+            output_final = [output_final]
+        dict_outputs_final = OrderedDict([(output, None) for output in output_final])
 
-        return dict_imports_merge
+        # Find the type of output
+        for block in l_blocks:
+            for output in block.dict_output:
+                if output in dict_outputs_final:
+                    dict_outputs_final[output] = block.dict_output[output]
+
+        # Raise an error if some outputs are not defined
+        if None in dict_outputs_final.values():
+            raise ValueError("Some outputs are not defined")
+
+        new_block_function = merge.merge_blocks(
+            l_blocks,
+            new_block_name,
+            docstring=new_block["docstring"],
+            dict_output=dict_outputs_final,
+        )
+
+        return new_block_function
 
     def incorporte_merged_blocks(
         self: Self, gen: str, dict_blocks: OrderedDict[str, Block]
     ) -> OrderedDict[str, Block]:
         # Build new blocks
         for new_block_name, new_block in self.master[gen]["new_blocks"].items():
-
-            # Update parameters of each block to match the merged block specification
-            l_blocks = []
-            for block in new_block["blocks"]:
-                block_to_update = copy.deepcopy(dict_blocks[block])
-                l_params = new_block["blocks"][block]["params"]
-                l_outputs = new_block["blocks"][block]["output"]
-                block_to_update.set_parameters_names(l_params)
-                block_to_update.set_outputs_names(l_outputs)
-                l_blocks.append(block_to_update)
-
-            # Get the dict of final output (with undefined type for now)
-            output_final = new_block["output"]
-            if not isinstance(output_final, list):
-                output_final = [output_final]
-            dict_outputs_final = OrderedDict([(output, None) for output in output_final])
-
-            # Find the type of output
-            for block in l_blocks:
-                for output in block.dict_output:
-                    if output in dict_outputs_final:
-                        dict_outputs_final[output] = block.dict_output[output]
-
-            # Raise an error if some outputs are not defined
-            if None in dict_outputs_final.values():
-                raise ValueError("Some outputs are not defined")
-
-            new_block_function = merge.merge_blocks(
-                l_blocks,
-                new_block_name,
-                docstring=new_block["docstring"],
-                dict_output=dict_outputs_final,
+            dict_blocks[new_block_name] = self.build_merged_blocks(
+                new_block_name, new_block, dict_blocks
             )
-
-            dict_blocks[new_block_name] = new_block_function
 
         return dict_blocks
 
@@ -134,8 +127,6 @@ class StudyGen:
         self: Self,
         gen: str,
         dict_blocks: OrderedDict[str, Block],
-        save: str | None = None,
-        dict_imports_merge: OrderedDict[str, str] | None = None,
     ):
         # Get script
         script = self.master[gen]["script"]
@@ -163,20 +154,21 @@ class StudyGen:
             blocks_str += (
                 "\t" + dict_blocks[true_block].get_assignation_call_str(l_args, l_outputs) + "\n"
             )
-     
-        main_str = header_str + parameters_str + blocks_str 
+
+        main_str = header_str + blocks_str
 
         # Replace tabs by spaces to prevent inconsistent indentation
         main_str = main_str.replace("\t", "    ")
 
         return dict_blocks
-    
+
     def get_parameters_assignation(self: Self, main_block: Block) -> str:
-        parameters_str = "\t# Declare parameters\n"
+        str_parameters = "\t# Declare parameters\n"
         # TODO: look for parameters used by main block and declare them
-        for param, value in self.configuration..items():
-            parameters_str += "\t" + param + " = " + str(value) + "\n"
-            
+        for param, value in self.configuration.items():
+            str_parameters += "\t" + param + " = " + str(value) + "\n"
+
+        return str_parameters
 
     def generate_gen(self: Self, gen: str) -> list[str]:
 
@@ -184,7 +176,7 @@ class StudyGen:
         dict_blocks = self.get_dict_blocks(gen)
 
         # Get dictionnary of imports
-        dict_imports_merge = self.get_dict_imports_merge(gen, dict_blocks)
+        dict_imports_merge = merge.merge_imports(list(dict_blocks.values()))
 
         # Get string imports
         str_imports = Block.get_external_l_imports_str(dict_imports_merge)
@@ -194,10 +186,10 @@ class StudyGen:
             dict_blocks = self.incorporte_merged_blocks(gen, dict_blocks)
 
         # Add main as ultimate block
-        dict_blocks = self.generate_main_block(dict_blocks, save, dict_imports_merge)
-        
+        dict_blocks = self.generate_main_block(gen, dict_blocks)
+
         # Declare parameters
-        str_parameters = "a= 2" # TODO
+        str_parameters = self.get_parameters_assignation(dict_blocks["main"])
 
         # Get the dictionnary of block strings
         dict_blocks_str = {k: v.get_str() for k, v in dict_blocks.items()}
