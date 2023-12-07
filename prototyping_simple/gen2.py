@@ -41,9 +41,11 @@ def main():
     d = 0.5
 
     # Declare blocks
+    bc_c = add_power(b, c, c)
+    a_bc_c = multiply_function(a, bc_c)
     c_c_d = add_power(c, c, d)
-    result = multiply_function(fact_a_bc, a_bc_c_c_d)
     a_bc_c_c_d = add_function(a_bc_c, c_c_d)
+    result = multiply_function(fact_a_bc, a_bc_c_c_d)
 
     # Save output
 
