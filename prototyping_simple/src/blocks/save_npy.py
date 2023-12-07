@@ -5,10 +5,10 @@ import importlib
 
 from ..block import Block
 
-# This is needed to get the import and the import alias for code generation
-dict_imports = {"numpy": "np"}
-for module, alias in dict_imports.items():
-    vars()[alias] = importlib.import_module(module)
+# This is needed to get the import and the import statement for code generation
+dict_imports = {"numpy": "import numpy as np"}
+for module, import_statement in dict_imports.items():
+    exec(import_statement)
 
 
 # ==================================================================================================

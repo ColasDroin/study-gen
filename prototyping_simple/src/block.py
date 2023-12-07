@@ -95,7 +95,9 @@ class Block:
         function_str = self.prepare_function_str(dict_parameters=dict_parameters)
 
         # Write string to temporary file and update
-        self.function = self.write_and_load_temp_block(function_str, self.get_name_str())
+        self.function = self.write_and_load_temp_block(
+            function_str, self.get_name_str(), self.dict_imports
+        )
 
     def set_parameters_names(self: Self, l_parameters_names: list[str]):
         # Ensure that l_parameters_names is not just a string
@@ -232,9 +234,7 @@ class Block:
     @staticmethod
     def get_external_l_imports_str(dict_imports: dict[str, str]) -> str:
         # Write import statements (do not check for import repetitions across blocks)
-        return "\n".join(
-            [f"import {package} as {alias}" for package, alias in dict_imports.items()]
-        )
+        return "\n".join([import_statement for package, import_statement in dict_imports.items()])
 
     @classmethod
     def build_function_str(
@@ -248,7 +248,10 @@ class Block:
     ):
 
         # Write docstring
-        docstring = '''\t"""''' + "\n".join([f"{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
+        if docstring != "":
+            docstring = (
+                '''\t"""''' + "\n".join([f"{x}" for x in docstring.split("\n")]) + '''\n\t"""'''
+            )
 
         # Write function body: call all functions successively
         if function_body is None:
@@ -318,14 +321,18 @@ class Block:
 
         return function_str
 
-    @staticmethod
-    def write_and_load_temp_block(function_str: str, name_function: str) -> Callable:
+    @classmethod
+    def write_and_load_temp_block(
+        cls, function_str: str, name_function: str, dict_imports: dict[str, str]
+    ) -> Callable:
 
         # Write string to temporary file
         tmp = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
 
         # Open the file for writing.
         with open(tmp.name, "w") as f:
+            f.write(cls.get_external_l_imports_str(dict_imports))
+            f.write("\n")
             f.write(function_str)
             tmp.flush()
 

@@ -105,4 +105,6 @@ def merge_dependencies(l_blocks: list[Block]) -> set[str]:
     for block in l_blocks:
         set_imports.add(block.get_name_str())
     return set_imports
-    return set_imports
+
+
+

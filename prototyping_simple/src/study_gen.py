@@ -2,12 +2,10 @@ import copy
 from collections import OrderedDict
 from typing import Any, Callable, Self
 
-import blocks
-import merge
 from jinja2 import Environment, FileSystemLoader
-from matplotlib.pylab import f
 from ruamel import yaml
 
+from . import blocks, merge
 from .block import Block
 
 

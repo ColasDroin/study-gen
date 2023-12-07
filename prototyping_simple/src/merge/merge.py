@@ -9,14 +9,14 @@ def merge_imports(l_blocks: list[Block]) -> OrderedDict[str, str]:
     # Merge imports, ensuring that there are no conflicts
     dict_imports = OrderedDict()
     for block in l_blocks:
-        for module, alias in block.dict_imports.items():
+        for module, import_statement in block.dict_imports.items():
             if module in dict_imports:
-                if dict_imports[module] != alias:
+                if dict_imports[module] != import_statement:
                     raise ValueError(
-                        f"Import conflict for module {module}. Aliases are not consistent"
+                        f"Import conflict for module {module}. Import statements are not consistent"
                     )
             else:
-                dict_imports[module] = alias
+                dict_imports[module] = import_statement
 
     return dict_imports
 
@@ -31,14 +31,14 @@ def merge_blocks(
     # Build function string
     function_str = get_multiple_merge_str(l_blocks, name_function, docstring, dict_output)
 
-    # Write string to temporary file
-    function = Block.write_and_load_temp_block(function_str, name_function)
-
     # Merge imports
     dict_imports = merge_imports(l_blocks)
 
     # Add dependencies
     set_deps = merge_dependencies(l_blocks)
+
+    # Write string to temporary file
+    function = Block.write_and_load_temp_block(function_str, name_function, dict_imports)
 
     return Block(
         function=function, dict_imports=dict_imports, set_deps=set_deps, dict_output=dict_output

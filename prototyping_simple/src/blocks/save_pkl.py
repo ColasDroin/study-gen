@@ -6,10 +6,10 @@ import pickle
 
 from ..block import Block
 
-# This is needed to get the import and the import alias for code generation
-dict_imports = {"pickle": "pickle", "typing.Any": "Any"}
-for module, alias in dict_imports.items():
-    vars()[alias] = importlib.import_module(module)
+# This is needed to get the import and the import statement for code generation
+dict_imports = {"pickle": "import pickle", "Any": "from typing import Any"}
+for module, import_statement in dict_imports.items():
+    exec(import_statement)
 
 
 # ==================================================================================================

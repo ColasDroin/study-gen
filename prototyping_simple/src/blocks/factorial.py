@@ -6,10 +6,10 @@ from collections import OrderedDict
 
 from ..block import Block
 
-# This is needed to get the import and the import alias for code generation
-dict_imports = {"math": "math"}
-for module, alias in dict_imports.items():
-    vars()[alias] = importlib.import_module(module)
+# This is needed to get the import and the import statement for code generation
+dict_imports = {"math": "import math"}
+for module, import_statement in dict_imports.items():
+    exec(import_statement)
 
 
 # ==================================================================================================
