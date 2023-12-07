@@ -2,8 +2,19 @@
 # --- Imports
 # ==================================================================================================
 
-import math as math
+import math
 import numpy as np
+from typing import Any
+
+# ==================================================================================================
+# --- Parameters
+# ==================================================================================================
+
+	# Declare parameters
+	b = 10
+	c = 4
+	a = 2
+
 
 # ==================================================================================================
 # --- Blocks
@@ -24,24 +35,23 @@ def gamma_function(a: float) -> float:
     # Compute factorial of a
     return math.gamma(a)
 
+def save_npy_function(output: Any) -> None:
+    np.save(f"{output=}".split("=")[0], output)
+
+def main(b: float, c: float, a: float) -> None:
+
+
+    bc = multiply_function(b, c)
+    a_bc = add_function(a, bc)
+    fact_a_bc = gamma_function(a_bc)
+    save_npy_function(fact_a_bc)
+    return 
+
 
 # ==================================================================================================
 # --- Main
 # ==================================================================================================
 
-def main():
-    # Declare parameters
-    a = 2
-    b = 10
-    c = 4
-
-    # Declare blocks
-    bc = multiply_function(b, c)
-    a_bc = add_function(a, bc)
-    fact_a_bc = gamma_function(a_bc)
-
-    # Save output
-    np.save('fact_a_bc', fact_a_bc)
 
 
 # ==================================================================================================

@@ -74,6 +74,7 @@ class Block:
 
     @parameters.setter
     def parameters(self: Self, dict_parameters: OrderedDict[str, type]):
+
         # Ensure that the number of arguments is the same
         if len(dict_parameters) != len(self.parameters):
             raise ValueError(
@@ -104,7 +105,10 @@ class Block:
         if not isinstance(l_parameters_names, list):
             l_parameters_names = [l_parameters_names]
 
+        print(l_parameters_names, self.parameters.values())
+
         # Only update the names of the parameters, not types
+        # ! Major problem here: two parameters with the same name can't coexist
         self.parameters = OrderedDict(
             [
                 (param, type_param)
@@ -328,6 +332,8 @@ class Block:
 
         # Write string to temporary file
         tmp = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
+
+        print(cls.get_external_l_imports_str(dict_imports))
 
         # Open the file for writing.
         with open(tmp.name, "w") as f:

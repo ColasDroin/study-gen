@@ -92,20 +92,23 @@ class StudyGen:
             l_blocks.append(block_to_update)
 
         # Get the dict of final output (with undefined type for now)
-        output_final = new_block["output"]
-        if not isinstance(output_final, list):
-            output_final = [output_final]
-        dict_outputs_final = OrderedDict([(output, None) for output in output_final])
+        if "output" in new_block:
+            output_final = new_block["output"]
+            if not isinstance(output_final, list):
+                output_final = [output_final]
+            dict_outputs_final = OrderedDict([(output, None) for output in output_final])
 
-        # Find the type of output
-        for block in l_blocks:
-            for output in block.dict_output:
-                if output in dict_outputs_final:
-                    dict_outputs_final[output] = block.dict_output[output]
+            # Find the type of output
+            for block in l_blocks:
+                for output in block.dict_output:
+                    if output in dict_outputs_final:
+                        dict_outputs_final[output] = block.dict_output[output]
 
-        # Raise an error if some outputs are not defined
-        if None in dict_outputs_final.values():
-            raise ValueError("Some outputs are not defined")
+            # Raise an error if some outputs are not defined
+            if None in dict_outputs_final.values():
+                raise ValueError("Some outputs are not defined")
+        else:
+            dict_outputs_final = OrderedDict()
 
         # Handle docstring
         if "docstring" not in new_block:
