@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
+from ..block import Block
 from ._merge_blocks import get_multiple_merge_str, merge_dependencies
-from .block import Block
 
 
 def merge_imports(l_blocks: list[Block]) -> dict[str, str]:
