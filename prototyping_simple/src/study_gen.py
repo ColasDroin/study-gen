@@ -5,6 +5,7 @@ from typing import Any, Callable, Self
 import blocks
 import merge
 from jinja2 import Environment, FileSystemLoader
+from matplotlib.pylab import f
 from ruamel import yaml
 
 from .block import Block
@@ -80,7 +81,12 @@ class StudyGen:
         # Update parameters of each block to match the merged block specification
         l_blocks = []
         for block in new_block["blocks"]:
-            block_to_update = copy.deepcopy(dict_blocks[block])
+            if "__" in block:
+                # Don't want to declare twice the same block
+                true_block = block.split("__")[0]
+            else:
+                true_block = block
+            block_to_update = copy.deepcopy(dict_blocks[true_block])
             l_params = new_block["blocks"][block]["params"]
             l_outputs = new_block["blocks"][block]["output"]
             block_to_update.set_parameters_names(l_params)
@@ -102,6 +108,10 @@ class StudyGen:
         # Raise an error if some outputs are not defined
         if None in dict_outputs_final.values():
             raise ValueError("Some outputs are not defined")
+
+        # Handle docstring
+        if "docstring" not in new_block:
+            new_block["docstring"] = ""
 
         new_block_function = merge.merge_blocks(
             l_blocks,
@@ -131,46 +141,46 @@ class StudyGen:
         # Get script
         script = self.master[gen]["script"]
 
-        # Generate header
-        header_str = "def main():\n"
+        # Replace args keyword by params keyword
+        for block_name in script:
+            script[block_name]["params"] = script[block_name]["args"]
+            del script[block_name]["args"]
 
-        # Declare blocks
-        blocks_str = "\n\t# Declare blocks\n"
-        for block, dict_block in script.items():
-            # Get block arguments
-            l_args = dict_block["args"]
-            if not isinstance(l_args, list):
-                l_args = [l_args]
-            # Get block outputs
-            l_outputs = dict_block["output"]
-            if not isinstance(l_outputs, list):
-                l_outputs = [l_outputs]
-            # Get true block in case of repeaded key
-            if "__" in block:
-                true_block = block.split("__")[0]
-            else:
-                true_block = block
-            # Write blocks string
-            blocks_str += (
-                "\t" + dict_blocks[true_block].get_assignation_call_str(l_args, l_outputs) + "\n"
-            )
+        # Convert script format to new_block format
+        main_block_dict = OrderedDict([(str("blocks"), script)])
 
-        main_str = header_str + blocks_str
+        new_block_function = self.build_merged_blocks(
+            new_block_name="main",
+            new_block=main_block_dict,
+            dict_blocks=dict_blocks,
+        )
 
-        # Replace tabs by spaces to prevent inconsistent indentation
-        main_str = main_str.replace("\t", "    ")
+        dict_blocks["main"] = new_block_function
 
         return dict_blocks
 
     def get_parameters_assignation(self: Self, main_block: Block) -> str:
+        def _finditem(obj, key):
+            if key in obj:
+                return obj[key]
+            for k, v in obj.items():
+                if isinstance(v, dict):
+                    item = _finditem(v, key)
+                    if item is not None:
+                        return item
+
         str_parameters = "\t# Declare parameters\n"
-        # TODO: look for parameters used by main block and declare them
-        for param, value in self.configuration.items():
+        # TODO: find a way to handle parameters with the same name in different blocks
+        for param in main_block.parameters:
+            # Look recursively for the corresponding parameter value in the configuration
+            value = _finditem(self.configuration, param)
+            if value is None:
+                raise ValueError(f"Parameter {param} is not defined in the configuration")
             str_parameters += "\t" + param + " = " + str(value) + "\n"
 
         return str_parameters
 
-    def generate_gen(self: Self, gen: str) -> list[str]:
+    def generate_gen(self: Self, gen: str) -> tuple[str, str, str]:
 
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
