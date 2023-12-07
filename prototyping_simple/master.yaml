@@ -11,6 +11,9 @@ gen1:
     factorial:
       args: a_bc
       output: fact_a_bc
+    save_npy:
+      args: fact_a_bc
+      output:
 
   # parameters:
   #   a:
@@ -20,8 +23,6 @@ gen1:
   #     range: [10, 20]
   #     steps: 2
 
-  save:
-    fact_a_bc: npy
 # Compute fact_a_bc * (a * (b**c + c) + (d + c**c))
 # Scan d from 0 to 1
 gen2:
@@ -38,9 +39,6 @@ gen2:
           output: x_y_z
       output: x_y_z
 
-  # ! Some blocks are repeated... How to handle this?
-  # ! Use ruaml + annotate repeated blocks
-  # ! In the end, I can automatize the process of annotation
   script:
     add_power:
       args: [b, c, c]
@@ -57,11 +55,11 @@ gen2:
     multiply__2:
       args: [fact_a_bc, a_bc_c_c_d]
       output: result
+    save_pkl:
+      args: result
+      output:
 
   # parameters:
   #   d:
   #     range: [0, 1]
   #     steps: 4
-
-  save:
-    result: pkl

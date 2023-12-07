@@ -4,7 +4,7 @@ from ..block import Block
 from ._merge_blocks import get_multiple_merge_str, merge_dependencies
 
 
-def merge_imports(l_blocks: list[Block]) -> dict[str, str]:
+def merge_imports(l_blocks: list[Block]) -> OrderedDict[str, str]:
 
     # Merge imports, ensuring that there are no conflicts
     dict_imports = OrderedDict()

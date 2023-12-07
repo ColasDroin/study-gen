@@ -1,7 +1,7 @@
 import copy
 from collections import OrderedDict
 
-from .block import Block
+from ..block import Block
 
 
 def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, type]:
@@ -104,4 +104,5 @@ def merge_dependencies(l_blocks: list[Block]) -> set[str]:
     set_imports = set()
     for block in l_blocks:
         set_imports.add(block.get_name_str())
+    return set_imports
     return set_imports
