@@ -101,10 +101,7 @@ def get_multiple_merge_str(
 
 
 def merge_dependencies(l_blocks: list[Block]) -> set[str]:
-    set_imports = set()
+    set_deps = set()
     for block in l_blocks:
-        set_imports.add(block.get_name_str())
-    return set_imports
-
-
-
+        set_deps.add(block.get_name_str())
+    return set_deps

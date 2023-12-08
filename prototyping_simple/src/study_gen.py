@@ -124,13 +124,33 @@ class StudyGen:
         return new_block_function
 
     def incorporte_merged_blocks(
-        self: Self, gen: str, dict_blocks: OrderedDict[str, Block]
+        self: Self, new_blocks: OrderedDict[str, Any], dict_blocks: OrderedDict[str, Block]
     ) -> OrderedDict[str, Block]:
         # Build new blocks
-        for new_block_name, new_block in self.master[gen]["new_blocks"].items():
-            dict_blocks[new_block_name] = self.build_merged_blocks(
-                new_block_name, new_block, dict_blocks
-            )
+        for new_block_name, new_block in new_blocks.items():
+
+            # Compute the new block from merged blocks
+            new_block_object = self.build_merged_blocks(new_block_name, new_block, dict_blocks)
+
+            # Add dependencies of the new block to the dict of blocks
+            for block_name in new_block_object.set_deps:
+                if block_name not in dict_blocks:
+                    try:
+                        dict_blocks[block_name] = getattr(blocks, block_name)
+                    except AttributeError:
+                        raise ValueError(
+                            f"Block {block_name} is used in block {new_block_name} but is not"
+                            " defined anywhere."
+                        )
+            # Ensure that the new block is not already defined
+            if new_block_name in dict_blocks:
+                raise ValueError(
+                    f"Block {new_block_name} is already defined. Please ensure there are no"
+                    " redefinition in the master file."
+                )
+
+            # Add new block to the dict of blocks
+            dict_blocks[new_block_name] = new_block_object
 
         return dict_blocks
 
@@ -194,7 +214,7 @@ class StudyGen:
 
         # Incorporate merged blocks if needed
         if "new_blocks" in self.master[gen]:
-            dict_blocks = self.incorporte_merged_blocks(gen, dict_blocks)
+            dict_blocks = self.incorporte_merged_blocks(self.master[gen]["new_blocks"], dict_blocks)
 
         # Add main as ultimate block
         dict_blocks = self.generate_main_block(gen, dict_blocks)

@@ -333,8 +333,6 @@ class Block:
         # Write string to temporary file
         tmp = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
 
-        print(cls.get_external_l_imports_str(dict_imports))
-
         # Open the file for writing.
         with open(tmp.name, "w") as f:
             f.write(cls.get_external_l_imports_str(dict_imports))
