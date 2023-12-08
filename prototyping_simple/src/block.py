@@ -102,19 +102,56 @@ class Block:
         )
 
     def set_parameters_names(self: Self, l_parameters_names: list[str]):
-        # Ensure that l_parameters_names is not just a string
+        # Ensure that l_parameters_names is not just a string (from bad yaml parsing)
         if not isinstance(l_parameters_names, list):
             l_parameters_names = [l_parameters_names]
 
-        print(l_parameters_names, self.parameters.values())
-
         # Only update the names of the parameters, not types
-        self.parameters = OrderedDict(
+        self.dict_parameters = OrderedDict(
             [
                 (param, type_param)
-                for param, type_param in zip(l_parameters_names, self.parameters.values())
+                for param, type_param in zip(l_parameters_names, self.dict_parameters.values())
             ]
         )
+
+    @property
+    def l_arguments(self: Self) -> list[tuple[str, type]]:
+        return self._l_arguments
+
+    @l_arguments.setter
+    def l_arguments(self: Self, l_arguments: list[tuple[str, type]]):
+
+        # Ensure that the number of arguments is the same
+        if len(l_arguments) != len(self.dict_parameters):
+            raise ValueError(
+                "Number of arguments is different from number of parameters. Number of parameters:"
+                f" {len(self.dict_parameters)}. Number of arguments: {len(l_arguments)}"
+            )
+
+        # Ensure that the provided arguments have the correct type
+        for (argument, argument_type), (parameter, parameter_type) in zip(
+            l_arguments, self.dict_parameters.items()
+        ):
+            if argument_type != parameter_type:
+                raise ValueError(
+                    f"Argument {argument} has a different type than expected:"
+                    f" {argument_type.__name__}. Instead of: {parameter_type.__name__}"
+                )
+
+        # Update list of arguments
+        self._l_arguments = l_arguments
+
+    def set_arguments_names(self: Self, l_arguments_names: list[str]):
+
+        # Ensure that l_arguments_names is not just a string (from bad yaml parsing)
+        if not isinstance(l_arguments_names, list):
+            l_arguments_names = [l_arguments_names]
+
+        # Only update the names of the parameters, not types (obtain the types from the parameters)
+        self._l_arguments = [
+            (arg, type_param)
+            for arg, type_param in zip(l_arguments_names, self.dict_parameters.values())
+        ]
 
     def get_str(self: Self) -> str:
         if self.function is None:
