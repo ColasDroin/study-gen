@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from ..block import Block
 
-
+# ! Need to be re-implemented with arguments?
 def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, type]:
 
     # Start with empty dictionnary of parameters
@@ -24,13 +24,13 @@ def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, ty
     # Except if it's modified inplace (inside of a block)
     for block in l_blocks:
         for key in block.dict_output:
-            if key not in block.parameters and key in dict_parameters:
+            if key not in block.dict_parameters and key in dict_parameters:
                 del dict_parameters[key]
 
     # Return the merged parameters
     return dict_parameters
 
-
+ # ! Same
 def _check_external_merge_output(
     l_blocks: list[Block],
     dict_parameters: OrderedDict[str, type],
@@ -50,7 +50,7 @@ def _check_external_merge_output(
             if key not in dic_block_parameters_and_outputs:
                 raise ValueError(f"Output {key} is not in the parameters nor the outputs")
 
-
+# ! Same
 def _build_external_merge_str(
     l_blocks: list[Block],
     name_function: str,
@@ -78,7 +78,7 @@ def _build_external_merge_str(
 
     return function_str
 
-
+# ! Same
 def get_multiple_merge_str(
     l_blocks: list[Block],
     name_function: str,

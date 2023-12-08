@@ -230,6 +230,8 @@ class Block:
 
         return output_hint_str
 
+    # ! Need to update this: set arguments first, and then call this function with self only
+    # ! There shouldn't be a need to call the function using parameters
     def get_call_str(self: Self, l_arguments: list[str] | None = None) -> str:
         if self.function is None:
             logging.warning("No function defined for this block")
@@ -239,6 +241,7 @@ class Block:
                 l_arguments = list(self.dict_parameters.keys())
             return f"{self.function.__name__}({', '.join(l_arguments)})"
 
+    # ! Same as above
     def get_assignation_call_str(
         self: Self,
         l_arguments: list[str] | None = None,
@@ -259,6 +262,7 @@ class Block:
         else:
             return inspect.signature(self.function)
 
+    # ! Hopefully using arguments instead of parameters will fix this unelegant function as well
     def get_parameters_assignation_str(self: Self, dict_parameters: OrderedDict[str, type]) -> str:
         old_dict_parameters = self.dict_parameters
         return "\n".join(
@@ -327,7 +331,7 @@ class Block:
         # must be modified through the corresponding setter)
         output_type_hint_str = self.get_output_type_hint_str()
 
-        # Get function names and parameters, with a flag for the updated parameters
+        # Get function names and parameters
         if name_function is None:
             name_function = self.get_name_str()
         if dict_parameters is None:
