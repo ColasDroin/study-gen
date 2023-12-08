@@ -14,11 +14,11 @@ def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, ty
         for block2 in l_blocks[idx + 1 :]:
 
             # Check that identical parameters have identical type
-            for key in set(block1.parameters).intersection(block2.parameters):
-                if block1.parameters[key] != block2.parameters[key]:
+            for key in set(block1.dict_parameters).intersection(block2.dict_parameters):
+                if block1.dict_parameters[key] != block2.dict_parameters[key]:
                     raise ValueError(f"Parameter {key} has different types in the two blocks")
 
-            dict_parameters = dict_parameters | block1.parameters | block2.parameters
+            dict_parameters = dict_parameters | block1.dict_parameters | block2.dict_parameters
 
     # If an output has been provided, remove it from the list of parameters
     # Except if it's modified inplace (inside of a block)

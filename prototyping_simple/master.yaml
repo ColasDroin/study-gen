@@ -32,13 +32,13 @@ gen2:
       #params: [x, y, z]
       blocks:
         power:
-          params: [x, y]
+          args: [x, y]
           output: x_y
         power__2:
-          params: [x_y, x_y]
+          args: [x_y, x_y]
           output: x_y
         add:
-          params: [x_y, z]
+          args: [x_y, z]
           output: x_y_z
       output: x_y_z
 

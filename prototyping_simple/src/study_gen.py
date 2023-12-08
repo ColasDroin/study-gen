@@ -76,7 +76,7 @@ class StudyGen:
         dict_blocks: OrderedDict[str, Block],
     ) -> Block:
 
-        # Update parameters of each block to match the merged block specification
+        # Update arguments of each block to match the merged block specification
         l_blocks = []
         for block in new_block["blocks"]:
             if "__" in block:
@@ -85,9 +85,9 @@ class StudyGen:
             else:
                 true_block = block
             block_to_update = copy.deepcopy(dict_blocks[true_block])
-            l_params = new_block["blocks"][block]["params"]
+            l_args = new_block["blocks"][block]["args"]
             l_outputs = new_block["blocks"][block]["output"]
-            block_to_update.set_parameters_names(l_params)
+            block_to_update.set_arguments_names(l_args)
             block_to_update.set_outputs_names(l_outputs)
             l_blocks.append(block_to_update)
 
@@ -161,11 +161,6 @@ class StudyGen:
     ):
         # Get script
         script = self.master[gen]["script"]
-
-        # Replace args keyword by params keyword
-        for block_name in script:
-            script[block_name]["params"] = script[block_name]["args"]
-            del script[block_name]["args"]
 
         # Convert script format to new_block format
         main_block_dict = OrderedDict([(str("blocks"), script)])

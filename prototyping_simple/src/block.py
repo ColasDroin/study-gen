@@ -19,6 +19,7 @@ class Block:
         self.dict_imports = dict_imports
         self.set_deps = set_deps
         self._dict_output = dict_output
+        self._l_arguments = []
 
     @property
     def dict_output(self: Self):
@@ -58,7 +59,7 @@ class Block:
         )
 
     @property
-    def parameters(self: Self) -> OrderedDict[str, type]:
+    def dict_parameters(self: Self) -> OrderedDict[str, type]:
         if self.function is None:
             logging.warning("No function defined for this block")
             return OrderedDict()
@@ -72,19 +73,19 @@ class Block:
             )
             return dict_parameters
 
-    @parameters.setter
-    def parameters(self: Self, dict_parameters: OrderedDict[str, type]):
+    @dict_parameters.setter
+    def dict_parameters(self: Self, dict_parameters: OrderedDict[str, type]):
 
         # Ensure that the number of arguments is the same
-        if len(dict_parameters) != len(self.parameters):
+        if len(dict_parameters) != len(self.dict_parameters):
             raise ValueError(
-                f"Number of parameters is different. Previous: {len(self.parameters)}. New:"
+                f"Number of parameters is different. Previous: {len(self.dict_parameters)}. New:"
                 f" {len(dict_parameters)}"
             )
 
         # Ensure that the provided parameters have the correct type
         for (new_parameter, new_type), (previous_parameter, previous_type) in zip(
-            dict_parameters.items(), self.parameters.items()
+            dict_parameters.items(), self.dict_parameters.items()
         ):
             if new_type != previous_type:
                 raise ValueError(
@@ -108,7 +109,6 @@ class Block:
         print(l_parameters_names, self.parameters.values())
 
         # Only update the names of the parameters, not types
-        # ! Major problem here: two parameters with the same name can't coexist
         self.parameters = OrderedDict(
             [
                 (param, type_param)
@@ -199,7 +199,7 @@ class Block:
             return ""
         else:
             if l_arguments is None:
-                l_arguments = list(self.parameters.keys())
+                l_arguments = list(self.dict_parameters.keys())
             return f"{self.function.__name__}({', '.join(l_arguments)})"
 
     def get_assignation_call_str(
@@ -223,7 +223,7 @@ class Block:
             return inspect.signature(self.function)
 
     def get_parameters_assignation_str(self: Self, dict_parameters: OrderedDict[str, type]) -> str:
-        old_dict_parameters = self.parameters
+        old_dict_parameters = self.dict_parameters
         return "\n".join(
             [
                 f"\t{old_name} = {name}"
@@ -295,7 +295,7 @@ class Block:
             name_function = self.get_name_str()
         if dict_parameters is None:
             parameters_assignation_str = ""
-            dict_parameters = self.parameters
+            dict_parameters = self.dict_parameters
         else:
             # Update parameters assignation at the beginning of the function body
             parameters_assignation_str = self.get_parameters_assignation_str(dict_parameters)
