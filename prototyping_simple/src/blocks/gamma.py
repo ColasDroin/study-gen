@@ -17,7 +17,7 @@ for module, import_statement in dict_imports.items():
 # ==================================================================================================
 def gamma_function(a: float) -> float:
     """Dummy docstring"""
-    # Compute factorial of a
+    # Compute gamma function of a
     return math.gamma(a)
 
 
@@ -29,5 +29,5 @@ gamma = Block(
     "gamma_function",
     gamma_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_factorial", float)]),
+    dict_output=OrderedDict([("output_gamma", float)]),
 )

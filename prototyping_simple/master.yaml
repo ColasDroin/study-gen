@@ -8,7 +8,7 @@ gen1:
     add:
       args: [a, bc]
       output: a_bc
-    factorial:
+    gamma:
       args: a_bc
       output: fact_a_bc
     save_npy:
