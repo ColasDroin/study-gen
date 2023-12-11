@@ -186,7 +186,6 @@ class StudyGen:
                         return item
 
         str_parameters = "\t# Declare parameters\n"
-        # ! This needs to be fixed, as arguments are used instead of parameters
         for param in main_block.dict_parameters:
             # Look recursively for the corresponding parameter value in the configuration
             value = _finditem(self.configuration, param)
@@ -214,7 +213,6 @@ class StudyGen:
         # Add main as ultimate block
         dict_blocks = self.generate_main_block(gen, dict_blocks)
 
-        # ! Fix this
         # Declare parameters
         str_parameters = self.get_parameters_assignation(dict_blocks["main"])
 

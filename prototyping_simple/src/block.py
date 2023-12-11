@@ -3,6 +3,7 @@ import inspect
 import logging
 import sys
 import tempfile
+from ast import Or
 from collections import OrderedDict
 from typing import Any, Callable, Self
 
@@ -15,11 +16,17 @@ class Block:
         set_deps: set[str] = set(),
         dict_output: OrderedDict[str, type] = OrderedDict(),
     ):
-        self.function = function
+        self._function = function
         self.dict_imports = dict_imports
         self.set_deps = set_deps
         self._dict_output = dict_output
         self._l_arguments = []
+
+    @property
+    def function(self: Self) -> Callable | None:
+        if self._function is None:
+            logging.warning("No function defined for this block")
+        return self._function
 
     @property
     def dict_output(self: Self):
@@ -58,64 +65,77 @@ class Block:
             ]
         )
 
+    def get_outputs_names(self: Self) -> list[str]:
+        return [output for output, _ in self.dict_output.items()]
+
     @property
     def dict_parameters(self: Self) -> OrderedDict[str, type]:
-        if self.function is None:
-            logging.warning("No function defined for this block")
-            return OrderedDict()
-        else:
-            signature = self.get_signature()
-            dict_parameters = OrderedDict(
-                [
-                    (parameter, signature.parameters[parameter].annotation)
-                    for parameter in signature.parameters
-                ]
-            )
-            return dict_parameters
-
-    @dict_parameters.setter
-    def dict_parameters(self: Self, dict_parameters: OrderedDict[str, type]):
-
-        # Ensure that the number of arguments is the same
-        if len(dict_parameters) != len(self.dict_parameters):
-            raise ValueError(
-                f"Number of parameters is different. Previous: {len(self.dict_parameters)}. New:"
-                f" {len(dict_parameters)}"
-            )
-
-        # Ensure that the provided parameters have the correct type
-        for (new_parameter, new_type), (previous_parameter, previous_type) in zip(
-            dict_parameters.items(), self.dict_parameters.items()
-        ):
-            if new_type != previous_type:
-                raise ValueError(
-                    f"Parameter {new_parameter} has a different type. Previous type:"
-                    f" {previous_type.__name__}. New type: {new_type.__name__}"
-                )
-
-        # Update callable function
-        function_str = self.prepare_function_str(dict_parameters=dict_parameters)
-
-        # Write string to temporary file and update
-        self.function = self.write_and_load_temp_block(
-            function_str, self.get_name_str(), self.dict_imports
-        )
-
-    def set_parameters_names(self: Self, l_parameters_names: list[str]):
-        # Ensure that l_parameters_names is not just a string (from bad yaml parsing)
-        if not isinstance(l_parameters_names, list):
-            l_parameters_names = [l_parameters_names]
-
-        # Only update the names of the parameters, not types
-        self.dict_parameters = OrderedDict(
+        signature = self.get_signature()
+        dict_parameters = OrderedDict(
             [
-                (param, type_param)
-                for param, type_param in zip(l_parameters_names, self.dict_parameters.values())
+                (parameter, signature.parameters[parameter].annotation)
+                for parameter in signature.parameters
             ]
         )
+        return dict_parameters
+
+    # @dict_parameters.setter
+    # def dict_parameters(self: Self, dict_parameters: OrderedDict[str, type]):
+
+    #     # Ensure that the number of arguments is the same
+    #     if len(dict_parameters) != len(self.dict_parameters):
+    #         raise ValueError(
+    #             f"Number of parameters is different. Previous: {len(self.dict_parameters)}. New:"
+    #             f" {len(dict_parameters)}"
+    #         )
+
+    #     # Ensure that the provided parameters have the correct type
+    #     for (new_parameter, new_type), (previous_parameter, previous_type) in zip(
+    #         dict_parameters.items(), self.dict_parameters.items()
+    #     ):
+    #         if new_type != previous_type:
+    #             raise ValueError(
+    #                 f"Parameter {new_parameter} has a different type. Previous type:"
+    #                 f" {previous_type.__name__}. New type: {new_type.__name__}"
+    #             )
+
+    #     # Update callable function
+    #     function_header, parameters_assignation_str, function_body, docstring = (
+    #         self.prepare_function_str(dict_parameters=dict_parameters)
+    #     )
+
+    #     # Build function string
+    #     function_str = self.build_function_str(
+    #         [self],
+    #         function_header,
+    #         parameters_assignation_str=parameters_assignation_str,
+    #         function_body=function_body,
+    #         docstring=docstring,
+    #         output_str=None,
+    #     )
+
+    #     # Write string to temporary file and update
+    #     self.function = self.write_and_load_temp_block(
+    #         function_str, self.get_name_str(), self.dict_imports
+    #     )
+
+    # def set_parameters_names(self: Self, l_parameters_names: list[str]):
+    #     # Ensure that l_parameters_names is not just a string (from bad yaml parsing)
+    #     if not isinstance(l_parameters_names, list):
+    #         l_parameters_names = [l_parameters_names]
+
+    #     # Only update the names of the parameters, not types
+    #     self.dict_parameters = OrderedDict(
+    #         [
+    #             (param, type_param)
+    #             for param, type_param in zip(l_parameters_names, self.dict_parameters.values())
+    #         ]
+    #     )
 
     @property
     def l_arguments(self: Self) -> list[tuple[str, type]]:
+        if self._l_arguments == []:
+            logging.warning("No arguments defined for this block")
         return self._l_arguments
 
     @l_arguments.setter
@@ -153,23 +173,26 @@ class Block:
             for arg, type_param in zip(l_arguments_names, self.dict_parameters.values())
         ]
 
+    def get_arguments_names(self: Self) -> list[str]:
+        return [arg for arg, _ in self.l_arguments]
+
+    def get_arguments_as_dict(self: Self) -> OrderedDict[str, type]:
+        return OrderedDict(self.l_arguments)
+
     def get_str(self: Self) -> str:
         if self.function is None:
-            logging.warning("No function defined for this block")
             return ""
         else:
             return inspect.getsource(self.function)
 
     def get_name_str(self: Self) -> str:
         if self.function is None:
-            logging.warning("No function defined for this block")
             return ""
         else:
             return self.function.__name__
 
     def get_docstring(self: Self) -> str:
         if self.function is None:
-            logging.warning("No function defined for this block")
             return ""
         else:
             doc = inspect.getdoc(self.function)
@@ -180,7 +203,6 @@ class Block:
 
     def get_body_str(self: Self) -> str:
         if self.function is None:
-            logging.warning("No function defined for this block")
             return ""
         else:
             body = inspect.getsource(self.function)
@@ -195,9 +217,8 @@ class Block:
 
             return body
 
-    def get_output_str(self: Self, l_outputs: list[str] | None = None) -> str:
-        if l_outputs is None:
-            l_outputs = list(self.dict_output.keys())
+    def get_output_str(self: Self) -> str:
+        l_outputs = self.get_outputs_names()
         return self.get_external_output_str(l_outputs)
 
     @staticmethod
@@ -230,25 +251,16 @@ class Block:
 
         return output_hint_str
 
-    # ! Need to update this: set arguments first, and then call this function with self only
-    # ! There shouldn't be a need to call the function using parameters
-    def get_call_str(self: Self, l_arguments: list[str] | None = None) -> str:
+    def get_call_str(self: Self) -> str:
         if self.function is None:
             logging.warning("No function defined for this block")
             return ""
         else:
-            if l_arguments is None:
-                l_arguments = list(self.dict_parameters.keys())
-            return f"{self.function.__name__}({', '.join(l_arguments)})"
+            return f"{self.function.__name__}({', '.join(self.get_arguments_names())})"
 
-    # ! Same as above
-    def get_assignation_call_str(
-        self: Self,
-        l_arguments: list[str] | None = None,
-        l_outputs: list[str] | None = None,
-    ) -> str:
-        function_call_str = self.get_call_str(l_arguments)
-        output_str = self.get_output_str(l_outputs)
+    def get_assignation_call_str(self: Self) -> str:
+        function_call_str = self.get_call_str()
+        output_str = self.get_output_str()
 
         if output_str == "":
             return function_call_str
@@ -262,16 +274,16 @@ class Block:
         else:
             return inspect.signature(self.function)
 
-    # ! Hopefully using arguments instead of parameters will fix this unelegant function as well
-    def get_parameters_assignation_str(self: Self, dict_parameters: OrderedDict[str, type]) -> str:
-        old_dict_parameters = self.dict_parameters
-        return "\n".join(
-            [
-                f"\t{old_name} = {name}"
-                for old_name, name in zip(old_dict_parameters, dict_parameters)
-                if old_name != name
-            ]
-        )
+    # # ! Hopefully using arguments instead of parameters will fix this unelegant function as well
+    # def get_parameters_assignation_str(self: Self, dict_parameters: OrderedDict[str, type]) -> str:
+    #     old_dict_parameters = self.dict_parameters
+    #     return "\n".join(
+    #         [
+    #             f"\t{old_name} = {name}"
+    #             for old_name, name in zip(old_dict_parameters, dict_parameters)
+    #             if old_name != name
+    #         ]
+    #     )
 
     def get_l_imports_str(self: Self) -> str:
         return self.get_external_l_imports_str(self.dict_imports)
@@ -320,51 +332,41 @@ class Block:
 
         return function_str
 
-    def prepare_function_str(
-        self,
-        name_function: str | None = None,
-        docstring: str | None = None,
-        dict_parameters: OrderedDict[str, type] | None = None,
-    ) -> str:
+    # def prepare_function_str(
+    #     self,
+    #     name_function: str | None = None,
+    #     docstring: str | None = None,
+    #     dict_parameters: OrderedDict[str, type] | None = None,
+    # ) -> tuple[str, str, str, str]:
 
-        # Get output type hint string and output name (can't modify the output type, and output name
-        # must be modified through the corresponding setter)
-        output_type_hint_str = self.get_output_type_hint_str()
+    #     # Get output type hint string and output name (can't modify the output type, and output name
+    #     # must be modified through the corresponding setter)
+    #     output_type_hint_str = self.get_output_type_hint_str()
 
-        # Get function names and parameters
-        if name_function is None:
-            name_function = self.get_name_str()
-        if dict_parameters is None:
-            parameters_assignation_str = ""
-            dict_parameters = self.dict_parameters
-        else:
-            # Update parameters assignation at the beginning of the function body
-            parameters_assignation_str = self.get_parameters_assignation_str(dict_parameters)
+    #     # Get function names and parameters
+    #     if name_function is None:
+    #         name_function = self.get_name_str()
+    #     if dict_parameters is None:
+    #         parameters_assignation_str = ""
+    #         dict_parameters = self.dict_parameters
+    #     else:
+    #         # Update parameters assignation at the beginning of the function body
+    #         parameters_assignation_str = self.get_parameters_assignation_str(dict_parameters)
 
-        # Get function header with the (potentially updated) function name and parameters
-        parameters_header = ", ".join(
-            [f"{parameter}: {dict_parameters[parameter].__name__}" for parameter in dict_parameters]
-        )
-        function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
+    #     # Get function header with the (potentially updated) function name and parameters
+    #     parameters_header = ", ".join(
+    #         [f"{parameter}: {dict_parameters[parameter].__name__}" for parameter in dict_parameters]
+    #     )
+    #     function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
 
-        # Get potentially updated docstring
-        if docstring is None:
-            docstring = self.get_docstring()
+    #     # Get potentially updated docstring
+    #     if docstring is None:
+    #         docstring = self.get_docstring()
 
-        # Get function body (including return statement)
-        function_body = self.get_body_str()
+    #     # Get function body (including return statement)
+    #     function_body = self.get_body_str()
 
-        # Build function string
-        function_str = self.build_function_str(
-            [self],
-            function_header,
-            parameters_assignation_str=parameters_assignation_str,
-            function_body=function_body,
-            docstring=docstring,
-            output_str=None,
-        )
-
-        return function_str
+    #     return function_header, parameters_assignation_str, function_body, docstring
 
     @classmethod
     def write_and_load_temp_block(

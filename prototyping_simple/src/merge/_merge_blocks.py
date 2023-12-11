@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from ..block import Block
 
-# ! Need to be re-implemented with arguments?
+
 def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, type]:
 
     # Start with empty dictionnary of parameters
@@ -14,23 +14,26 @@ def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, ty
         for block2 in l_blocks[idx + 1 :]:
 
             # Check that identical parameters have identical type
-            for key in set(block1.dict_parameters).intersection(block2.dict_parameters):
-                if block1.dict_parameters[key] != block2.dict_parameters[key]:
+            dict_arguments_block1 = block1.get_arguments_as_dict()
+            dict_arguments_block2 = block2.get_arguments_as_dict()
+            for key in set(dict_arguments_block1).intersection(dict_arguments_block2):
+                if dict_arguments_block1[key] != dict_arguments_block2[key]:
                     raise ValueError(f"Parameter {key} has different types in the two blocks")
 
-            dict_parameters = dict_parameters | block1.dict_parameters | block2.dict_parameters
+            # Add to dictionnary of parameters
+            dict_parameters = dict_parameters | dict_arguments_block1 | dict_arguments_block2
 
     # If an output has been provided, remove it from the list of parameters
     # Except if it's modified inplace (inside of a block)
     for block in l_blocks:
         for key in block.dict_output:
-            if key not in block.dict_parameters and key in dict_parameters:
+            if key not in block.get_arguments_names() and key in dict_parameters:
                 del dict_parameters[key]
 
     # Return the merged parameters
     return dict_parameters
 
- # ! Same
+
 def _check_external_merge_output(
     l_blocks: list[Block],
     dict_parameters: OrderedDict[str, type],
@@ -50,7 +53,7 @@ def _check_external_merge_output(
             if key not in dic_block_parameters_and_outputs:
                 raise ValueError(f"Output {key} is not in the parameters nor the outputs")
 
-# ! Same
+
 def _build_external_merge_str(
     l_blocks: list[Block],
     name_function: str,
@@ -78,7 +81,7 @@ def _build_external_merge_str(
 
     return function_str
 
-# ! Same
+
 def get_multiple_merge_str(
     l_blocks: list[Block],
     name_function: str,
