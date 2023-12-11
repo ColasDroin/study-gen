@@ -26,4 +26,4 @@ def save_pkl_function(output: Any) -> None:
 # --- Block object ---
 # ==================================================================================================
 
-save_pkl = Block(save_pkl_function, dict_imports=dict_imports)
+save_pkl = Block("save_pkl", save_pkl_function, dict_imports=dict_imports)

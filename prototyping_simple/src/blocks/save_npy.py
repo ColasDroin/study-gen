@@ -22,4 +22,4 @@ def save_npy_function(output: Any) -> None:
 # --- Block object ---
 # ==================================================================================================
 
-save_npy = Block(save_npy_function, dict_imports=dict_imports)
+save_npy = Block("save_npy", save_npy_function, dict_imports=dict_imports)

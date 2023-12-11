@@ -11,11 +11,13 @@ from typing import Any, Callable, Self
 class Block:
     def __init__(
         self,
+        name: str,
         function: Callable | None = None,
         dict_imports: dict[str, str] = OrderedDict(),
         set_deps: set[str] = set(),
         dict_output: OrderedDict[str, type] = OrderedDict(),
     ):
+        self.name = name
         self._function = function
         self.dict_imports = dict_imports
         self.set_deps = set_deps
@@ -185,7 +187,7 @@ class Block:
         else:
             return inspect.getsource(self.function)
 
-    def get_name_str(self: Self) -> str:
+    def get_name_function_str(self: Self) -> str:
         if self.function is None:
             return ""
         else:

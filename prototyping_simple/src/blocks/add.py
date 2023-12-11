@@ -19,4 +19,4 @@ def add_function(a: float, b: float) -> float:
 # --- Block object ---
 # ==================================================================================================
 
-add = Block(add_function, dict_output=OrderedDict([("output_add", float)]))
+add = Block("add", add_function, dict_output=OrderedDict([("output_add", float)]))

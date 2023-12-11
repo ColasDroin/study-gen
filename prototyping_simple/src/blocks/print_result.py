@@ -15,4 +15,4 @@ def print_result_function(d: float) -> None:
 # --- Block object ---
 # ==================================================================================================
 
-print_result = Block(print_result_function)
+print_result = Block("print_result", print_result_function)

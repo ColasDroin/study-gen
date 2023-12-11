@@ -64,7 +64,9 @@ class StudyGen:
         # Get blocks used for new blocks
         for new_block in set_new_blocks:
             for block in self.master[gen]["new_blocks"][new_block]["blocks"]:
-                # ! I need to find a way to do this iteratively, as there might be several levels of new blocks
+                if "__" in block:
+                    # Don't want to declare twice the same block
+                    continue
                 dict_blocks[block] = getattr(blocks, block)
 
         return dict_blocks
@@ -114,9 +116,13 @@ class StudyGen:
         if "docstring" not in new_block:
             new_block["docstring"] = ""
 
+        # Name the block function
+        name_merged_function = f"{new_block_name}_function"
+
         new_block_function = merge.merge_blocks(
-            l_blocks,
             new_block_name,
+            l_blocks,
+            name_merged_function,
             docstring=new_block["docstring"],
             dict_output=dict_outputs_final,
         )

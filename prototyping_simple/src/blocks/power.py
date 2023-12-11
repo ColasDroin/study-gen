@@ -25,7 +25,10 @@ def power_function(b: float, c: float) -> float:
 # ==================================================================================================
 
 power = Block(
-    power_function, dict_imports=dict_imports, dict_output=OrderedDict([("output_power", float)])
+    "power",
+    power_function,
+    dict_imports=dict_imports,
+    dict_output=OrderedDict([("output_power", float)]),
 )
 
 # ==================================================================================================

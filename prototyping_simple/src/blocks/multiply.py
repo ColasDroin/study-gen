@@ -19,4 +19,6 @@ def multiply_function(a: float, b: float) -> float:
 # --- Block object ---
 # ==================================================================================================
 
-multiply = Block(multiply_function, dict_output=OrderedDict([("output_multiply", float)]))
+multiply = Block(
+    "multiply", multiply_function, dict_output=OrderedDict([("output_multiply", float)])
+)

@@ -25,7 +25,8 @@ def gamma_function(a: float) -> float:
 # --- Block object ---
 # ==================================================================================================
 
-factorial = Block(
+gamma = Block(
+    "gamma_function",
     gamma_function,
     dict_imports=dict_imports,
     dict_output=OrderedDict([("output_factorial", float)]),

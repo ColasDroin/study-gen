@@ -22,14 +22,15 @@ def merge_imports(l_blocks: list[Block]) -> OrderedDict[str, str]:
 
 
 def merge_blocks(
+    name_merged_block: str,
     l_blocks: list[Block],
-    name_function: str,
+    name_merged_function: str,
     docstring: str = "",
     dict_output: OrderedDict[str, type] = OrderedDict(),
 ) -> Block:
 
     # Build function string
-    function_str = get_multiple_merge_str(l_blocks, name_function, docstring, dict_output)
+    function_str = get_multiple_merge_str(l_blocks, name_merged_function, docstring, dict_output)
 
     # Merge imports
     dict_imports = merge_imports(l_blocks)
@@ -38,8 +39,12 @@ def merge_blocks(
     set_deps = merge_dependencies(l_blocks)
 
     # Write string to temporary file
-    function = Block.write_and_load_temp_block(function_str, name_function, dict_imports)
+    function = Block.write_and_load_temp_block(function_str, name_merged_function, dict_imports)
 
     return Block(
-        function=function, dict_imports=dict_imports, set_deps=set_deps, dict_output=dict_output
+        name_merged_block,
+        function=function,
+        dict_imports=dict_imports,
+        set_deps=set_deps,
+        dict_output=dict_output,
     )
