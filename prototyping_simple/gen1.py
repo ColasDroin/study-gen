@@ -32,13 +32,13 @@ def add_function(a: float, b: float) -> float:
 
 def gamma_function(a: float) -> float:
     """Dummy docstring"""
-    # Compute factorial of a
+    # Compute gamma function of a
     return math.gamma(a)
 
 def save_npy_function(output: Any) -> None:
     np.save(f"{output=}".split("=")[0], output)
 
-def main(b: float, c: float, a: float) -> None:
+def main_function(b: float, c: float, a: float) -> None:
 
 
     bc = multiply_function(b, c)
