@@ -76,6 +76,7 @@ class StudyGen:
         new_block_name: str,
         new_block: OrderedDict[str, Any],
         dict_blocks: OrderedDict[str, Block],
+        name_merged_function: str | None = None,
     ) -> Block:
 
         # Update arguments of each block to match the merged block specification
@@ -117,7 +118,8 @@ class StudyGen:
             new_block["docstring"] = ""
 
         # Name the block function
-        name_merged_function = f"{new_block_name}_function"
+        if name_merged_function is None:
+            name_merged_function = f"{new_block_name}_function"
 
         new_block_function = merge.merge_blocks(
             new_block_name,
@@ -171,15 +173,14 @@ class StudyGen:
         # Convert script format to new_block format
         main_block_dict = OrderedDict([(str("blocks"), script)])
 
-        new_block_function = self.build_merged_blocks(
+        main_block = self.build_merged_blocks(
             new_block_name="main",
             new_block=main_block_dict,
             dict_blocks=dict_blocks,
+            name_merged_function="main",
         )
 
-        dict_blocks["main"] = new_block_function
-
-        return dict_blocks
+        return main_block
 
     def get_parameters_assignation(self: Self, main_block: Block) -> str:
         def _finditem(obj, key):
@@ -197,11 +198,11 @@ class StudyGen:
             value = _finditem(self.configuration, param)
             if value is None:
                 raise ValueError(f"Parameter {param} is not defined in the configuration")
-            str_parameters += "\t" + param + " = " + str(value) + "\n"
+            str_parameters += param + " = " + str(value) + "\n"
 
         return str_parameters
 
-    def generate_gen(self: Self, gen: str) -> tuple[str, str, str]:
+    def generate_gen(self: Self, gen: str) -> tuple[str, str, str, str]:
 
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
@@ -217,10 +218,10 @@ class StudyGen:
             dict_blocks = self.incorporte_merged_blocks(self.master[gen]["new_blocks"], dict_blocks)
 
         # Add main as ultimate block
-        dict_blocks = self.generate_main_block(gen, dict_blocks)
+        main_block = self.generate_main_block(gen, dict_blocks)
 
         # Declare parameters
-        str_parameters = self.get_parameters_assignation(dict_blocks["main"])
+        str_parameters = self.get_parameters_assignation(main_block)
 
         # Get the dictionnary of block strings
         dict_blocks_str = {k: v.get_str() for k, v in dict_blocks.items()}
@@ -228,9 +229,11 @@ class StudyGen:
         # Get corresponding block string
         str_blocks = "\n".join([f"{k}" for k in dict_blocks_str.values()])
 
-        return str_imports, str_parameters, str_blocks
+        return str_imports, str_parameters, str_blocks, main_block.get_str()
 
-    def render(self: Self, str_imports: str, str_parameters: str, str_blocks: str) -> str:
+    def render(
+        self: Self, str_imports: str, str_parameters: str, str_blocks: str, str_main: str
+    ) -> str:
 
         # Generate generations from template
         environment = Environment(loader=FileSystemLoader(self.path_template))
@@ -241,6 +244,7 @@ class StudyGen:
             imports=str_imports,
             parameters=str_parameters,
             blocks=str_blocks,
+            main=str_main,
         )
         return study_str
 
@@ -253,8 +257,8 @@ class StudyGen:
         l_study_str = []
         for gen in sorted(self.master.keys()):
             file_path_gen = f"{gen}.py"
-            str_main, str_blocks, str_imports = self.generate_gen(gen)
-            study_str = self.render(str_main, str_blocks, str_imports)
+            str_imports, str_parameters, str_blocks, str_main = self.generate_gen(gen)
+            study_str = self.render(str_imports, str_parameters, str_blocks, str_main)
             self.write(study_str, file_path_gen)
             l_study_str.append(study_str)
         return l_study_str

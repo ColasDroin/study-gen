@@ -56,7 +56,8 @@ gen2:
       args: [a_bc_c, c_c_d]
       output: a_bc_c_c_d
     multiply__2:
-      args: [fact_a_bc, a_bc_c_c_d]
+      #args: [fact_a_bc, a_bc_c_c_d]
+      args: [a_bc_c, a_bc_c_c_d]
       output: result
     save_pkl:
       args: result
