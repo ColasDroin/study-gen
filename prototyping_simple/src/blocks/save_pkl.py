@@ -15,10 +15,10 @@ for module, import_statement in dict_imports.items():
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def save_pkl_function(output: Any) -> None:
+def save_pkl_function(output: Any, path_output: str) -> None:
     # Get output name
-    output_str = f"{output=}".split("=")[0]
-    with open(output_str, "wb") as f:
+    # output_str = f"{output=}".split("=")[0]
+    with open(path_output, "wb") as f:
         pickle.dump(output, f)
 
 

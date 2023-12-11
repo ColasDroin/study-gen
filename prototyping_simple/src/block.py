@@ -81,6 +81,9 @@ class Block:
         )
         return dict_parameters
 
+    def get_dict_parameters_names(self: Self) -> list[str]:
+        return list(self.dict_parameters.keys())
+
     # @dict_parameters.setter
     # def dict_parameters(self: Self, dict_parameters: OrderedDict[str, type]):
 
@@ -253,12 +256,14 @@ class Block:
 
         return output_hint_str
 
-    def get_call_str(self: Self) -> str:
+    def get_call_str(self: Self, l_external_arguments: list[str] | None = None) -> str:
         if self.function is None:
             logging.warning("No function defined for this block")
             return ""
         else:
-            return f"{self.function.__name__}({', '.join(self.get_arguments_names())})"
+            if l_external_arguments is None:
+                l_external_arguments = self.get_arguments_names()
+            return f"{self.function.__name__}({', '.join(l_external_arguments)})"
 
     def get_assignation_call_str(self: Self) -> str:
         function_call_str = self.get_call_str()

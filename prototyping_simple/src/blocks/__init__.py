@@ -1,5 +1,6 @@
 from .add import add
 from .gamma import gamma
+from .load_npy import load_npy
 from .multiply import multiply
 from .power import power
 from .print_result import print_result

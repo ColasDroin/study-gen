@@ -14,8 +14,9 @@ for module, import_statement in dict_imports.items():
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def save_npy_function(output: Any) -> None:
-    np.save(f"{output=}".split("=")[0], output)
+def save_npy_function(output: Any, path_output: str) -> None:
+    # path_output = f"{output=}".split("=")[0]
+    np.save(path_output, output)
 
 
 # ==================================================================================================

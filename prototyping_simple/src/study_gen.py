@@ -91,6 +91,7 @@ class StudyGen:
             l_args = new_block["blocks"][block]["args"]
             l_outputs = new_block["blocks"][block]["output"]
             block_to_update.set_arguments_names(l_args)
+            # ! SOMETHING FISHY HERE
             block_to_update.set_outputs_names(l_outputs)
             l_blocks.append(block_to_update)
 
@@ -131,7 +132,7 @@ class StudyGen:
 
         return new_block_function
 
-    def incorporte_merged_blocks(
+    def incorporate_merged_blocks(
         self: Self, new_blocks: OrderedDict[str, Any], dict_blocks: OrderedDict[str, Block]
     ) -> OrderedDict[str, Block]:
         # Build new blocks
@@ -202,7 +203,7 @@ class StudyGen:
 
         return str_parameters
 
-    def generate_gen(self: Self, gen: str) -> tuple[str, str, str, str]:
+    def generate_gen(self: Self, gen: str) -> tuple[str, str, str, str, str]:
 
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
@@ -215,7 +216,9 @@ class StudyGen:
 
         # Incorporate merged blocks if needed
         if "new_blocks" in self.master[gen]:
-            dict_blocks = self.incorporte_merged_blocks(self.master[gen]["new_blocks"], dict_blocks)
+            dict_blocks = self.incorporate_merged_blocks(
+                self.master[gen]["new_blocks"], dict_blocks
+            )
 
         # Add main as ultimate block
         main_block = self.generate_main_block(gen, dict_blocks)
@@ -223,16 +226,29 @@ class StudyGen:
         # Declare parameters
         str_parameters = self.get_parameters_assignation(main_block)
 
+        # Get main block string
+        str_main = main_block.get_str()
+
+        # Get main call (use parameters as arguments, since parameters are built from arguments in this case)
+        str_main_call = main_block.get_call_str(
+            l_external_arguments=main_block.get_dict_parameters_names()
+        )
+
         # Get the dictionnary of block strings
         dict_blocks_str = {k: v.get_str() for k, v in dict_blocks.items()}
 
         # Get corresponding block string
         str_blocks = "\n".join([f"{k}" for k in dict_blocks_str.values()])
 
-        return str_imports, str_parameters, str_blocks, main_block.get_str()
+        return str_imports, str_parameters, str_blocks, str_main, str_main_call
 
     def render(
-        self: Self, str_imports: str, str_parameters: str, str_blocks: str, str_main: str
+        self: Self,
+        str_imports: str,
+        str_parameters: str,
+        str_blocks: str,
+        str_main: str,
+        str_main_call: str,
     ) -> str:
 
         # Generate generations from template
@@ -245,6 +261,7 @@ class StudyGen:
             parameters=str_parameters,
             blocks=str_blocks,
             main=str_main,
+            main_call=str_main_call,
         )
         return study_str
 
@@ -257,8 +274,12 @@ class StudyGen:
         l_study_str = []
         for gen in sorted(self.master.keys()):
             file_path_gen = f"{gen}.py"
-            str_imports, str_parameters, str_blocks, str_main = self.generate_gen(gen)
-            study_str = self.render(str_imports, str_parameters, str_blocks, str_main)
+            str_imports, str_parameters, str_blocks, str_main, str_main_call = self.generate_gen(
+                gen
+            )
+            study_str = self.render(
+                str_imports, str_parameters, str_blocks, str_main, str_main_call
+            )
             self.write(study_str, file_path_gen)
             l_study_str.append(study_str)
         return l_study_str
