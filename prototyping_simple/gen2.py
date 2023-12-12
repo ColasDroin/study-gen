@@ -2,13 +2,16 @@
 # --- Imports
 # ==================================================================================================
 
-import math
 import numpy as np
 from typing import Any
+import pickle
 
 # ==================================================================================================
 # --- Blocks
 # ==================================================================================================
+
+def load_npy_function(path: str) -> Any:
+    return np.load(path)
 
 def multiply_function(a: float, b: float) -> float:
 
@@ -20,27 +23,40 @@ def add_function(a: float, b: float) -> float:
     # Add a and b
     return a + b
 
-def gamma_function(a: float) -> float:
-    """Dummy docstring"""
-    # Compute gamma function of a
-    return math.gamma(a)
+def save_pkl_function(output: Any, path_output: str) -> None:
+    # Get output name
+    # output_str = f"{output=}".split("=")[0]
+    with open(path_output, "wb") as f:
+        pickle.dump(output, f)
 
-def save_npy_function(output: Any, path_output: str) -> None:
-    # path_output = f"{output=}".split("=")[0]
-    np.save(path_output, output)
+def power_function(b: float, c: float) -> float:
+    # Returns a at the power of b
+    return np.power(b, c)
+
+def add_power_function(x: float, y: float, z: float) -> float:
+    """This is a merge test.
+    """
+
+    x_y = power_function(x, y)
+    x_y = power_function(x_y, x_y)
+    x_y_z = add_function(x_y, z)
+    return x_y_z
 
 
 # ==================================================================================================
 # --- Main
 # ==================================================================================================
 
-def main(b: float, c: float, a: float, path_fact_a_bc: str) -> None:
+def main(path_fact_a_bc: str, b: float, c: float, a: float, d: float, path_result: str) -> None:
 
 
-    bc = multiply_function(b, c)
-    a_bc = add_function(a, bc)
-    fact_a_bc = gamma_function(a_bc)
-    save_npy_function(fact_a_bc, path_fact_a_bc)
+    fact_a_bc = load_npy_function(path_fact_a_bc)
+    bc_c = add_power_function(b, c, c)
+    a_bc_c = multiply_function(a, bc_c)
+    c_c_d = add_power_function(c, c, d)
+    a_bc_c_c_d = add_function(a_bc_c, c_c_d)
+    result = multiply_function(fact_a_bc, a_bc_c_c_d)
+    save_pkl_function(result, path_result)
 
 
 
@@ -49,10 +65,12 @@ def main(b: float, c: float, a: float, path_fact_a_bc: str) -> None:
 # ==================================================================================================
 
 	# Declare parameters
+path_fact_a_bc = "fact_a_bc.npy"
 b = 10
 c = 4
 a = 2
-path_fact_a_bc = "fact_a_bc.npy"
+d = 0.5
+path_result = "result.pkl"
 
 
 # ==================================================================================================
@@ -60,4 +78,4 @@ path_fact_a_bc = "fact_a_bc.npy"
 # ==================================================================================================
 
 if __name__ == "__main__":
-    main(b, c, a, path_fact_a_bc)
+    main(path_fact_a_bc, b, c, a, d, path_result)

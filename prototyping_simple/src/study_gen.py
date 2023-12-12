@@ -91,7 +91,6 @@ class StudyGen:
             l_args = new_block["blocks"][block]["args"]
             l_outputs = new_block["blocks"][block]["output"]
             block_to_update.set_arguments_names(l_args)
-            # ! SOMETHING FISHY HERE
             block_to_update.set_outputs_names(l_outputs)
             l_blocks.append(block_to_update)
 
@@ -199,7 +198,9 @@ class StudyGen:
             value = _finditem(self.configuration, param)
             if value is None:
                 raise ValueError(f"Parameter {param} is not defined in the configuration")
-            str_parameters += param + " = " + str(value) + "\n"
+            if isinstance(value, str):
+                value = f'"{value}"'
+            str_parameters += param + f" = {value}\n"
 
         return str_parameters
 

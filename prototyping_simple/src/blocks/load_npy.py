@@ -22,4 +22,6 @@ def load_npy_function(path: str) -> Any:
 # --- Block object ---
 # ==================================================================================================
 
-load_npy = Block("load_npy", load_npy_function, dict_imports=dict_imports)
+load_npy = Block(
+    "load_npy", load_npy_function, dict_imports=dict_imports, dict_output={"output_load_npy": Any}
+)

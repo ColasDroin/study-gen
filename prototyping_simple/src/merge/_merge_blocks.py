@@ -25,9 +25,7 @@ def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, ty
 
     # If an output has been provided, remove it from the list of parameters
     # Except if it's modified inplace (inside of a block)
-    print("START")
     for block in l_blocks:
-        print("ICIOO", block.name, block.dict_output)
         for key in block.dict_output:
             # print("ICI", block.name, key, block.get_arguments_names(), dict_parameters)
             if key not in block.get_arguments_names() and key in dict_parameters:

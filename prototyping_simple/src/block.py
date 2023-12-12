@@ -24,6 +24,11 @@ class Block:
         self._dict_output = dict_output
         self._l_arguments = []
 
+        if len(dict_output) == 0 and "return" in self.get_str():
+            logging.warning(
+                f"Block {self.name} has no output defined, but the function has a return statement"
+            )
+
     @property
     def function(self: Self) -> Callable | None:
         if self._function is None:
@@ -324,7 +329,7 @@ class Block:
             )
 
         # Write function output
-        if output_str is not None:
+        if output_str is not None and output_str != "":
             function_output = f"\treturn {output_str}"
         else:
             function_output = ""
