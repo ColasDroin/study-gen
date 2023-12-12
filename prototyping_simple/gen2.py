@@ -33,10 +33,11 @@ def power_function(b: float, c: float) -> float:
     # Returns a at the power of b
     return np.power(b, c)
 
-def add_power_function(x: float, y: float, z: float) -> float:
+def add_power_function(y: float, z: float, x: float) -> float:
     """This is a merge test.
+    
     """
-
+    
     x_y = power_function(x, y)
     x_y = power_function(x_y, x_y)
     x_y_z = add_function(x_y, z)
@@ -48,7 +49,6 @@ def add_power_function(x: float, y: float, z: float) -> float:
 # ==================================================================================================
 
 def main(path_fact_a_bc: str, b: float, c: float, a: float, d: float, path_result: str) -> None:
-
 
     fact_a_bc = load_npy_function(path_fact_a_bc)
     bc_c = add_power_function(b, c, c)

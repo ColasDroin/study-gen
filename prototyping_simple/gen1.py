@@ -36,7 +36,6 @@ def save_npy_function(output: Any, path_output: str) -> None:
 
 def main(b: float, c: float, a: float, path_fact_a_bc: str) -> None:
 
-
     bc = multiply_function(b, c)
     a_bc = add_function(a, bc)
     fact_a_bc = gamma_function(a_bc)

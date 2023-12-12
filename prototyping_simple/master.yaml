@@ -29,7 +29,7 @@ gen2:
   new_blocks:
     add_power:
       docstring: "This is a merge test."
-      #params: [x, y, z]
+      params: [y, z, x]
       blocks:
         power:
           args: [x, y]

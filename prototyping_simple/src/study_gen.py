@@ -140,6 +140,32 @@ class StudyGen:
             # Compute the new block from merged blocks
             new_block_object = self.build_merged_blocks(new_block_name, new_block, dict_blocks)
 
+            # Ensure parameters match the definition
+            if "params" in new_block:
+                # Ensure that the parameters are provided in a list
+                if not isinstance(new_block["params"], list):
+                    new_block["params"] = [new_block["params"]]
+                # Ensure that the parameters are as they should be
+                if new_block_object.get_dict_parameters_names() != new_block["params"]:
+                    for param in new_block["params"]:
+                        if param not in new_block_object.get_dict_parameters_names():
+                            raise ValueError(
+                                f"Parameter {param} is not defined in the merged block"
+                            )
+                    for param in new_block_object.get_dict_parameters_names():
+                        if param not in new_block["params"]:
+                            raise ValueError(
+                                f"Parameter {param} is defined in the merged block but not in the"
+                                " master file"
+                            )
+                    # Reorder the parameters
+                    new_block_object.dict_parameters = OrderedDict(
+                        [
+                            (param, new_block_object.dict_parameters[param])
+                            for param in new_block["params"]
+                        ]
+                    )
+
             # Add dependencies of the new block to the dict of blocks
             for block_name in new_block_object.set_deps:
                 if block_name not in dict_blocks:
