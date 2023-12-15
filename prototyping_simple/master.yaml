@@ -1,5 +1,5 @@
 # Compute (a+b*c)!
-# Scan a and b from 0 to 100
+# Scan a and b
 gen1:
   script:
     multiply:
