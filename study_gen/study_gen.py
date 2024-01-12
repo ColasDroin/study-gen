@@ -5,7 +5,7 @@ from typing import Any, Callable, Self
 from jinja2 import Environment, FileSystemLoader
 from ruamel import yaml
 
-from . import blocks, merge
+from . import merge
 from .block import Block
 
 
@@ -14,13 +14,16 @@ class StudyGen:
         self: Self,
         path_configuration: str,
         path_master: str,
+        dict_ref_blocks: dict[str, Callable],
         path_template: str = "templates/",
         template_name: str = "default_template.txt",
+        
     ):
         self.configuration = self.load_configuration(path_configuration)
         self.master = self.load_master(path_master)
         self.path_template = path_template
         self.template_name = template_name
+        self.dict_ref_blocks = dict_ref_blocks
 
     def load_configuration(self: Self, path_configuration: str) -> dict[str, Any]:
         ryaml = yaml.YAML()
@@ -59,7 +62,7 @@ class StudyGen:
                 # Don't want to declare twice the same block
                 continue
             if block not in set_new_blocks:
-                dict_blocks[block] = getattr(blocks, block)
+                dict_blocks[block] = self.dict_ref_blocks[block]
 
         # Get blocks used for new blocks
         for new_block in set_new_blocks:
@@ -67,7 +70,7 @@ class StudyGen:
                 if "__" in block:
                     # Don't want to declare twice the same block
                     continue
-                dict_blocks[block] = getattr(blocks, block)
+                dict_blocks[block] = self.dict_ref_blocks[block]
 
         return dict_blocks
 
