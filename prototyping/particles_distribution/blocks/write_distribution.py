@@ -4,17 +4,16 @@
 # helpful to declare them also here for linting.
 # ==================================================================================================
 # Standard library imports
-import itertools
-from collections import OrderedDict
+import os
 
 # Third party imports
-import numpy as np
+import pandas as pd
 
 # Local imports
 from study_gen.block import Block
 
 # Imports needed for block to work (not detected by linting tools)
-dict_imports = {"numpy": "import numpy as np", "itertools": "import itertools"}
+dict_imports = {"os": "import os", "pandas": "import pandas as pd"}
 for module, import_statement in dict_imports.items():
     exec(import_statement)
 
@@ -22,33 +21,22 @@ for module, import_statement in dict_imports.items():
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def build_distribution_function(
-    r_min: float, r_max: float, n_r: int, n_angles: int, n_split: int
-) -> list[list[tuple[int, float, float]]]:
-    radial_list = np.linspace(r_min, r_max, n_r, endpoint=False)
-
-    # Define angle distribution
-    theta_list = np.linspace(0, 90, n_angles + 2)[1:-1]
-
-    # Define particle distribution as a cartesian product of the above
-    particle_list = [
-        (particle_id, ii[1], ii[0])
-        for particle_id, ii in enumerate(itertools.product(theta_list, radial_list))
-    ]
-
-    # Split distribution into several chunks for parallelization
-    particle_list = list(np.array_split(particle_list, n_split))
-
-    # Return distribution
-    return particle_list
+def write_distribution_function(particle_list: list[list[tuple[int, float, float]]]) -> None:
+    # Write distribution to parquet files
+    distributions_folder = "particles"
+    os.makedirs(distributions_folder, exist_ok=True)
+    for idx_chunk, my_list in enumerate(particle_list):
+        pd.DataFrame(
+            my_list,
+            columns=["particle_id", "normalized amplitude in xy-plane", "angle in xy-plane [deg]"],
+        ).to_parquet(f"{distributions_folder}/{idx_chunk:02}.parquet")
 
 
 # ==================================================================================================
 # --- Block object ---
 # ==================================================================================================
 
-build_distribution = Block(
-    "build_distribution",
-    build_distribution_function,
-    dict_output=OrderedDict([("output_build_distribution", float)]),
+write_distribution = Block(
+    "write_distribution",
+    write_distribution_function,
 )
