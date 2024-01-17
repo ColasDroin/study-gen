@@ -17,7 +17,6 @@ class StudyGen:
         dict_ref_blocks: dict[str, Callable],
         path_template: str = "templates/",
         template_name: str = "default_template.txt",
-        
     ):
         self.configuration = self.load_configuration(path_configuration)
         self.master = self.load_master(path_master)
@@ -221,7 +220,7 @@ class StudyGen:
                     if item is not None:
                         return item
 
-        str_parameters = "\t# Declare parameters\n"
+        str_parameters = "# Declare parameters\n"
         for param in main_block.dict_parameters:
             # Look recursively for the corresponding parameter value in the configuration
             value = _finditem(self.configuration, param)

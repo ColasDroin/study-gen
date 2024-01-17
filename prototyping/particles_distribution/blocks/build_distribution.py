@@ -1,7 +1,7 @@
 # ==================================================================================================
 # --- Imports ---
 # Some imports are optional as they're also declared in dict_imports, but it's
-# helpful to declare them also here for linting.
+# helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
 import itertools
@@ -50,5 +50,6 @@ def build_distribution_function(
 build_distribution = Block(
     "build_distribution",
     build_distribution_function,
+    dict_imports=dict_imports,
     dict_output=OrderedDict([("output_build_distribution", float)]),
 )

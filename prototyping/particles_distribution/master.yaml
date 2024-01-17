@@ -1,14 +1,17 @@
+# Generate and write particle distribution
 gen1:
   script:
-    - load_optics
-    - check_observables
-#   parameters_scanned:
-# gen2:
-#   script:
-#     - load_collider
-#     - track
+    build_distribution:
+      args: [r_min, r_max, n_r, n_angles, n_split]
+      output: particle_list
+    write_distribution:
+      args: particle_list
+      output:
 
-
-
-    
-
+  # parameters:
+  #   a:
+  #     range: [1, 100]
+  #     steps: 3
+  #   b:
+  #     range: [10, 20]
+  #     steps: 2

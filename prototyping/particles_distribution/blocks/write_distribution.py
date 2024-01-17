@@ -1,7 +1,7 @@
 # ==================================================================================================
 # --- Imports ---
 # Some imports are optional as they're also declared in dict_imports, but it's
-# helpful to declare them also here for linting.
+# helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
 import os
@@ -39,4 +39,5 @@ def write_distribution_function(particle_list: list[list[tuple[int, float, float
 write_distribution = Block(
     "write_distribution",
     write_distribution_function,
+    dict_imports=dict_imports,
 )
