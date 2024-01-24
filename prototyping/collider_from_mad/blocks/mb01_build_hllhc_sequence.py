@@ -47,8 +47,11 @@ def build_hllhc_sequence_function(
     apply_acsca_fix: bool,
     cycle_to_IP3: bool,
     incorporate_CC: bool,
-    beam: int,
 ) -> Madx:
+
+    # Get beam
+    # ! FIX THIS
+    beam = ?
 
     # Build initial sequence
     mad = build_initial_hllhc_sequence_function(mad, beam)

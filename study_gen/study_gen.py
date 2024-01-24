@@ -106,12 +106,19 @@ class StudyGen:
             else:
                 true_block = block
             block_to_update = copy.deepcopy(dict_blocks[true_block])
-            
+
             # Get arguments
+            # ! Ensure that unmixing arguments and output does not break anything
             l_args = new_block["blocks"][block]["args"]
-            l_outputs = new_block["blocks"][block]["output"]
+            # ! I need to find a way to handle provided arguments...
+            l_args = [arg if "=" not in arg else arg.split("=")[1] for arg in l_args]
             block_to_update.set_arguments_names(l_args)
+
+            # Get outputs
+            l_outputs = new_block["blocks"][block]["output"]
             block_to_update.set_outputs_names(l_outputs)
+
+            # Add to updated list of blocks
             l_blocks.append(block_to_update)
 
         # Get the dict of final output (with undefined type for now)
