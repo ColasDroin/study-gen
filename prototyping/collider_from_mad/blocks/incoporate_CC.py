@@ -21,7 +21,7 @@ for module, import_statement in dict_imports.items():
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def ignore_CC_function(
+def incorporate_CC_function(
     mad: Madx,
 ) -> Madx:
     mad.input("""
@@ -38,9 +38,9 @@ def ignore_CC_function(
 # --- Block object ---
 # ==================================================================================================
 
-ignore_CC = Block(
-    "ignore_CC",
-    ignore_CC_function,
+incorporate_CC = Block(
+    "incorporate_CC",
+    incorporate_CC_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_ignore_CC", Madx)]),
+    dict_output=OrderedDict([("output_incorporate_CC", Madx)]),
 )
