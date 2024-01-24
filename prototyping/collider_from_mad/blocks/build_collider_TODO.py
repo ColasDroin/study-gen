@@ -24,8 +24,9 @@ for module, import_statement in dict_imports.items():
 # ==================================================================================================
 # ! Type parameters
 def build_collider_function(links, sanity_checks=True):
+    
     # Make mad environment
-    xm.make_mad_environment(links=config_mad["links"])
+    xm.make_mad_environment(links=links)
 
     # Start mad for all beams
     mad_b1b2 = Madx(command_log="mad_b1b2.log")

@@ -4,14 +4,14 @@ import logging
 import sys
 import tempfile
 from collections import OrderedDict
-from typing import Any, Callable, Self
+from typing import Callable, Self
 
 
 class Block:
     def __init__(
         self,
         name: str,
-        function: Callable | None = None,
+        function: Callable,
         dict_imports: dict[str, str] = OrderedDict(),
         set_deps: set[str] = set(),
         dict_output: OrderedDict[str, type] = OrderedDict(),
@@ -29,7 +29,7 @@ class Block:
             )
 
     @property
-    def function(self: Self) -> Callable | None:
+    def function(self: Self) -> Callable:
         if self._function is None:
             logging.warning("No function defined for this block")
         return self._function

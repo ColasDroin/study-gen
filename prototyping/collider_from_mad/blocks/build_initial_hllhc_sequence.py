@@ -23,7 +23,7 @@ for module, import_statement in dict_imports.items():
 # ==================================================================================================
 def build_initial_hllhc_sequence_function(
     mad: Madx,
-    beam: str,
+    beam: int,
 ) -> Madx:
 
     # Select beam
@@ -55,7 +55,7 @@ def build_initial_hllhc_sequence_function(
 
 build_initial_hllhc_sequence = Block(
     "build_initial_hllhc_sequence",
-    build_initial_hllhc_sequence_function,
+    function=build_initial_hllhc_sequence_function,
     dict_imports=dict_imports,
     dict_output=OrderedDict([("output_build_initial_hllhc_sequence", Madx)]),
 )

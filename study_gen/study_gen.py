@@ -50,20 +50,25 @@ class StudyGen:
         # Start with empty dict of blocks
         dict_blocks = OrderedDict()
 
-        # Get set of new (merged) blocks
+        # Get set of new (merged) blocks names
         set_new_blocks = set()
         if "new_blocks" in self.master[gen]:
             set_new_blocks.update(self.master[gen]["new_blocks"].keys())
 
-        # Get all blocks (except new blocks)
+        # Get all blocks (except new blocks) objects
         for block in self.master[gen]["script"]:
             if "__" in block:
                 # Don't want to declare twice the same block
                 continue
             if block not in set_new_blocks:
+                # Get dependencies of the block first
+                for dep in self.dict_ref_blocks[block].set_deps:
+                    if dep not in dict_blocks:
+                        dict_blocks[dep] = self.dict_ref_blocks[dep]
+                # Then get the block itself
                 dict_blocks[block] = self.dict_ref_blocks[block]
 
-        # Get blocks used for new blocks
+        # Get blocks objects used for new blocks
         for new_block in set_new_blocks:
             for block in self.master[gen]["new_blocks"][new_block]["blocks"]:
                 if "__" in block:
@@ -74,6 +79,14 @@ class StudyGen:
                     continue
                 dict_blocks[block] = self.dict_ref_blocks[block]
 
+        # Ensure that all blocks have valid dependencies
+        for block in dict_blocks.values():
+            for dep in block.set_deps:
+                if dep not in dict_blocks:
+                    raise ValueError(
+                        f"Block {block.name} depends on block {dep} but this block is not defined"
+                        " in the master file."
+                    )
         return dict_blocks
 
     def build_merged_blocks(
