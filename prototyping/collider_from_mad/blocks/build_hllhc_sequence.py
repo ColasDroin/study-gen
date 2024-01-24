@@ -24,8 +24,6 @@ from .slice_sequence import slice_sequence_function
 
 # Imports needed for block to work (not detected by linting tools)
 dict_imports = {"Madx": "from cpymad.madx import Madx", "xm": "import xmask as xm"}
-for module, import_statement in dict_imports.items():
-    exec(import_statement)
 
 # Block dependencies
 set_deps = set(

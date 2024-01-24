@@ -4,40 +4,34 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
+import os
 
 # Third party imports
-from cpymad.madx import Madx
+import xtrack as xt
 
 # Local imports
 from study_gen.block import Block
 
 # Imports needed for block to work (not detected by linting tools)
-dict_imports = {"Madx": "from cpymad.madx import Madx"}
+dict_imports = {"xt": "import xtrack as xt"}
 
 
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def initialize_beam_function(
-    mad: Madx,
-) -> Madx:
-    mad.input("""
-    nrj=7000;
-    beam,particle=proton,sequence=lhcb1,energy=nrj,npart=1.15E11,sige=4.5e-4;
-    beam,particle=proton,sequence=lhcb2,energy=nrj,bv = -1,npart=1.15E11,sige=4.5e-4;
-    """)
-
-    return mad
+def dump_collider_json_function(
+    collider: xt.Multiline,
+) -> None:
+    os.makedirs("collider", exist_ok=True)
+    collider.to_json("collider/collider.json")
 
 
 # ==================================================================================================
 # --- Block object ---
 # ==================================================================================================
 
-initialize_beam = Block(
-    "initialize_beam",
-    initialize_beam_function,
+dump_collider_json = Block(
+    "dump_collider_json",
+    dump_collider_json_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_initialize_beam", Madx)]),
 )

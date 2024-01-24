@@ -7,37 +7,42 @@
 from collections import OrderedDict
 
 # Third party imports
-from cpymad.madx import Madx
+import xtrack as xt
 
 # Local imports
 from study_gen.block import Block
 
 # Imports needed for block to work (not detected by linting tools)
-dict_imports = {"Madx": "from cpymad.madx import Madx"}
+dict_imports = {"xt": "import xtrack as xt"}
 
 
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def initialize_beam_function(
-    mad: Madx,
-) -> Madx:
-    mad.input("""
-    nrj=7000;
-    beam,particle=proton,sequence=lhcb1,energy=nrj,npart=1.15E11,sige=4.5e-4;
-    beam,particle=proton,sequence=lhcb2,energy=nrj,bv = -1,npart=1.15E11,sige=4.5e-4;
-    """)
+def activate_RF_function(
+    collider: xt.Multiline,
+) -> xt.Multiline:
 
-    return mad
+    # Define a RF system for twissing (values are not so immportant as they're defined later)
+    dic_rf = {"vrf400": 16.0, "lagrf400.b1": 0.5, "lagrf400.b2": 0.5}
+    print("Now Computing Twiss assuming:")
+    for knob, val in dic_rf.items():
+        print(f"\t{knob} = {val}")
+
+    # Apply the RF system
+    for knob, val in dic_rf.items():
+        collider.vars[knob] = val
+
+    return collider
 
 
 # ==================================================================================================
 # --- Block object ---
 # ==================================================================================================
 
-initialize_beam = Block(
-    "initialize_beam",
-    initialize_beam_function,
+activate_RF = Block(
+    "activate_RF",
+    activate_RF_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_initialize_beam", Madx)]),
+    dict_output=OrderedDict([("output_activate_RF", xt.Multiline)]),
 )

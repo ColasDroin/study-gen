@@ -4,40 +4,30 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
-
-# Third party imports
-from cpymad.madx import Madx
+import os
+import shutil
 
 # Local imports
 from study_gen.block import Block
-
-# Imports needed for block to work (not detected by linting tools)
-dict_imports = {"Madx": "from cpymad.madx import Madx"}
 
 
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def initialize_beam_function(
-    mad: Madx,
-) -> Madx:
-    mad.input("""
-    nrj=7000;
-    beam,particle=proton,sequence=lhcb1,energy=nrj,npart=1.15E11,sige=4.5e-4;
-    beam,particle=proton,sequence=lhcb2,energy=nrj,bv = -1,npart=1.15E11,sige=4.5e-4;
-    """)
-
-    return mad
+def clean_temp_files_function() -> None:
+    # Remove all the temporaty files created in the process of building collider
+    os.remove("mad_collider.log")
+    os.remove("mad_b4.log")
+    shutil.rmtree("temp")
+    os.unlink("errors")
+    os.unlink("acc-models-lhc")
 
 
 # ==================================================================================================
 # --- Block object ---
 # ==================================================================================================
 
-initialize_beam = Block(
-    "initialize_beam",
-    initialize_beam_function,
-    dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_initialize_beam", Madx)]),
+clean_temp_files = Block(
+    "clean_temp_files",
+    clean_temp_files_function,
 )
