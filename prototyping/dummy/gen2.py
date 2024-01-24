@@ -43,6 +43,12 @@ def add_power_function(y: float, z: float, x: float) -> float:
     x_y_z = add_function(x_y, z)
     return x_y_z
 
+def add_power_multiply_function(x: float, y: float, z: float, w: float) -> float:
+
+    x_y_z = add_power_function(x, y, z)
+    x_y_z_w = multiply_function(x_y_z, w)
+    return x_y_z_w
+
 
 # ==================================================================================================
 # --- Main
@@ -55,7 +61,8 @@ def main(path_fact_a_bc: str, b: float, c: float, a: float, d: float, path_resul
     a_bc_c = multiply_function(a, bc_c)
     c_c_d = add_power_function(c, c, d)
     a_bc_c_c_d = add_function(a_bc_c, c_c_d)
-    result = multiply_function(fact_a_bc, a_bc_c_c_d)
+    a_bc_c_c_d_new = add_power_multiply_function(a, b, c, a_bc_c_c_d)
+    result = multiply_function(fact_a_bc, a_bc_c_c_d_new)
     save_pkl_function(result, path_result)
 
 
@@ -64,7 +71,7 @@ def main(path_fact_a_bc: str, b: float, c: float, a: float, d: float, path_resul
 # --- Parameters
 # ==================================================================================================
 
-	# Declare parameters
+# Declare parameters
 path_fact_a_bc = "fact_a_bc.npy"
 b = 10
 c = 4

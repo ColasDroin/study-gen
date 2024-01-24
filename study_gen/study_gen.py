@@ -1,6 +1,6 @@
 import copy
 from collections import OrderedDict
-from typing import Any, Callable, Self
+from typing import Any, Self
 
 from jinja2 import Environment, FileSystemLoader
 from ruamel import yaml
@@ -14,7 +14,7 @@ class StudyGen:
         self: Self,
         path_configuration: str,
         path_master: str,
-        dict_ref_blocks: dict[str, Callable],
+        dict_ref_blocks: dict[str, Block],
         path_template: str = "templates/",
         template_name: str = "default_template.txt",
     ):
@@ -68,6 +68,9 @@ class StudyGen:
             for block in self.master[gen]["new_blocks"][new_block]["blocks"]:
                 if "__" in block:
                     # Don't want to declare twice the same block
+                    continue
+                if block in set_new_blocks:
+                    # New blocks will be declared later
                     continue
                 dict_blocks[block] = self.dict_ref_blocks[block]
 
@@ -128,7 +131,7 @@ class StudyGen:
             l_blocks,
             name_merged_function,
             docstring=new_block["docstring"],
-            dict_output=dict_outputs_final,
+            dict_output=dict_outputs_final,  # type: ignore
         )
 
         return new_block_function
@@ -172,7 +175,7 @@ class StudyGen:
             for block_name in new_block_object.set_deps:
                 if block_name not in dict_blocks:
                     try:
-                        dict_blocks[block_name] = getattr(blocks, block_name)
+                        dict_blocks[block_name] = self.dict_ref_blocks[block_name]
                     except AttributeError:
                         raise ValueError(
                             f"Block {block_name} is used in block {new_block_name} but is not"

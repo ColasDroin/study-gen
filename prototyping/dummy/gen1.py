@@ -47,7 +47,7 @@ def main(b: float, c: float, a: float, path_fact_a_bc: str) -> None:
 # --- Parameters
 # ==================================================================================================
 
-	# Declare parameters
+# Declare parameters
 b = 10
 c = 4
 a = 2
