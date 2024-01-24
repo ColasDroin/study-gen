@@ -1,11 +1,11 @@
 # Generate and write particle distribution
 gen1:
   script:
-    build_distribution:
-      args: [r_min, r_max, n_r, n_angles, n_split]
-      output: particle_list
-    write_distribution:
-      args: particle_list
+    prepare_mad_environment:
+      args: links
+      output: mad_b1b2, mad_b4
+    build_hllhc_sequence:
+      args: [mad_b1b2, apply_acsca_fix, cycle_to_IP3, incorporate_CC, beam = 1]
       output:
 
   # parameters:

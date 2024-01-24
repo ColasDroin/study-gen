@@ -106,6 +106,8 @@ class StudyGen:
             else:
                 true_block = block
             block_to_update = copy.deepcopy(dict_blocks[true_block])
+            
+            # Get arguments
             l_args = new_block["blocks"][block]["args"]
             l_outputs = new_block["blocks"][block]["output"]
             block_to_update.set_arguments_names(l_args)
