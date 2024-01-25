@@ -1,0 +1,85 @@
+# Compute (a+b*c)!
+# Scan a and b
+gen1:
+  script:
+    multiply:
+      args: [b, c]
+      output: bc
+    add:
+      args: [a, bc]
+      output: a_bc
+    gamma:
+      args: a_bc
+      output: fact_a_bc
+    save_npy:
+      args: [fact_a_bc, path_fact_a_bc]
+      output:
+
+  # parameters:
+  #   a:
+  #     range: [1, 100]
+  #     steps: 3
+  #   b:
+  #     range: [10, 20]
+  #     steps: 2
+
+# Compute fact_a_bc * (a * (b**c + c) + (d + c**c))
+# Scan d from 0 to 1
+gen2:
+  new_blocks:
+    add_power:
+      docstring: "This is a merge test."
+      params: [y, z, x]
+      blocks:
+        power:
+          args: [x, y]
+          output: x_y
+        power__2:
+          args: [x_y, x_y]
+          output: x_y
+        add:
+          args: [x_y, z]
+          output: x_y_z
+      output: x_y_z
+    add_power_multiply:
+      params: [x, y, z, w]
+      blocks:
+        add_power:
+          args: [x, y, z]
+          output: x_y_z
+        multiply:
+          args: [x_y_z, w]
+          output: x_y_z_w
+      output: x_y_z_w
+
+  script:
+    load_npy:
+      args: path_fact_a_bc
+      output: fact_a_bc
+    add_power:
+      args: [b, c, c]
+      output: bc_c
+    multiply:
+      args: [a, bc_c]
+      output: a_bc_c
+    add_power__2:
+      args: [c, c, d]
+      output: c_c_d
+    add:
+      args: [a_bc_c, c_c_d]
+      output: a_bc_c_c_d
+    add_power_multiply:
+      args: [a, b, c, a_bc_c_c_d]
+      output: a_bc_c_c_d_new
+    multiply__2:
+      args: [fact_a_bc, a_bc_c_c_d_new]
+      output: result
+
+    save_pkl:
+      args: [result, path_result]
+      output:
+
+  # parameters:
+  #   d:
+  #     range: [0, 1]
+  #     steps: 4
