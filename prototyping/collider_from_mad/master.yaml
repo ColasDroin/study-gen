@@ -27,6 +27,60 @@ gen2:
       output: path_correction_setup
     install_beam_beam:
       args: collider, num_long_range_encounters_per_side, num_slices_head_on, bunch_spacing_buckets, sigma_z
+      output: collider
+    build_tracker:
+      args: collider
+      output: collider
+    set_knobs:
+      args: collider, knob_settings
+      output: collider
+    match_tune_and_chroma:
+      args: collider, conf_knob_names, conf_qx, conf_qy, conf_dqx, conf_dqy, conf_closed_orbit_correction
+      output: collider
+    load_filling_scheme:
+      args: filling_scheme_path
+      output: array_b1, array_b2
+    compute_collision_schedule:
+      args: array_b1, array_b2
+      output: n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8
+    get_CC_bool:
+      args: crab1_val, crab5_val
+      output: crab_bool
+    luminosity_levelling_ip1_5_function:
+      args: collider, n_collisions_ip1_and_5, nemitt_x, nemitt_y, sigma_z, crab_bool, max_PU, max_lumi_ip1_and_5, max_bunch_intensity, target_lumi_ip1_and_5
+      output: luminosity_ip1_and_5_after_optimization_before_bb
+    compute_constraints_ip8_function:
+      args: l_contraints_ip8
+      output: xsuite_constraints_ip8
+    luminosity_levelling_ip2_8_function:
+      args: collider, config_lumi_leveling_ip2_8, num_particles_per_bunch, sigma_z, nemitt_x, nemitt_y, n_collisions_ip8, xsuite_constraints_ip8
+      output: collider
+    add_linear_coupling_hllhc:
+      args: collider, delta_cmr
+      output: collider
+    match_tune_and_chroma:
+      args: collider, conf_knob_names, conf_qx, conf_qy, conf_dqx, conf_dqy, conf_closed_orbit_correction
+      output: collider
+    assert_tune_chroma_coupling:
+      args: collider, conf_qx, conf_qy, conf_dqx, conf_dqy, delta_cmr
+      output: 
+    configure_beam_beam_interactions:
+      args: collider, num_particles_per_bunch, nemitt_x, nemitt_y
+      output: collider
+    apply_filling_scheme:
+      args: collider, array_b1, array_b2, i_bunch_b1, i_bunch_b2
+      output: collider
+    record_final_luminosity_and_PU:
+      args: collider, num_particles_per_bunch, nemitt_x, nemitt_y, sigma_z, crab_bool, n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8
+      output: lumi_ip1, lumi_ip2, lumi_ip5, lumi_ip8, PU_ip1, PU_ip2, PU_ip5, PU_ip8
+    dump_collider_json:
+      args: collider, name_configured_collider
+      output:
+    
+
+    
+    
+
       
     
   

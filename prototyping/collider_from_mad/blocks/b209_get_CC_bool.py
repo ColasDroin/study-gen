@@ -15,12 +15,12 @@ from study_gen.block import Block
 # ==================================================================================================
 def get_CC_bool_function(
     crab1_val: float,
-    crab2_val: float,
+    crab5_val: float,
 ) -> bool:
 
     # Get crab cavities as boolean
     crab = False
-    if abs(crab1_val) > 0 or abs(crab2_val) > 0:
+    if abs(crab1_val) > 0 or abs(crab5_val) > 0:
         crab = True
     return crab
 

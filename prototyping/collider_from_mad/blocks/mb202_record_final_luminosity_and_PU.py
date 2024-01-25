@@ -35,7 +35,7 @@ def record_final_luminosity_and_PU_function(
     num_colliding_bunches_ip1_and_5: int,
     num_colliding_bunches_ip2: int,
     num_colliding_bunches_ip8: int,
-) -> tuple[list[float], list[float]]:
+) -> list[float]:
 
     # Get the final luminoisty in all IPs
     twiss_b1 = collider["lhcb1"].twiss()
@@ -70,7 +70,7 @@ def record_final_luminosity_and_PU_function(
         l_lumi.append(L)
         l_PU.append(PU)
 
-    return l_lumi, l_PU
+    return l_lumi + l_PU
 
 
 # ==================================================================================================
@@ -81,8 +81,6 @@ add_linear_coupling = Block(
     "record_final_luminosity_and_PU",
     record_final_luminosity_and_PU_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict(
-        [("output_record_final_luminosity_and_PU", tuple[list[float], list[float]])]
-    ),
+    dict_output=OrderedDict([("output_record_final_luminosity_and_PU", list[float])]),
     set_deps=set_deps,
 )
