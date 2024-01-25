@@ -14,13 +14,13 @@ from cpymad.madx import Madx
 from study_gen.block import Block
 
 # Block dependencies
-from .b01_build_initial_hllhc_sequence import build_initial_hllhc_sequence_function
-from .b02_apply_acsca_fix_hllhc import apply_acsca_fix_hllhc_function
-from .b03_slice_sequence import slice_sequence_function
-from .b04_initialize_beam import initialize_beam_function
-from .b05_cycle_to_IP3 import cycle_to_IP3_function
-from .b06_incorporate_CC import incorporate_CC_function
-from .b07_set_twiss import set_twiss_function
+from .b101_build_initial_hllhc_sequence import build_initial_hllhc_sequence_function
+from .b102_apply_acsca_fix_hllhc import apply_acsca_fix_hllhc_function
+from .b103_slice_sequence import slice_sequence_function
+from .b104_initialize_beam import initialize_beam_function
+from .b105_cycle_to_IP3 import cycle_to_IP3_function
+from .b106_incorporate_CC import incorporate_CC_function
+from .b107_set_twiss import set_twiss_function
 
 # Imports needed for block to work (not detected by linting tools)
 dict_imports = {"Madx": "from cpymad.madx import Madx", "xm": "import xmask as xm"}

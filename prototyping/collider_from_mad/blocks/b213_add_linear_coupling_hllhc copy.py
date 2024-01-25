@@ -4,7 +4,7 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-import os
+from collections import OrderedDict
 
 # Third party imports
 import xtrack as xt
@@ -19,19 +19,31 @@ dict_imports = {"xt": "import xtrack as xt"}
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def dump_collider_json_function(
+def add_linear_coupling_hllhc_function(
     collider: xt.Multiline,
-) -> None:
-    os.makedirs("collider", exist_ok=True)
-    collider.to_json("collider/collider.json")
+    delta_cmr: float,
+    # delta_cmi: float,
+) -> xt.Multiline:
+
+    # Add linear coupling as the target in the tuning of the base collider was 0
+    # (not possible to set it the target to 0.001 for now)
+    collider.vars["c_minus_re_b1"] += delta_cmr
+    collider.vars["c_minus_re_b2"] += delta_cmr
+
+    # ! Only handle real coupling for now
+    # collider.vars["c_minus_im_b1"] += delta_cmi
+    # collider.vars["c_minus_im_b2"] += delta_cmi
+
+    return collider
 
 
 # ==================================================================================================
 # --- Block object ---
 # ==================================================================================================
 
-dump_collider_json = Block(
-    "dump_collider_json",
-    dump_collider_json_function,
+add_linear_coupling = Block(
+    "add_linear_coupling_hllhc",
+    add_linear_coupling_hllhc_function,
     dict_imports=dict_imports,
+    dict_output=OrderedDict([("output_add_linear_coupling_hllhc", xt.Multiline)]),
 )

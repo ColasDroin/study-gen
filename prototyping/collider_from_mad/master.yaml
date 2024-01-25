@@ -16,6 +16,19 @@ gen1:
     
 gen2:
   script:
+    load_collider_json:
+      args: name_base_collider
+      output: collider
+    generate_orbit_configuration_setup:
+      args:
+      output: correction_setup
+    dump_orbit_configuration_files:
+      args: correction_setup
+      output: path_correction_setup
+    install_beam_beam:
+      args: collider, num_long_range_encounters_per_side, num_slices_head_on, bunch_spacing_buckets, sigma_z
+      
+    
   
 
 

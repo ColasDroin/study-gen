@@ -28,7 +28,7 @@ dict_imports = {
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def build_collider_with_trackers_function(
+def build_collider_function(
     mad_b1b2: Madx,
     mad_b4: Madx,
     beam_config: OrderedDict[str, Any],
@@ -53,9 +53,6 @@ def build_collider_with_trackers_function(
         ver_hllhc_optics=ver_hllhc_optics,
     )
 
-    # Build trackers (CPU context by defaults)
-    collider.build_trackers()
-
     return collider
 
 
@@ -63,9 +60,9 @@ def build_collider_with_trackers_function(
 # --- Block object ---
 # ==================================================================================================
 
-build_collider_with_trackers = Block(
-    "build_collider_with_trackers",
-    build_collider_with_trackers_function,
+build_collider = Block(
+    "build_collider",
+    build_collider_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_build_collider_with_trackers", xt.Multiline)]),
+    dict_output=OrderedDict([("output_build_collider", xt.Multiline)]),
 )

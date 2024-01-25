@@ -3,6 +3,9 @@
 # Some imports are optional as they're also declared in dict_imports, but it's
 # helpful to declare them here for linting.
 # ==================================================================================================
+# Standard library imports
+from collections import OrderedDict
+
 # Local imports
 from study_gen.block import Block
 
@@ -261,4 +264,5 @@ def generate_orbit_correction_setup_function() -> dict:
 get_context = Block(
     "generate_orbit_correction_setup",
     generate_orbit_correction_setup_function,
+    dict_output=OrderedDict([("output_generate_orbit_correction_setup", dict)]),
 )

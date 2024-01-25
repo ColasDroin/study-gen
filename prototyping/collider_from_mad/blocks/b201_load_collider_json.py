@@ -1,0 +1,35 @@
+# ==================================================================================================
+# --- Imports ---
+# Some imports are optional as they're also declared in dict_imports, but it's
+# helpful to declare them here for linting.
+# ==================================================================================================
+# Standard library imports
+from collections import OrderedDict
+
+# Third party imports
+import xtrack as xt
+
+# Local imports
+from study_gen.block import Block
+
+# Imports needed for block to work (not detected by linting tools)
+dict_imports = {"xt": "import xtrack as xt"}
+# ==================================================================================================
+# --- Block function ---
+# ==================================================================================================
+
+
+def load_collider_json_function(path_base_collider: str) -> xt.Multiline:
+    collider = xt.Multiline.from_json(path_base_collider)
+    return collider
+
+
+# ==================================================================================================
+# --- Block object ---
+# ==================================================================================================
+
+get_context = Block(
+    "load_collider_json",
+    load_collider_json_function,
+    dict_output=OrderedDict([("output_load_collider_json", xt.Multiline)]),
+)
