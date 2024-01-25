@@ -14,6 +14,10 @@ gen1:
       args: [mad_b1b2, optics_file]
       output: mad_b1b2
     
+gen2:
+  script:
+  
+
 
   # parameters:
   #   a:
