@@ -110,8 +110,6 @@ class StudyGen:
             # Get arguments
             # ! Ensure that unmixing arguments and output does not break anything
             l_args = new_block["blocks"][block]["args"]
-            # ! I need to find a way to handle provided arguments...
-            l_args = [arg if "=" not in arg else arg.split("=")[1] for arg in l_args]
             block_to_update.set_arguments_names(l_args)
 
             # Get outputs
@@ -247,6 +245,7 @@ class StudyGen:
 
         str_parameters = "# Declare parameters\n"
         for param in main_block.dict_parameters:
+            print(main_block.dict_parameters)
             # Look recursively for the corresponding parameter value in the configuration
             value = _finditem(self.configuration, param)
             if value is None:
