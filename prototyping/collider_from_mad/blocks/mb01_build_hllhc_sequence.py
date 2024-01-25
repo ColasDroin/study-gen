@@ -43,15 +43,20 @@ set_deps = set(
 # --- Block function ---
 # ==================================================================================================
 def build_hllhc_sequence_function(
+    beam_name: str,
     mad: Madx,
     apply_acsca_fix: bool,
     cycle_to_IP3: bool,
     incorporate_CC: bool,
 ) -> Madx:
 
-    # Get beam
-    # ! FIX THIS
-    beam = ?
+    # Get beam number
+    if beam_name == "b1b2":
+        beam = 1
+    elif beam_name == "b4":
+        beam = 4
+    else:
+        raise ValueError("Beam name not recognized.")
 
     # Build initial sequence
     mad = build_initial_hllhc_sequence_function(mad, beam)

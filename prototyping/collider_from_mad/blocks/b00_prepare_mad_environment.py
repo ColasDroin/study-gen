@@ -26,16 +26,18 @@ dict_imports = {
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def prepare_mad_environment_function(links: OrderedDict[str, Any]) -> tuple[Madx, Madx]:
+def prepare_mad_environment_function(links: OrderedDict[str, Any]) -> tuple[str, Madx, str, Madx]:
 
     # Make mad environment
     xm.make_mad_environment(links=links)
 
     # Start mad for all beams
-    mad_b1b2 = Madx(command_log="mad_b1b2.log")
-    mad_b4 = Madx(command_log="mad_b4.log")
+    b1b2_name = "b1b2"
+    b4_name = "b4"
+    mad_b1b2 = Madx(command_log="mad" + b1b2_name + ".log")
+    mad_b4 = Madx(command_log="mad" + b4_name + ".log")
 
-    return mad_b1b2, mad_b4
+    return b1b2_name, mad_b1b2, b4_name, mad_b4
 
 
 # ==================================================================================================
