@@ -19,7 +19,12 @@ dict_imports = {"Madx": "from cpymad.madx import Madx", "np": "import numpy as n
 # ==================================================================================================
 def check_madx_lattice_function(
     mad: Madx,
+    sequence_name: str,
 ) -> None:
+
+    # Select correct sequence and twiss
+    mad.use(sequence=sequence_name)
+    mad.twiss()
 
     # Internal mad globals asserts
     assert mad.globals["qxb1"] == mad.globals["qxb2"]

@@ -13,12 +13,41 @@ gen1:
     apply_optics:
       args: [mad_b1b2, optics_file]
       output: mad_b1b2
-    twiss:
-
+    check_madx_lattice:
+      args: mad_b1b2, sequence_name_b1
+      output:
+    check_madx_lattice:
+      args: mad_b1b2, sequence_name_b2
+      output: 
     apply_optics:
       args: [mad_b4, optics_file]
       output: mad_b4
+    check_madx_lattice:
+      args: mad_b4, sequence_name_b2
+      output: 
+    build_collider:
+      args: [mad_b1b2, mad_b4, beam_config, enable_imperfections, enable_knob_synthesis, rename_coupling_knobs, pars_for_imperfections, ver_hllhc_optics]
+      output: collider
+    build_trackers:
+      args: collider
+      output: collider
+    check_xsuite_twiss:
+      args: collider
+      output:
+    activate_RF:
+      args: collider
+      output: collider
+    display_xsuite_lattice:
+      args: collider
+      output:
+    clean_temp_files:
+      args: 
+      output:
+    dump_collider_json:
+      args: collider
+      output: name_base_collider
     
+
 gen2:
   script:
     load_collider_json:
