@@ -14,14 +14,19 @@ class Block:
         function: Callable,
         dict_imports: dict[str, str] = OrderedDict(),
         set_deps: set[str] = set(),
-        dict_output: OrderedDict[str, type] = OrderedDict(),
+        dict_output: OrderedDict[str, type]|None = None,
     ):
         self.name = name
         self._function = function
         self.dict_imports = dict_imports
         self.set_deps = set_deps
         self._l_arguments = []
-        self.initial_dic_output_setter(dict_output)
+
+        # Set output
+        if dict_output is None:
+            self._dict_output = self.initial_dic_output_setter_from_signature()
+        else:
+            self._dict_output = self. initial_dic_output_setter_from_output(dict_output)
 
     @property
     def function(self: Self) -> Callable:
@@ -34,10 +39,39 @@ class Block:
         self._function = function
 
     @property
-    def dict_output(self: Self):
+    def dict_output(self: Self) -> OrderedDict[str, type]:
         return self._dict_output
 
-    def initial_dic_output_setter(self: Self, dict_output: OrderedDict[str, type]):
+    def initial_dic_output_setter_from_signature(self: Self) -> OrderedDict[str, type]:
+
+        # Get signature output as str
+        signature_output_str = str(self.get_signature())
+
+        # Check that output exists
+        if "->" in signature_output_str:
+            signature_output_str = signature_output_str
+        else:
+            raise ValueError(f"Block {self.name} has no output signature")
+
+        # Create empty dict_output
+        dict_output = OrderedDict()
+
+        # Get signature hint output
+        signature_type_hint = self.get_output_type_from_signature()
+
+        # Check if several outputs are defined
+        if "tuple[" in signature_output_str:
+
+            # Create each output name and type from the signature
+            for type_output in signature_type_hint.__args__:  # type: ignore
+                dict_output[f"output_{len(dict_output)}_{self.name}"] = type_output
+        else:
+            dict_output[f"output_{self.name}"] = signature_type_hint
+
+        return dict_output
+
+
+    def initial_dic_output_setter_from_output(self: Self, dict_output: OrderedDict[str, type]) -> OrderedDict[str, type]:
 
         # Check that the output corresponds to the return statement
         if len(dict_output) == 0 and "return" in self.get_str():
@@ -52,11 +86,8 @@ class Block:
         if "->" in signature_output_str:
             signature_output_str = signature_output_str
         else:
-            if len(dict_output) > 0:
-                raise ValueError(f"Block {self.name} has no signature, but the output is defined")
-            else:
-                self._dict_output = dict_output
-                return
+            raise ValueError(f"Block {self.name} has no output signature")
+
 
         # Get signature hint output
         signature_type_hint = self.get_output_type_from_signature()
@@ -95,7 +126,7 @@ class Block:
                         f" {list(dict_output.values())[0].__name__} for block {self.name}"
                     )
 
-        self._dict_output = dict_output
+        return dict_output
 
     @dict_output.setter
     def dict_output(self: Self, dict_output: OrderedDict[str, type]):
