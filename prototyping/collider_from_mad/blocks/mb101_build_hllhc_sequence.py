@@ -28,7 +28,7 @@ dict_imports = {"Madx": "from cpymad.madx import Madx", "xm": "import xmask as x
 # Block dependencies
 set_deps = set(
     [
-        "apply_acsca_fix_hllh",
+        "apply_acsca_fix_hllhc",
         "build_initial_hllhc_sequence",
         "cycle_to_IP3",
         "incorporate_CC",

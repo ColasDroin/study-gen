@@ -3,12 +3,26 @@ gen1:
   script:
     prepare_mad_environment:
       args: links
-      output: sequence_name_b1, sequence_name_b2, b4_name, sequence_name_b4
+      output: sequence_name_b1, sequence_name_b2, mad_b1b2, b4_name, sequence_name_b4, mad_b4
     build_hllhc_sequence:
-      args: [sequence_name_b1, mad_b1b2, apply_acsca_fix, cycle_to_IP3, incorporate_CC]
+      args:
+        [
+          sequence_name_b1,
+          mad_b1b2,
+          apply_acsca_fix,
+          cycle_to_IP3,
+          incorporate_CC,
+        ]
       output: mad_b1b2
-    build_hllhc_sequence:
-      args: [sequence_name_b4, mad_b4, apply_acsca_fix, cycle_to_IP3, incorporate_CC]
+    build_hllhc_sequence__2:
+      args:
+        [
+          sequence_name_b4,
+          mad_b4,
+          apply_acsca_fix,
+          cycle_to_IP3,
+          incorporate_CC,
+        ]
       output: mad_b4
     apply_optics:
       args: [mad_b1b2, optics_file]
@@ -16,17 +30,27 @@ gen1:
     check_madx_lattice:
       args: mad_b1b2, sequence_name_b1
       output:
-    check_madx_lattice:
+    check_madx_lattice__2:
       args: mad_b1b2, sequence_name_b2
-      output: 
-    apply_optics:
+      output:
+    apply_optics__2:
       args: [mad_b4, optics_file]
       output: mad_b4
-    check_madx_lattice:
+    check_madx_lattice__3:
       args: mad_b4, sequence_name_b2
-      output: 
+      output:
     build_collider:
-      args: [mad_b1b2, mad_b4, beam_config, enable_imperfections, enable_knob_synthesis, rename_coupling_knobs, pars_for_imperfections, ver_hllhc_optics]
+      args:
+        [
+          mad_b1b2,
+          mad_b4,
+          beam_config,
+          enable_imperfections,
+          enable_knob_synthesis,
+          rename_coupling_knobs,
+          pars_for_imperfections,
+          ver_hllhc_optics,
+        ]
       output: collider
     build_trackers:
       args: collider
@@ -41,12 +65,11 @@ gen1:
       args: collider
       output:
     clean_temp_files:
-      args: 
+      args:
       output:
     dump_collider_json:
       args: collider
       output: name_base_collider
-    
 
 gen2:
   script:
@@ -92,12 +115,12 @@ gen2:
     add_linear_coupling_hllhc:
       args: collider, delta_cmr
       output: collider
-    match_tune_and_chroma:
+    match_tune_and_chroma__2:
       args: collider, conf_knob_names, conf_qx, conf_qy, conf_dqx, conf_dqy, conf_closed_orbit_correction
       output: collider
     assert_tune_chroma_coupling:
       args: collider, conf_qx, conf_qy, conf_dqx, conf_dqy, delta_cmr
-      output: 
+      output:
     configure_beam_beam_interactions:
       args: collider, num_particles_per_bunch, nemitt_x, nemitt_y
       output: collider
@@ -110,15 +133,6 @@ gen2:
     dump_collider_json:
       args: collider, name_configured_collider
       output:
-    
-
-    
-    
-
-      
-    
-  
-
 
   # parameters:
   #   a:

@@ -136,8 +136,8 @@ class Block:
 
     @property
     def l_arguments(self: Self) -> list[tuple[str, type]]:
-        if self._l_arguments == []:
-            logging.warning("No arguments defined for this block")
+        # if self._l_arguments == []:
+        #     logging.warning(f"No arguments defined for this block ({self.name})")
         return self._l_arguments
 
     @l_arguments.setter
