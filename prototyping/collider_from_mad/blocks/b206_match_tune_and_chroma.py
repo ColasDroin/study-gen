@@ -28,7 +28,7 @@ def match_tune_and_chroma_function(
     conf_dqx: dict,
     conf_dqy: dict,
     conf_closed_orbit_correction: dict,
-):
+) -> xt.Multiline:
     # Tunings
     for line_name in ["lhcb1", "lhcb2"]:
         knob_names = conf_knob_names[line_name]
