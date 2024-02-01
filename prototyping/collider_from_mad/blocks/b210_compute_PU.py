@@ -4,7 +4,6 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
 
 # Local imports
 from study_gen.block import Block

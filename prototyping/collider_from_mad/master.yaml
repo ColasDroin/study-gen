@@ -1,4 +1,6 @@
-# Generate and write particle distribution
+# ==================================================================================================
+# --- Base collider generation ---
+# ==================================================================================================
 gen1:
   script:
     prepare_mad_environment:
@@ -46,7 +48,9 @@ gen1:
     dump_collider_json:
       args: collider, path_base_collider
       output:
-
+# ==================================================================================================
+# --- Tailor collider with xsuite generation ---
+# ==================================================================================================
 gen2:
   script:
     load_collider_json:
@@ -110,10 +114,17 @@ gen2:
       args: collider, path_configured_collider
       output:
 
-  # parameters:
-  #   a:
-  #     range: [1, 100]
-  #     steps: 3
-  #   b:
-  #     range: [10, 20]
-  #     steps: 2
+# ==================================================================================================
+# --- Particles distribution generation ---
+# ==================================================================================================
+gen3:
+  script:
+    build_particles_distribution:
+      args: [r_min, r_max, n_r, n_angles, n_split]
+      output: particle_list
+    write_particles_distribution:
+      args: particle_list
+      output:
+# ==================================================================================================
+# --- Simulation and tracking generation ---
+# ==================================================================================================

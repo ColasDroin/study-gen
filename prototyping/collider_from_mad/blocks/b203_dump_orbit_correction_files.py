@@ -6,7 +6,6 @@
 # Standard library imports
 import json
 import os
-from collections import OrderedDict
 
 # Local imports
 from study_gen.block import Block

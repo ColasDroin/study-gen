@@ -49,7 +49,7 @@ class Block:
 
         # Check that output exists
         if "->" in signature_output_str:
-            signature_output_str = signature_output_str
+            signature_output_str = signature_output_str.split("->")[1].strip()
         else:
             raise ValueError(f"Block {self.name} has no output signature")
 
@@ -87,7 +87,7 @@ class Block:
 
         # Check that output exists
         if "->" in signature_output_str:
-            signature_output_str = signature_output_str
+            signature_output_str = signature_output_str.split("->")[1].strip()
         else:
             raise ValueError(f"Block {self.name} has no output signature")
 

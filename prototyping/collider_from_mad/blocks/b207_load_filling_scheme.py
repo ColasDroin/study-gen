@@ -5,7 +5,6 @@
 # ==================================================================================================
 # Standard library imports
 import json
-from collections import OrderedDict
 
 # Third party imports
 import numpy as np

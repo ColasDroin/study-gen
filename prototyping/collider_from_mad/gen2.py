@@ -988,6 +988,7 @@ config_lumi_leveling_ip2_8 = {
             "corr_co_acbyhs5.r8b1",
         ],
     },
+    "path_configured_collider": "configured_collider.json",
 }
 num_particles_per_bunch = 140000000000.0
 delta_cmr = 0.001

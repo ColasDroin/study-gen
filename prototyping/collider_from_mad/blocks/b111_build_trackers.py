@@ -4,7 +4,6 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
 from typing import Any
 
 # Third party imports

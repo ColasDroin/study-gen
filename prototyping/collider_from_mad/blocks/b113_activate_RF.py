@@ -4,7 +4,6 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
 
 # Third party imports
 import xtrack as xt
@@ -40,7 +39,4 @@ def activate_RF_function(
 # --- Block object ---
 # ==================================================================================================
 
-activate_RF = Block(
-    "activate_RF",
-    activate_RF_function,
-    dict_imports=dict_imports)
+activate_RF = Block("activate_RF", activate_RF_function, dict_imports=dict_imports)
