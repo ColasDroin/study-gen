@@ -65,7 +65,11 @@ class Block:
     def set_outputs_names(self: Self, l_outputs_names: list[str]):
         # Ensure that l_outputs_names is not just a string
         if not isinstance(l_outputs_names, list):
-            l_outputs_names = [l_outputs_names]
+            # Ensure the user did not provide a string with a comma
+            if "," in l_outputs_names:
+                l_outputs_names = l_outputs_names.split(",")
+            else:
+                l_outputs_names = [l_outputs_names]
 
         # Only update the names of the outputs, not types
         self.dict_output = OrderedDict(
@@ -167,7 +171,11 @@ class Block:
 
         # Ensure that l_arguments_names is not just a string (from bad yaml parsing)
         if not isinstance(l_arguments_names, list):
-            l_arguments_names = [l_arguments_names]
+            # Ensure the user did not provide a string with a comma
+            if "," in l_arguments_names:
+                l_arguments_names = l_arguments_names.split(",")
+            else:
+                l_arguments_names = [l_arguments_names]
 
         # Only update the names of the parameters, not types (obtain the types from the parameters)
         self._l_arguments = [

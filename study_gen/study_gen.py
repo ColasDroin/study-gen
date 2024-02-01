@@ -169,7 +169,11 @@ class StudyGen:
             if "params" in new_block:
                 # Ensure that the parameters are provided in a list
                 if not isinstance(new_block["params"], list):
-                    new_block["params"] = [new_block["params"]]
+                    # If user provided several parameters separated by a comma
+                    if ',' in new_block["params"]:
+                        new_block["params"] = new_block["params"].split(',')
+                    else:
+                        new_block["params"] = [new_block["params"]]
                 # Ensure that the parameters are as they should be
                 if new_block_object.get_dict_parameters_names() != new_block["params"]:
                     for param in new_block["params"]:
