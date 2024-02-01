@@ -20,13 +20,8 @@ class Block:
         self._function = function
         self.dict_imports = dict_imports
         self.set_deps = set_deps
-        self._dict_output = dict_output
         self._l_arguments = []
-
-        if len(dict_output) == 0 and "return" in self.get_str():
-            logging.warning(
-                f"Block {self.name} has no output defined, but the function has a return statement"
-            )
+        self.initial_dic_output_setter(dict_output)
 
     @property
     def function(self: Self) -> Callable:
@@ -41,6 +36,66 @@ class Block:
     @property
     def dict_output(self: Self):
         return self._dict_output
+
+    def initial_dic_output_setter(self: Self, dict_output: OrderedDict[str, type]):
+
+        # Check that the output corresponds to the return statement
+        if len(dict_output) == 0 and "return" in self.get_str():
+            logging.warning(
+                f"Block {self.name} has no output defined, but the function has a return statement"
+            )
+
+        # Get signature output as str
+        signature_output_str = str(self.get_signature())
+
+        # Check that output exists
+        if "->" in signature_output_str:
+            signature_output_str = signature_output_str
+        else:
+            if len(dict_output) > 0:
+                raise ValueError(f"Block {self.name} has no signature, but the output is defined")
+            else:
+                self._dict_output = dict_output
+                return
+
+        # Get signature hint output
+        signature_type_hint = self.get_output_type_from_signature()
+
+        # Check if several outputs are defined
+        if "tuple[" in signature_output_str:
+
+            # Check that the number of outputs is the same
+            if len(dict_output) != len(signature_type_hint.__args__): # type: ignore
+                raise ValueError(
+                    f"Number of outputs differs from type hint signature for block {self.name}."
+                )
+
+            # Check that the provided output(s) have the correct type
+            if signature_type_hint is not None:
+                # Compare the signature type hint of each output (unpacked) with the provided output type hints
+                for output, type_output in zip(dict_output, signature_type_hint.__args__):  # type: ignore
+                    if type_output != dict_output[output]:
+                        logging.warning(
+                            f"Output {output} has a different type than expected:"
+                            f" {type_output.__name__} Instead of:"
+                            f" {dict_output[output].__name__} for block {self.name}"
+                        )
+        else:
+            # Chat that dict_output only has one element
+            if len(dict_output) > 1:
+                raise ValueError(
+                    "Number of outputs differs from type hint signature for block {self.name}."
+                )
+            else:
+                # Check that the provided output has the correct type
+                if signature_type_hint != list(dict_output.values())[0]:
+                    logging.warning(
+                        f"Output {list(dict_output.keys())[0]} has a different type than expected:"
+                        f" {signature_type_hint.__name__} Instead of:"
+                        f" {list(dict_output.values())[0].__name__} for block {self.name}"
+                    )
+
+        self._dict_output = dict_output
 
     @dict_output.setter
     def dict_output(self: Self, dict_output: OrderedDict[str, type]):
@@ -289,6 +344,13 @@ class Block:
             return inspect.Signature()
         else:
             return inspect.signature(self.function)
+
+    def get_output_type_from_signature(self: Self) -> type | None:
+        if self.function is None:
+            logging.warning("No function defined for this block")
+            return None
+        else:
+            return self.get_signature().return_annotation
 
     def get_l_imports_str(self: Self) -> str:
         return self.get_external_l_imports_str(self.dict_imports)
