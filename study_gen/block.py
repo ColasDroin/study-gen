@@ -66,8 +66,10 @@ class Block:
         # Ensure that l_outputs_names is not just a string
         if not isinstance(l_outputs_names, list):
             # Ensure the user did not provide a string with a comma
-            if "," in l_outputs_names:
-                l_outputs_names = l_outputs_names.split(",")
+            if l_outputs_names is None:
+                l_outputs_names = []
+            elif "," in l_outputs_names:
+                l_outputs_names = [x.strip() for x in l_outputs_names.split(",")]
             else:
                 l_outputs_names = [l_outputs_names]
 
@@ -172,8 +174,10 @@ class Block:
         # Ensure that l_arguments_names is not just a string (from bad yaml parsing)
         if not isinstance(l_arguments_names, list):
             # Ensure the user did not provide a string with a comma
-            if "," in l_arguments_names:
-                l_arguments_names = l_arguments_names.split(",")
+            if l_arguments_names is None:
+                l_arguments_names = []
+            elif "," in l_arguments_names:
+                l_arguments_names = [x.strip() for x in l_arguments_names.split(",")]
             else:
                 l_arguments_names = [l_arguments_names]
 
