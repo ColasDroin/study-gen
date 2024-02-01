@@ -14,7 +14,7 @@ class Block:
         function: Callable,
         dict_imports: dict[str, str] = OrderedDict(),
         set_deps: set[str] = set(),
-        dict_output: OrderedDict[str, type]|None = None,
+        dict_output: OrderedDict[str, type] | None = None,
     ):
         self.name = name
         self._function = function
@@ -26,7 +26,7 @@ class Block:
         if dict_output is None:
             self._dict_output = self.initial_dic_output_setter_from_signature()
         else:
-            self._dict_output = self. initial_dic_output_setter_from_output(dict_output)
+            self._dict_output = self.initial_dic_output_setter_from_output(dict_output)
 
     @property
     def function(self: Self) -> Callable:
@@ -66,12 +66,15 @@ class Block:
             for type_output in signature_type_hint.__args__:  # type: ignore
                 dict_output[f"output_{len(dict_output)}_{self.name}"] = type_output
         else:
-            dict_output[f"output_{self.name}"] = signature_type_hint
+            if signature_type_hint is not None:
+                # Create output name and type from the signature
+                dict_output[f"output_{self.name}"] = signature_type_hint
 
         return dict_output
 
-
-    def initial_dic_output_setter_from_output(self: Self, dict_output: OrderedDict[str, type]) -> OrderedDict[str, type]:
+    def initial_dic_output_setter_from_output(
+        self: Self, dict_output: OrderedDict[str, type]
+    ) -> OrderedDict[str, type]:
 
         # Check that the output corresponds to the return statement
         if len(dict_output) == 0 and "return" in self.get_str():
@@ -88,7 +91,6 @@ class Block:
         else:
             raise ValueError(f"Block {self.name} has no output signature")
 
-
         # Get signature hint output
         signature_type_hint = self.get_output_type_from_signature()
 
@@ -96,7 +98,7 @@ class Block:
         if "tuple[" in signature_output_str:
 
             # Check that the number of outputs is the same
-            if len(dict_output) != len(signature_type_hint.__args__): # type: ignore
+            if len(dict_output) != len(signature_type_hint.__args__):  # type: ignore
                 raise ValueError(
                     f"Number of outputs differs from type hint signature for block {self.name}."
                 )
@@ -117,6 +119,12 @@ class Block:
                 raise ValueError(
                     "Number of outputs differs from type hint signature for block {self.name}."
                 )
+            elif len(dict_output) == 0:
+                if signature_type_hint is not None:
+                    logging.warning(
+                        f"No output provided in dict_output for block {self.name}, while signature"
+                        f" shows one output of type {signature_type_hint.__name__}"
+                    )
             else:
                 # Check that the provided output has the correct type
                 if signature_type_hint != list(dict_output.values())[0]:
@@ -133,8 +141,8 @@ class Block:
         # Ensure that the number of arguments is the same
         if len(dict_output) != len(self._dict_output):
             raise ValueError(
-                f"Number of outputs is different. Previous: {len(self._dict_output)}. New:"
-                f" {len(dict_output)}"
+                f"Number of outputs is different for block {self.name}. Previous:"
+                f" {len(self._dict_output)}. New: {len(dict_output)}"
             )
         # Ensure that the provided output(s) have the correct type
         for (new_output, new_type), (previous_output, previous_type) in zip(
@@ -142,8 +150,8 @@ class Block:
         ):
             if new_type != previous_type:
                 raise ValueError(
-                    f"Output {new_output} has a different type. Previous type:"
-                    f" {previous_type.__name__}. New type: {new_type.__name__}"
+                    f"Output {new_output} has a different type for block {self.name}. Previous"
+                    f" type: {previous_type.__name__}. New type: {new_type.__name__}"
                 )
         # Update output
         self._dict_output = dict_output

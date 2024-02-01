@@ -21,7 +21,7 @@ dict_imports = {"xt": "import xtrack as xt"}
 # ==================================================================================================
 def install_beam_beam_function(
     collider: xt.Multiline,
-    num_long_range_encounters_per_side: int,
+    num_long_range_encounters_per_side: dict[str, int],
     num_slices_head_on: int,
     bunch_spacing_buckets: int,
     sigma_z: float,

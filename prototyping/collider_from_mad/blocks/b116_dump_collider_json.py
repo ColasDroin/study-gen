@@ -21,11 +21,9 @@ dict_imports = {"xt": "import xtrack as xt"}
 # ==================================================================================================
 def dump_collider_json_function(
     collider: xt.Multiline,
-    name_collider: str = "collider.json",
-) -> str:
-    collider.to_json(name_collider)
-
-    return name_collider
+    name_collider: str,
+) -> None:
+    collider.to_json(name_collider + ".json")
 
 
 # ==================================================================================================

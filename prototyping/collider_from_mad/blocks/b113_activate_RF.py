@@ -43,5 +43,4 @@ def activate_RF_function(
 activate_RF = Block(
     "activate_RF",
     activate_RF_function,
-    dict_imports=dict_imports,
--)
+    dict_imports=dict_imports)

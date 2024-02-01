@@ -3,29 +3,15 @@ gen1:
   script:
     prepare_mad_environment:
       args: links
-      output: sequence_name_b1, sequence_name_b2, mad_b1b2, b4_name, sequence_name_b4, mad_b4
+      output: sequence_name_b1, sequence_name_b2, mad_b1b2, sequence_name_b4, mad_b4
     build_hllhc_sequence:
-      args:
-        [
-          sequence_name_b1,
-          mad_b1b2,
-          apply_acsca_fix,
-          cycle_to_IP3,
-          incorporate_CC,
-        ]
+      args: sequence_name_b1, mad_b1b2, apply_acsca_fix, cycle_to_IP3, incorporate_CC
       output: mad_b1b2
     build_hllhc_sequence__2:
-      args:
-        [
-          sequence_name_b4,
-          mad_b4,
-          apply_acsca_fix,
-          cycle_to_IP3,
-          incorporate_CC,
-        ]
+      args: sequence_name_b4, mad_b4, apply_acsca_fix, cycle_to_IP3, incorporate_CC
       output: mad_b4
     apply_optics:
-      args: [mad_b1b2, optics_file]
+      args: mad_b1b2, optics_file
       output: mad_b1b2
     check_madx_lattice:
       args: mad_b1b2, sequence_name_b1
@@ -34,23 +20,13 @@ gen1:
       args: mad_b1b2, sequence_name_b2
       output:
     apply_optics__2:
-      args: [mad_b4, optics_file]
+      args: mad_b4, optics_file
       output: mad_b4
     check_madx_lattice__3:
       args: mad_b4, sequence_name_b2
       output:
     build_collider:
-      args:
-        [
-          mad_b1b2,
-          mad_b4,
-          beam_config,
-          enable_imperfections,
-          enable_knob_synthesis,
-          rename_coupling_knobs,
-          pars_for_imperfections,
-          ver_hllhc_optics,
-        ]
+      args: mad_b1b2, mad_b4, beam_config, enable_imperfections, enable_knob_synthesis, rename_coupling_knobs, pars_for_imperfections, ver_hllhc_optics
       output: collider
     build_trackers:
       args: collider
@@ -68,58 +44,58 @@ gen1:
       args:
       output:
     dump_collider_json:
-      args: collider
-      output: name_base_collider
+      args: collider, path_base_collider
+      output:
 
 gen2:
   script:
     load_collider_json:
-      args: name_base_collider
+      args: path_base_collider
       output: collider
-    generate_orbit_configuration_setup:
+    generate_orbit_correction_setup:
       args:
       output: correction_setup
-    dump_orbit_configuration_files:
+    dump_orbit_correction_files:
       args: correction_setup
       output: path_correction_setup
     install_beam_beam:
       args: collider, num_long_range_encounters_per_side, num_slices_head_on, bunch_spacing_buckets, sigma_z
       output: collider
-    build_tracker:
+    build_trackers:
       args: collider
       output: collider
     set_knobs:
       args: collider, knob_settings
       output: collider
     match_tune_and_chroma:
-      args: collider, conf_knob_names, conf_qx, conf_qy, conf_dqx, conf_dqy, conf_closed_orbit_correction
+      args: collider, knob_names, qx, qy, dqx, dqy, closed_orbit_correction
       output: collider
     load_filling_scheme:
-      args: filling_scheme_path
+      args: pattern_fname
       output: array_b1, array_b2
     compute_collision_schedule:
       args: array_b1, array_b2
       output: n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8
     get_CC_bool:
-      args: crab1_val, crab5_val
+      args: on_crab1, on_crab5
       output: crab_bool
-    luminosity_levelling_ip1_5_function:
-      args: collider, n_collisions_ip1_and_5, nemitt_x, nemitt_y, sigma_z, crab_bool, max_PU, max_lumi_ip1_and_5, max_bunch_intensity, target_lumi_ip1_and_5
+    luminosity_levelling_ip1_5:
+      args: collider, n_collisions_ip1_and_5, nemitt_x, nemitt_y, sigma_z, crab_bool, max_PU_ip1_5, max_luminosity_ip1_5, max_intensity_ip1_5, target_luminosity_ip1_5
       output: luminosity_ip1_and_5_after_optimization_before_bb
-    compute_constraints_ip8_function:
-      args: l_contraints_ip8
-      output: xsuite_constraints_ip8
-    luminosity_levelling_ip2_8_function:
-      args: collider, config_lumi_leveling_ip2_8, num_particles_per_bunch, sigma_z, nemitt_x, nemitt_y, n_collisions_ip8, xsuite_constraints_ip8
+    # compute_constraints_ip8:
+    #   args: l_contraints_ip8
+    #   output: xsuite_constraints_ip8
+    luminosity_levelling_ip2_8:
+      args: collider, config_lumi_leveling_ip2_8, num_particles_per_bunch, sigma_z, nemitt_x, nemitt_y, n_collisions_ip8 #, xsuite_constraints_ip8
       output: collider
     add_linear_coupling_hllhc:
       args: collider, delta_cmr
       output: collider
     match_tune_and_chroma__2:
-      args: collider, conf_knob_names, conf_qx, conf_qy, conf_dqx, conf_dqy, conf_closed_orbit_correction
+      args: collider, knob_names, qx, qy, dqx, dqy, closed_orbit_correction
       output: collider
     assert_tune_chroma_coupling:
-      args: collider, conf_qx, conf_qy, conf_dqx, conf_dqy, delta_cmr
+      args: collider, qx, qy, dqx, dqy, delta_cmr
       output:
     configure_beam_beam_interactions:
       args: collider, num_particles_per_bunch, nemitt_x, nemitt_y
@@ -131,7 +107,7 @@ gen2:
       args: collider, num_particles_per_bunch, nemitt_x, nemitt_y, sigma_z, crab_bool, n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8
       output: lumi_ip1, lumi_ip2, lumi_ip5, lumi_ip8, PU_ip1, PU_ip2, PU_ip5, PU_ip8
     dump_collider_json:
-      args: collider, name_configured_collider
+      args: collider, path_configured_collider
       output:
 
   # parameters:

@@ -10,6 +10,9 @@ import shutil
 # Local imports
 from study_gen.block import Block
 
+# Imports needed for block to work (not detected by linting tools)
+dict_imports = {"os": "import os"}
+
 
 # ==================================================================================================
 # --- Block function ---
@@ -30,4 +33,5 @@ def clean_temp_files_function() -> None:
 clean_temp_files = Block(
     "clean_temp_files",
     clean_temp_files_function,
+    dict_imports=dict_imports,
 )

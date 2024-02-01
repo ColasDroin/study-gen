@@ -2,6 +2,7 @@ import copy
 from collections import OrderedDict
 from typing import Any, Self
 
+from black import FileMode, format_str
 from jinja2 import Environment, FileSystemLoader
 from ruamel import yaml
 
@@ -61,12 +62,17 @@ class StudyGen:
                 # Don't want to declare twice the same block
                 continue
             if block not in set_new_blocks:
-                # Get dependencies of the block first
-                for dep in self.dict_ref_blocks[block].set_deps:
-                    if dep not in dict_blocks:
-                        dict_blocks[dep] = self.dict_ref_blocks[dep]
-                # Then get the block itself
-                dict_blocks[block] = self.dict_ref_blocks[block]
+                if block in self.dict_ref_blocks:
+                    # Get dependencies of the block first
+                    for dep in self.dict_ref_blocks[block].set_deps:
+                        if dep not in dict_blocks:
+                            dict_blocks[dep] = self.dict_ref_blocks[dep]
+                    # Then get the block itself
+                    dict_blocks[block] = self.dict_ref_blocks[block]
+                else:
+                    raise ValueError(
+                        f"Block {block} is in the master file but not in the reference blocks."
+                    )
 
         # Get blocks objects used for new blocks
         for new_block in set_new_blocks:
@@ -251,7 +257,6 @@ class StudyGen:
 
         str_parameters = "# Declare parameters\n"
         for param in main_block.dict_parameters:
-            print(main_block.dict_parameters)
             # Look recursively for the corresponding parameter value in the configuration
             value = _finditem(self.configuration, param)
             if value is None:
@@ -324,8 +329,11 @@ class StudyGen:
         )
         return study_str
 
-    def write(self: Self, study_str: str, file_path: str):
+    def write(self: Self, study_str: str, file_path: str, format_with_black: bool = True):
         # TODO: handle file path
+        if format_with_black:
+            study_str = format_str(study_str, mode=FileMode())
+
         with open(file_path, mode="w", encoding="utf-8") as file:
             file.write(study_str)
 
