@@ -77,7 +77,7 @@ def record_final_luminosity_and_PU_function(
 # --- Block object ---
 # ==================================================================================================
 
-add_linear_coupling = Block(
+record_final_luminosity_and_PU = Block(
     "record_final_luminosity_and_PU",
     record_final_luminosity_and_PU_function,
     dict_imports=dict_imports,

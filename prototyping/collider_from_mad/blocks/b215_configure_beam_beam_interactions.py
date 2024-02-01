@@ -38,7 +38,7 @@ def configure_beam_beam_interactions_function(
 # --- Block object ---
 # ==================================================================================================
 
-add_linear_coupling = Block(
+configure_beam_beam_interactions = Block(
     "configure_beam_beam_interactions",
     configure_beam_beam_interactions_function,
     dict_imports=dict_imports,

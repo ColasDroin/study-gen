@@ -42,7 +42,7 @@ def apply_filling_scheme_function(
 # --- Block object ---
 # ==================================================================================================
 
-add_linear_coupling = Block(
+apply_filling_scheme = Block(
     "apply_filling_scheme",
     apply_filling_scheme_function,
     dict_imports=dict_imports,

@@ -28,7 +28,7 @@ def load_collider_json_function(path_base_collider: str) -> xt.Multiline:
 # --- Block object ---
 # ==================================================================================================
 
-get_context = Block(
+load_collider_json = Block(
     "load_collider_json",
     load_collider_json_function,
     dict_output=OrderedDict([("output_load_collider_json", xt.Multiline)]),

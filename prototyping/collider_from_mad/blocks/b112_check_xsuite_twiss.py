@@ -23,7 +23,6 @@ def check_xsuite_twiss_function(collider: xt.Multiline) -> None:
     # Twiss in 4D just to ensure no error is raised at this point
     collider["lhcb1"].twiss(method="4d")
     collider["lhcb2"].twiss(method="4d")
-    return None
 
 
 # ==================================================================================================

@@ -34,7 +34,7 @@ def dump_orbit_correction_files_function(
 # --- Block object ---
 # ==================================================================================================
 
-get_context = Block(
+dump_orbit_correction_files = Block(
     "dump_orbit_correction_files",
     dump_orbit_correction_files_function,
     dict_imports=dict_imports,

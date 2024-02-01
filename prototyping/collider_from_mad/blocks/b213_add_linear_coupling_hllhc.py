@@ -41,7 +41,7 @@ def add_linear_coupling_hllhc_function(
 # --- Block object ---
 # ==================================================================================================
 
-add_linear_coupling = Block(
+add_linear_coupling_hllhc = Block(
     "add_linear_coupling_hllhc",
     add_linear_coupling_hllhc_function,
     dict_imports=dict_imports,

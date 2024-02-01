@@ -64,7 +64,7 @@ def assert_tune_chroma_coupling_function(
 # --- Block object ---
 # ==================================================================================================
 
-add_linear_coupling = Block(
+assert_tune_chroma_coupling = Block(
     "assert_tune_chroma_coupling",
     assert_tune_chroma_coupling_function,
     dict_imports=dict_imports,
