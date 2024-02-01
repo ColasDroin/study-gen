@@ -64,5 +64,4 @@ build_collider = Block(
     "build_collider",
     build_collider_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_build_collider", xt.Multiline)]),
 )

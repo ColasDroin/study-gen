@@ -55,5 +55,4 @@ build_initial_hllhc_sequence = Block(
     "build_initial_hllhc_sequence",
     function=build_initial_hllhc_sequence_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_build_initial_hllhc_sequence", Madx)]),
 )

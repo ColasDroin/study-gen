@@ -97,6 +97,5 @@ build_hllhc_sequence = Block(
     "build_hllhc_sequence",
     build_hllhc_sequence_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_build_hllhc_sequence", Madx)]),
     set_deps=set_deps,
 )

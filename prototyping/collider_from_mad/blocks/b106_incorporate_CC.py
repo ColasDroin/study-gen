@@ -40,5 +40,4 @@ incorporate_CC = Block(
     "incorporate_CC",
     incorporate_CC_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_incorporate_CC", Madx)]),
 )

@@ -41,5 +41,4 @@ cycle_to_IP3 = Block(
     "cycle_to_IP3",
     cycle_to_IP3_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_cycle_to_IP3", Madx)]),
 )

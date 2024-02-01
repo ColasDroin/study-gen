@@ -139,5 +139,4 @@ luminosity_levelling_ip2_8 = Block(
     "luminosity_levelling_ip2_8",
     luminosity_levelling_ip2_8_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_luminosity_levelling_ip2_8", xt.Multiline)]),
 )

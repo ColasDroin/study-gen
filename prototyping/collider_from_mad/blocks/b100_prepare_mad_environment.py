@@ -51,5 +51,4 @@ prepare_mad_environment = Block(
     "prepare_mad_environment",
     prepare_mad_environment_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_prepare_mad_environment", tuple[str, str, Madx, str, Madx])]),
 )

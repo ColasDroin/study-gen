@@ -51,5 +51,4 @@ install_beam_beam = Block(
     "install_beam_beam",
     install_beam_beam_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_install_beam_beam", xt.Multiline)]),
 )

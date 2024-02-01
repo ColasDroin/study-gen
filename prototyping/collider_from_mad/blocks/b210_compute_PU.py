@@ -26,5 +26,4 @@ def compute_PU_function(
 compute_PU = Block(
     "compute_PU",
     compute_PU_function,
-    dict_output=OrderedDict([("output_compute_PU", float)]),
 )

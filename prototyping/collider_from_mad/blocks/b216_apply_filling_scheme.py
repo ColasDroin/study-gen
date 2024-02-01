@@ -46,5 +46,4 @@ apply_filling_scheme = Block(
     "apply_filling_scheme",
     apply_filling_scheme_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_apply_filling_scheme", xt.Multiline)]),
 )

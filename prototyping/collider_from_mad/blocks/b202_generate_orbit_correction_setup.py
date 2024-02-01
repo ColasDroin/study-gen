@@ -264,5 +264,4 @@ def generate_orbit_correction_setup_function() -> dict:
 generate_orbit_correction_setup = Block(
     "generate_orbit_correction_setup",
     generate_orbit_correction_setup_function,
-    dict_output=OrderedDict([("output_generate_orbit_correction_setup", dict)]),
 )

@@ -42,5 +42,4 @@ configure_beam_beam_interactions = Block(
     "configure_beam_beam_interactions",
     configure_beam_beam_interactions_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_configure_beam_beam_interactions", xt.Multiline)]),
 )

@@ -40,5 +40,4 @@ set_knobs = Block(
     "set_knobs",
     set_knobs_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_set_knobs", xt.Multiline)]),
 )

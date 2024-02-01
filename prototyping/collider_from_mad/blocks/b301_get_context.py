@@ -44,5 +44,4 @@ get_context = Block(
     "get_context",
     get_context_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_get_context", Any)]),
 )

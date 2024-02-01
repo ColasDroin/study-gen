@@ -63,5 +63,4 @@ match_tune_and_chroma = Block(
     "match_tune_and_chroma",
     match_tune_and_chroma_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_match_tune_and_chroma", xt.Multiline)]),
 )

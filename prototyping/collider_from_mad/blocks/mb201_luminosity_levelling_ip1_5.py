@@ -105,6 +105,5 @@ luminosity_levelling_ip1_5 = Block(
     "luminosity_levelling_ip1_5",
     luminosity_levelling_ip1_5_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_luminosity_levelling_ip1_5", float)]),
     set_deps=set_deps,
 )

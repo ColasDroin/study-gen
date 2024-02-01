@@ -38,5 +38,4 @@ slice_sequence = Block(
     "slice_sequence",
     slice_sequence_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_slice_sequence", Madx)]),
 )

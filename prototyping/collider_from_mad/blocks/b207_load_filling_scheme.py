@@ -48,5 +48,4 @@ load_filling_scheme = Block(
     "load_filling_scheme",
     load_filling_scheme_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_load_filling_scheme", tuple[np.ndarray, np.ndarray])]),
 )

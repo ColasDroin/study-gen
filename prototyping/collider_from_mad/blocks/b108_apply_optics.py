@@ -39,5 +39,4 @@ apply_optics = Block(
     "apply_optics",
     apply_optics_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_apply_optics", Madx)]),
 )

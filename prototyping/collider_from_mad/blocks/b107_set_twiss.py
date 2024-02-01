@@ -38,5 +38,4 @@ set_twiss = Block(
     "set_twiss",
     set_twiss_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_set_twiss", Madx)]),
 )

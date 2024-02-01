@@ -39,5 +39,4 @@ initialize_beam = Block(
     "initialize_beam",
     initialize_beam_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_initialize_beam", Madx)]),
 )

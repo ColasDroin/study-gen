@@ -44,5 +44,4 @@ activate_RF = Block(
     "activate_RF",
     activate_RF_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_activate_RF", xt.Multiline)]),
-)
+-)

@@ -44,5 +44,4 @@ build_trackers = Block(
     "build_trackers",
     build_trackers_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_build_trackers", xt.Multiline)]),
 )

@@ -55,5 +55,4 @@ apply_acsca_fix_hllhc = Block(
     "apply_acsca_fix_hllhc",
     function=apply_acsca_fix_hllhc_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_apply_acsca_fix_hllhc", Madx)]),
 )

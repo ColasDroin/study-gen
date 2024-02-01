@@ -45,5 +45,4 @@ add_linear_coupling_hllhc = Block(
     "add_linear_coupling_hllhc",
     add_linear_coupling_hllhc_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_add_linear_coupling_hllhc", xt.Multiline)]),
 )

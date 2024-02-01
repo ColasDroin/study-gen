@@ -41,5 +41,4 @@ compute_constraints_ip8 = Block(
     "compute_constraints_ip8",
     compute_constraints_ip8_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_compute_constraints_ip8", list)]),
 )

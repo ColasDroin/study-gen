@@ -32,5 +32,4 @@ def get_CC_bool_function(
 get_CC_bool = Block(
     "get_CC_bool",
     get_CC_bool_function,
-    dict_output=OrderedDict([("output_get_CC_bool", bool)]),
 )

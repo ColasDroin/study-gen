@@ -40,5 +40,4 @@ compute_collision_schedule = Block(
     "compute_collision_schedule",
     compute_collision_schedule_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_compute_collision_schedule", tuple[int, int, int])]),
 )

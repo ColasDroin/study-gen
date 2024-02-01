@@ -36,5 +36,4 @@ dump_collider_json = Block(
     "dump_collider_json",
     dump_collider_json_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_dump_collider_json", str)]),
 )
