@@ -4,7 +4,6 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
 from typing import Any
 
 # Third party imports
@@ -19,17 +18,13 @@ dict_imports = {
     "Madx": "from cpymad.madx import Madx",
     "xm": "import xmask as xm",
     "Any": "from typing import Any",
-    "OrderedDict": "from collections import OrderedDict",
 }
 
 
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def prepare_mad_environment_function(
-    links: OrderedDict[str, Any]
-) -> tuple[str, str, Madx, str, Madx]:
-
+def prepare_mad_environment_function(links: dict[str, Any]) -> tuple[str, str, Madx, str, Madx]:
     # Make mad environment
     xm.make_mad_environment(links=links)
 

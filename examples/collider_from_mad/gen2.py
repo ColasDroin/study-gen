@@ -705,8 +705,7 @@ def record_final_luminosity_and_PU_function(
     num_colliding_bunches_ip1_and_5: int,
     num_colliding_bunches_ip2: int,
     num_colliding_bunches_ip8: int,
-) -> tuple[float]:
-
+) -> tuple[float, ...]:
     # Get the final luminoisty in all IPs
     twiss_b1 = collider["lhcb1"].twiss()
     twiss_b2 = collider["lhcb2"].twiss()
@@ -733,10 +732,10 @@ def record_final_luminosity_and_PU_function(
                 crab=crab,
             )
             PU = compute_PU_function(L, n_col, twiss_b1["T_rev0"])
-        except:
-            print(
-                f"There was a problem during the luminosity computation in {ip}... Ignoring it."
-            )
+        except Exception as e:
+            print(f"There was a problem during the luminosity computation in {ip}... ")
+            print(f"Error message: {e}")
+            print("Continuing with L=0 and PU=0...")
             L = 0
             PU = 0
         l_lumi.append(L)
@@ -841,7 +840,7 @@ def main(
     collider = apply_filling_scheme_function(
         collider, array_b1, array_b2, i_bunch_b1, i_bunch_b2
     )
-    lumi_ip1 = record_final_luminosity_and_PU_function(
+    lumi_ip1, lumi_ip2 = record_final_luminosity_and_PU_function(
         collider,
         num_particles_per_bunch,
         nemitt_x,

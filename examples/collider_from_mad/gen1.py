@@ -5,10 +5,10 @@
 from cpymad.madx import Madx
 import xmask as xm
 from typing import Any
-from collections import OrderedDict
 import numpy as np
 import xtrack as xt
 import os
+import shutil
 
 # ==================================================================================================
 # --- Blocks
@@ -16,9 +16,8 @@ import os
 
 
 def prepare_mad_environment_function(
-    links: OrderedDict[str, Any]
+    links: dict[str, Any]
 ) -> tuple[str, str, Madx, str, Madx]:
-
     # Make mad environment
     xm.make_mad_environment(links=links)
 
@@ -32,13 +31,57 @@ def prepare_mad_environment_function(
     return sequence_name_b1, sequence_name_b2, mad_b1b2, sequence_name_b4, mad_b4
 
 
-def slice_sequence_function(
+def build_initial_hllhc_sequence_function(
+    mad: Madx,
+    beam: int,
+) -> Madx:
+
+    # Select beam
+    mad.input(f"mylhcbeam = {beam}")
+
+    # Build sequence
+    mad.input(
+        """
+    ! Build sequence
+    option, -echo,-warn,-info;
+    if (mylhcbeam==4){
+        call,file="acc-models-lhc/lhcb4.seq";
+    }
+    else {
+        call,file="acc-models-lhc/lhc.seq";
+    };
+    !Install HL-LHC
+    call, file="acc-models-lhc/hllhc_sequence.madx";
+    ! Get the toolkit
+    call,file="acc-models-lhc/toolkit/macro.madx";
+    option, -echo, warn,-info;
+    """
+    )
+
+    return mad
+
+
+def initialize_beam_function(
     mad: Madx,
 ) -> Madx:
     mad.input(
         """
-    ! Slice nominal sequence
-    exec, myslice;
+    nrj=7000;
+    beam,particle=proton,sequence=lhcb1,energy=nrj,npart=1.15E11,sige=4.5e-4;
+    beam,particle=proton,sequence=lhcb2,energy=nrj,bv = -1,npart=1.15E11,sige=4.5e-4;
+    """
+    )
+
+    return mad
+
+
+def set_twiss_function(
+    mad: Madx,
+) -> Madx:
+    mad.input(
+        """
+    ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
+    exec, twiss_opt;
     """
     )
 
@@ -75,6 +118,19 @@ def apply_acsca_fix_hllhc_function(
     return mad
 
 
+def slice_sequence_function(
+    mad: Madx,
+) -> Madx:
+    mad.input(
+        """
+    ! Slice nominal sequence
+    exec, myslice;
+    """
+    )
+
+    return mad
+
+
 def cycle_to_IP3_function(
     mad: Madx,
 ) -> Madx:
@@ -85,63 +141,6 @@ def cycle_to_IP3_function(
     seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
     };
     seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
-    """
-    )
-
-    return mad
-
-
-def set_twiss_function(
-    mad: Madx,
-) -> Madx:
-    mad.input(
-        """
-    ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
-    exec, twiss_opt;
-    """
-    )
-
-    return mad
-
-
-def initialize_beam_function(
-    mad: Madx,
-) -> Madx:
-    mad.input(
-        """
-    nrj=7000;
-    beam,particle=proton,sequence=lhcb1,energy=nrj,npart=1.15E11,sige=4.5e-4;
-    beam,particle=proton,sequence=lhcb2,energy=nrj,bv = -1,npart=1.15E11,sige=4.5e-4;
-    """
-    )
-
-    return mad
-
-
-def build_initial_hllhc_sequence_function(
-    mad: Madx,
-    beam: int,
-) -> Madx:
-
-    # Select beam
-    mad.input(f"mylhcbeam = {beam}")
-
-    # Build sequence
-    mad.input(
-        """
-    ! Build sequence
-    option, -echo,-warn,-info;
-    if (mylhcbeam==4){
-        call,file="acc-models-lhc/lhcb4.seq";
-    }
-    else {
-        call,file="acc-models-lhc/lhc.seq";
-    };
-    !Install HL-LHC
-    call, file="acc-models-lhc/hllhc_sequence.madx";
-    ! Get the toolkit
-    call,file="acc-models-lhc/toolkit/macro.madx";
-    option, -echo, warn,-info;
     """
     )
 
@@ -288,14 +287,13 @@ def check_madx_lattice_function(
 def build_collider_function(
     mad_b1b2: Madx,
     mad_b4: Madx,
-    beam_config: OrderedDict[str, Any],
+    beam_config: dict[str, Any],
     enable_imperfections: bool,
     enable_knob_synthesis: bool,
     rename_coupling_knobs: bool,
-    pars_for_imperfections: OrderedDict[str, int],
+    pars_for_imperfections: dict[str, int],
     ver_hllhc_optics: float,
 ) -> xt.Multiline:
-
     # Build collider
     collider = xm.lhc.build_xsuite_collider(
         sequence_b1=mad_b1b2.sequence.lhcb1,
@@ -384,16 +382,16 @@ def dump_collider_json_function(
 
 
 def main(
-    links: OrderedDict,
+    links: dict,
     apply_acsca_fix: bool,
     cycle_to_IP3: bool,
     incorporate_CC: bool,
     optics_file: str,
-    beam_config: OrderedDict,
+    beam_config: dict,
     enable_imperfections: bool,
     enable_knob_synthesis: bool,
     rename_coupling_knobs: bool,
-    pars_for_imperfections: OrderedDict,
+    pars_for_imperfections: dict,
     ver_hllhc_optics: float,
     path_base_collider: str,
 ) -> None:

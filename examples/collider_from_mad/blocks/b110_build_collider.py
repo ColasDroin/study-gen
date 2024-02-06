@@ -4,7 +4,6 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
 from typing import Any
 
 # Third party imports
@@ -19,7 +18,6 @@ from study_gen.block import Block
 dict_imports = {
     "Madx": "from cpymad.madx import Madx",
     "Any": "from typing import Any",
-    "OrderedDict": "from collections import OrderedDict",
     "xm": "import xmask as xm",
     "xt": "import xtrack as xt",
 }
@@ -31,14 +29,13 @@ dict_imports = {
 def build_collider_function(
     mad_b1b2: Madx,
     mad_b4: Madx,
-    beam_config: OrderedDict[str, Any],
+    beam_config: dict[str, Any],
     enable_imperfections: bool,
     enable_knob_synthesis: bool,
     rename_coupling_knobs: bool,
-    pars_for_imperfections: OrderedDict[str, int],
+    pars_for_imperfections: dict[str, int],
     ver_hllhc_optics: float,
 ) -> xt.Multiline:
-
     # Build collider
     collider = xm.lhc.build_xsuite_collider(
         sequence_b1=mad_b1b2.sequence.lhcb1,

@@ -11,7 +11,7 @@ import shutil
 from study_gen.block import Block
 
 # Imports needed for block to work (not detected by linting tools)
-dict_imports = {"os": "import os"}
+dict_imports = {"os": "import os", "shutil": "import shutil"}
 
 
 # ==================================================================================================
