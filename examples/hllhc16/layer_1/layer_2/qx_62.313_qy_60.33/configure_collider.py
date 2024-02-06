@@ -915,8 +915,8 @@ knob_names = {
         "c_minus_knob_2": "c_minus_im_b2",
     },
 }
-qx = {"lhcb1": 62.313, "lhcb2": 62.313}
-qy = {"lhcb1": 60.33, "lhcb2": 60.33}
+qx = {"lhcb1": 62.316, "lhcb2": 62.316}
+qy = {"lhcb1": 60.321, "lhcb2": 60.321}
 dqx = {"lhcb1": 15, "lhcb2": 15}
 dqy = {"lhcb1": 15, "lhcb2": 15}
 closed_orbit_correction = {

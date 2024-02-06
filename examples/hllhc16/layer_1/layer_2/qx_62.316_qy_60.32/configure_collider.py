@@ -916,7 +916,7 @@ knob_names = {
     },
 }
 qx = {"lhcb1": 62.316, "lhcb2": 62.316}
-qy = {"lhcb1": 60.32, "lhcb2": 60.32}
+qy = {"lhcb1": 60.321, "lhcb2": 60.321}
 dqx = {"lhcb1": 15, "lhcb2": 15}
 dqy = {"lhcb1": 15, "lhcb2": 15}
 closed_orbit_correction = {

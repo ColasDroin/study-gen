@@ -249,7 +249,10 @@ class StudyGen:
         return main_block
 
     def get_parameters_assignation(
-        self: Self, main_block: Block, dic_mutated_parameters: dict[str, Any] = {}
+        self: Self,
+        main_block: Block,
+        dic_mutated_parameters: dict[str, Any] = {},
+        idx_scan: int = 0,
     ) -> str:
         def _finditem(obj, key):
             if key in obj:
@@ -272,7 +275,7 @@ class StudyGen:
                 else:
                     value = dic_mutated_parameters[param]
             else:
-                if param in dic_mutated_parameters:
+                if param in dic_mutated_parameters and idx_scan == 0:
                     print(
                         f"Parameter {param} is defined both in the configuration and being scanned."
                         " The value from the scan will be used."
@@ -287,7 +290,7 @@ class StudyGen:
         return str_parameters
 
     def generate_gen(
-        self: Self, gen: str, dic_mutated_parameters: dict[str, Any] = {}
+        self: Self, gen: str, dic_mutated_parameters: dict[str, Any] = {}, idx_scan: int = 0
     ) -> tuple[str, str, str, str, str]:
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
@@ -308,7 +311,9 @@ class StudyGen:
         main_block = self.generate_main_block(gen, dict_blocks)
 
         # Declare parameters
-        str_parameters = self.get_parameters_assignation(main_block, dic_mutated_parameters)
+        str_parameters = self.get_parameters_assignation(
+            main_block, dic_mutated_parameters, idx_scan
+        )
 
         # Get main block string
         str_main = main_block.get_str()
@@ -361,7 +366,11 @@ class StudyGen:
             file.write(study_str)
 
     def generate_render_write(
-        self: Self, gen_name: str, layer_path: str, dic_mutated_parameters: dict[str, Any] = {}
+        self: Self,
+        gen_name: str,
+        layer_path: str,
+        dic_mutated_parameters: dict[str, Any] = {},
+        idx_scan: int = 0,
     ):
         file_path_gen = f"{gen_name}.py"
         (
@@ -370,7 +379,7 @@ class StudyGen:
             str_blocks,
             str_main,
             str_main_call,
-        ) = self.generate_gen(gen_name, dic_mutated_parameters)
+        ) = self.generate_gen(gen_name, dic_mutated_parameters, idx_scan)
         study_str = self.render(str_imports, str_parameters, str_blocks, str_main, str_main_call)
         self.write(study_str, layer_path + file_path_gen)
         return study_str
@@ -417,9 +426,11 @@ class StudyGen:
 
         # Generate render write for cartesian product of all parameters
         l_study_str = []
-        for l_values, l_values_for_naming in zip(
-            itertools.product(*dic_parameter_lists.values()),
-            itertools.product(*dic_parameter_lists_for_naming.values()),
+        for idx_scan, (l_values, l_values_for_naming) in enumerate(
+            zip(
+                itertools.product(*dic_parameter_lists.values()),
+                itertools.product(*dic_parameter_lists_for_naming.values()),
+            )
         ):
             dic_mutated_parameters = dict(zip(dic_parameter_lists.keys(), l_values))
             dic_mutated_parameters_for_naming = dict(
@@ -437,6 +448,7 @@ class StudyGen:
                     )
                     + "/",
                     dic_mutated_parameters=dic_mutated_parameters,
+                    idx_scan=idx_scan,
                 )
             )
         return l_study_str
