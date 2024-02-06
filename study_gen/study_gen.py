@@ -119,7 +119,6 @@ class StudyGen:
             block_to_update = copy.deepcopy(dict_blocks[true_block])
 
             # Get arguments
-            # ! Ensure that unmixing arguments and output does not break anything
             l_args = new_block["blocks"][block]["args"]
             block_to_update.set_arguments_names(l_args)
 
@@ -275,7 +274,8 @@ class StudyGen:
             else:
                 if param in dic_mutated_parameters:
                     print(
-                        f"Parameter {param} is defined both in the configuration and being scanned. The value from the scan will be used."
+                        f"Parameter {param} is defined both in the configuration and being scanned."
+                        " The value from the scan will be used."
                     )
                     value = dic_mutated_parameters[param]
                 else:
@@ -375,6 +375,72 @@ class StudyGen:
         self.write(study_str, layer_path + file_path_gen)
         return study_str
 
+    def get_dic_parametric_scans(self: Self, layer) -> tuple[dict[str, Any], dict[str, Any]]:
+        dic_parameter_lists = {}
+        dic_parameter_lists_for_naming = {}
+        for parameter in self.master["structure"][layer]["scans"]:
+            if "linspace" in self.master["structure"][layer]["scans"][parameter]:
+                l_values_linspace = self.master["structure"][layer]["scans"][parameter]["linspace"]
+                parameter_list = np.round(
+                    np.linspace(
+                        l_values_linspace[0],
+                        l_values_linspace[1],
+                        l_values_linspace[2],
+                        endpoint=True,
+                    ),
+                    5,
+                )
+                dic_parameter_lists_for_naming[parameter] = parameter_list
+                if "for_each_beam" in self.master["structure"][layer]["scans"][parameter]:
+                    if self.master["structure"][layer]["scans"][parameter]["for_each_beam"]:
+                        parameter_list = [
+                            {"lhcb1": value, "lhcb2": value} for value in parameter_list
+                        ]
+
+            elif "list" in self.master["structure"][layer]["scans"][parameter]:
+                parameter_list = self.master["structure"][layer]["scans"][parameter]["list"]
+                dic_parameter_lists_for_naming[parameter] = parameter_list
+                if "for_each_beam" in self.master["structure"][layer]["scans"][parameter]:
+                    if self.master["structure"][layer]["scans"][parameter]["for_each_beam"]:
+                        parameter_list = [
+                            {"lhcb1": value, "lhcb2": value} for value in parameter_list
+                        ]
+            else:
+                raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
+            dic_parameter_lists[parameter] = parameter_list
+
+        return dic_parameter_lists, dic_parameter_lists_for_naming
+
+    def create_scans(self: Self, gen: str, layer: str, layer_path: str) -> list[str]:
+        # Get dictionnary of parametric values being scanned
+        dic_parameter_lists, dic_parameter_lists_for_naming = self.get_dic_parametric_scans(layer)
+
+        # Generate render write for cartesian product of all parameters
+        l_study_str = []
+        for l_values, l_values_for_naming in zip(
+            itertools.product(*dic_parameter_lists.values()),
+            itertools.product(*dic_parameter_lists_for_naming.values()),
+        ):
+            dic_mutated_parameters = dict(zip(dic_parameter_lists.keys(), l_values))
+            dic_mutated_parameters_for_naming = dict(
+                zip(dic_parameter_lists.keys(), l_values_for_naming)
+            )
+            l_study_str.append(
+                self.generate_render_write(
+                    gen,
+                    layer_path
+                    + "_".join(
+                        [
+                            f"{parameter}_{value}"
+                            for parameter, value in dic_mutated_parameters_for_naming.items()
+                        ]
+                    )
+                    + "/",
+                    dic_mutated_parameters=dic_mutated_parameters,
+                )
+            )
+        return l_study_str
+
     def create_study(self: Self) -> list[str]:
         l_study_str = []
         layer_path = ""
@@ -382,78 +448,7 @@ class StudyGen:
             layer_path += f"{layer}/"
             for gen in self.master["structure"][layer]["generations"]:
                 if "scans" in self.master["structure"][layer]:
-                    dic_parameter_lists = {}
-                    dic_parameter_lists_for_naming = {}
-                    for parameter in self.master["structure"][layer]["scans"]:
-                        if "linspace" in self.master["structure"][layer]["scans"][parameter]:
-                            l_values_linspace = self.master["structure"][layer]["scans"][parameter][
-                                "linspace"
-                            ]
-                            parameter_list = np.round(
-                                np.linspace(
-                                    l_values_linspace[0],
-                                    l_values_linspace[1],
-                                    l_values_linspace[2],
-                                    endpoint=True,
-                                ),
-                                5,
-                            )
-                            dic_parameter_lists_for_naming[parameter] = parameter_list
-                            if (
-                                "for_each_beam"
-                                in self.master["structure"][layer]["scans"][parameter]
-                            ):
-                                if self.master["structure"][layer]["scans"][parameter][
-                                    "for_each_beam"
-                                ]:
-                                    parameter_list = [
-                                        {"lhcb1": value, "lhcb2": value} for value in parameter_list
-                                    ]
-
-                        elif "list" in self.master["structure"][layer]["scans"][parameter]:
-                            parameter_list = self.master["structure"][layer]["scans"][parameter][
-                                "list"
-                            ]
-                            dic_parameter_lists_for_naming[parameter] = parameter_list
-                            if (
-                                "for_each_beam"
-                                in self.master["structure"][layer]["scans"][parameter]
-                            ):
-                                if self.master["structure"][layer]["scans"][parameter][
-                                    "for_each_beam"
-                                ]:
-                                    parameter_list = [
-                                        {"lhcb1": value, "lhcb2": value} for value in parameter_list
-                                    ]
-                        else:
-                            raise ValueError(
-                                f"Scanning method for parameter {parameter} is not recognized."
-                            )
-                        dic_parameter_lists[parameter] = parameter_list
-
-                    # Generate render write for cartesian product of all parameters
-                    for l_values, l_values_for_naming in zip(
-                        itertools.product(*dic_parameter_lists.values()),
-                        itertools.product(*dic_parameter_lists_for_naming.values()),
-                    ):
-                        dic_mutated_parameters = dict(zip(dic_parameter_lists.keys(), l_values))
-                        dic_mutated_parameters_for_naming = dict(
-                            zip(dic_parameter_lists.keys(), l_values_for_naming)
-                        )
-                        l_study_str.append(
-                            self.generate_render_write(
-                                gen,
-                                layer_path
-                                + "_".join(
-                                    [
-                                        f"{parameter}_{value}"
-                                        for parameter, value in dic_mutated_parameters_for_naming.items()
-                                    ]
-                                )
-                                + "/",
-                                dic_mutated_parameters=dic_mutated_parameters,
-                            )
-                        )
+                    l_study_str.extend(self.create_scans(gen, layer, layer_path))
                 else:
                     l_study_str.append(self.generate_render_write(gen, layer_path))
 
