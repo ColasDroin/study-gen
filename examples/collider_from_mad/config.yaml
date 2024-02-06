@@ -235,9 +235,9 @@ config_collider:
         - corr_co_acbyvs5.r8b1
         - corr_co_acbyhs5.r8b1
 
-  # ================================================================================================
-  # --- Additional parameters for xsuite collider configuration ---
-  # ================================================================================================
+    # ================================================================================================
+    # --- Additional parameters for xsuite collider configuration ---
+    # ================================================================================================
     path_configured_collider: configured_collider.json
 
 # ==================================================================================================
@@ -255,20 +255,27 @@ config_particles:
 
 config_simulation:
   # Collider file
-  collider_file: ../1_build_distr_and_collider/collider/collider.json
+  # collider_file: ../1_build_distr_and_collider/collider/collider.json
 
   # Distribution in the normalized xy space
-  particle_file: ../1_build_distr_and_collider/particles/00.parquet
+  path_input_distribution: ../1_build_distr_and_collider/particles/00.parquet
 
   # Initial off-momentum
   delta_max: 27.e-5
 
-  # Tracking
-  n_turns: 1000 # number of turns to track
+  # Number of turns to track
+  n_turns: 1000 #
 
   # Beam to track
-  beam: lhcb1 #lhcb1 or lhcb2
+  beam_sequence: lhcb1 #lhcb1 or lhcb2
 
   # Context for the simulation
-  context: "cpu" # 'cupy' # opencl
+  context_str: "cpu" # 'cupy' # opencl
 
+  # Optimize for tracking (often doesn't work)
+  optimize_for_tracking: false
+
+  # Save particles files
+  save_input_particles: true
+  path_input_particles: input_particles.parquet
+  path_output_particles: output_particles.parquet

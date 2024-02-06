@@ -128,3 +128,26 @@ gen3:
 # ==================================================================================================
 # --- Simulation and tracking generation ---
 # ==================================================================================================
+gen4:
+  script:
+    get_context:
+      args: context_str
+      output: context
+    load_collider_json:
+      args: path_configured_collider
+      output: collider
+    build_trackers:
+      args: collider, context
+      output: collider
+    prepare_distribution_for_tracking:
+      args: collider, context, beam_sequence, path_input_distribution, delta_max, nemitt_x, nemitt_y
+      output: particles, particles_id
+    track:
+      args: collider, particles, beam_sequence, n_turns, save_input_particles, optimize_for_tracking, path_input_particles
+      output: particles
+    dump_tracked_particles:
+      args: particles, particles_id, path_output_particles
+      output:
+    clean_after_tracking:
+      args:
+      output:
