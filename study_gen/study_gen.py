@@ -1,11 +1,17 @@
+# Standard library imports
 import copy
+import itertools
+import os
 from collections import OrderedDict
 from typing import Any, Self
 
+# Third party imports
+import numpy as np
 from black import FileMode, format_str
 from jinja2 import Environment, FileSystemLoader
 from ruamel import yaml
 
+# Local imports
 from . import merge
 from .block import Block
 
@@ -243,7 +249,9 @@ class StudyGen:
 
         return main_block
 
-    def get_parameters_assignation(self: Self, main_block: Block) -> str:
+    def get_parameters_assignation(
+        self: Self, main_block: Block, dic_mutated_parameters: dict[str, Any] = {}
+    ) -> str:
         def _finditem(obj, key):
             if key in obj:
                 return obj[key]
@@ -258,14 +266,29 @@ class StudyGen:
             # Look recursively for the corresponding parameter value in the configuration
             value = _finditem(self.configuration, param)
             if value is None:
-                raise ValueError(f"Parameter {param} is not defined in the configuration")
+                if param not in dic_mutated_parameters:
+                    raise ValueError(
+                        f"Parameter {param} is not defined in the configuration, nor being scanned"
+                    )
+                else:
+                    value = dic_mutated_parameters[param]
+            else:
+                if param in dic_mutated_parameters:
+                    print(
+                        f"Parameter {param} is defined both in the configuration and being scanned. The value from the scan will be used."
+                    )
+                    value = dic_mutated_parameters[param]
+                else:
+                    pass
             if isinstance(value, str):
                 value = f'"{value}"'
             str_parameters += param + f" = {value}\n"
 
         return str_parameters
 
-    def generate_gen(self: Self, gen: str) -> tuple[str, str, str, str, str]:
+    def generate_gen(
+        self: Self, gen: str, dic_mutated_parameters: dict[str, Any] = {}
+    ) -> tuple[str, str, str, str, str]:
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
 
@@ -285,7 +308,7 @@ class StudyGen:
         main_block = self.generate_main_block(gen, dict_blocks)
 
         # Declare parameters
-        str_parameters = self.get_parameters_assignation(main_block)
+        str_parameters = self.get_parameters_assignation(main_block, dic_mutated_parameters)
 
         # Get main block string
         str_main = main_block.get_str()
@@ -326,28 +349,112 @@ class StudyGen:
         return study_str
 
     def write(self: Self, study_str: str, file_path: str, format_with_black: bool = True):
-        # TODO: handle file path
         if format_with_black:
             study_str = format_str(study_str, mode=FileMode())
+
+        # Make folder if it doesn't exist
+        folder = os.path.dirname(file_path)
+        if folder != "":
+            os.makedirs(folder, exist_ok=True)
 
         with open(file_path, mode="w", encoding="utf-8") as file:
             file.write(study_str)
 
-    def generate_all(self: Self) -> list[str]:
+    def generate_render_write(
+        self: Self, gen_name: str, layer_path: str, dic_mutated_parameters: dict[str, Any] = {}
+    ):
+        file_path_gen = f"{gen_name}.py"
+        (
+            str_imports,
+            str_parameters,
+            str_blocks,
+            str_main,
+            str_main_call,
+        ) = self.generate_gen(gen_name, dic_mutated_parameters)
+        study_str = self.render(str_imports, str_parameters, str_blocks, str_main, str_main_call)
+        self.write(study_str, layer_path + file_path_gen)
+        return study_str
+
+    def create_study(self: Self) -> list[str]:
         l_study_str = []
+        layer_path = ""
         for layer in sorted(self.master["structure"].keys()):
+            layer_path += f"{layer}/"
             for gen in self.master["structure"][layer]["generations"]:
-                file_path_gen = f"{gen}.py"
-                (
-                    str_imports,
-                    str_parameters,
-                    str_blocks,
-                    str_main,
-                    str_main_call,
-                ) = self.generate_gen(gen)
-                study_str = self.render(
-                    str_imports, str_parameters, str_blocks, str_main, str_main_call
-                )
-                self.write(study_str, file_path_gen)
-                l_study_str.append(study_str)
+                if "scans" in self.master["structure"][layer]:
+                    dic_parameter_lists = {}
+                    dic_parameter_lists_for_naming = {}
+                    for parameter in self.master["structure"][layer]["scans"]:
+                        if "linspace" in self.master["structure"][layer]["scans"][parameter]:
+                            l_values_linspace = self.master["structure"][layer]["scans"][parameter][
+                                "linspace"
+                            ]
+                            parameter_list = np.round(
+                                np.linspace(
+                                    l_values_linspace[0],
+                                    l_values_linspace[1],
+                                    l_values_linspace[2],
+                                    endpoint=True,
+                                ),
+                                5,
+                            )
+                            dic_parameter_lists_for_naming[parameter] = parameter_list
+                            if (
+                                "for_each_beam"
+                                in self.master["structure"][layer]["scans"][parameter]
+                            ):
+                                if self.master["structure"][layer]["scans"][parameter][
+                                    "for_each_beam"
+                                ]:
+                                    parameter_list = [
+                                        {"lhcb1": value, "lhcb2": value} for value in parameter_list
+                                    ]
+
+                        elif "list" in self.master["structure"][layer]["scans"][parameter]:
+                            parameter_list = self.master["structure"][layer]["scans"][parameter][
+                                "list"
+                            ]
+                            dic_parameter_lists_for_naming[parameter] = parameter_list
+                            if (
+                                "for_each_beam"
+                                in self.master["structure"][layer]["scans"][parameter]
+                            ):
+                                if self.master["structure"][layer]["scans"][parameter][
+                                    "for_each_beam"
+                                ]:
+                                    parameter_list = [
+                                        {"lhcb1": value, "lhcb2": value} for value in parameter_list
+                                    ]
+                        else:
+                            raise ValueError(
+                                f"Scanning method for parameter {parameter} is not recognized."
+                            )
+                        dic_parameter_lists[parameter] = parameter_list
+
+                    # Generate render write for cartesian product of all parameters
+                    for l_values, l_values_for_naming in zip(
+                        itertools.product(*dic_parameter_lists.values()),
+                        itertools.product(*dic_parameter_lists_for_naming.values()),
+                    ):
+                        dic_mutated_parameters = dict(zip(dic_parameter_lists.keys(), l_values))
+                        dic_mutated_parameters_for_naming = dict(
+                            zip(dic_parameter_lists.keys(), l_values_for_naming)
+                        )
+                        l_study_str.append(
+                            self.generate_render_write(
+                                gen,
+                                layer_path
+                                + "_".join(
+                                    [
+                                        f"{parameter}_{value}"
+                                        for parameter, value in dic_mutated_parameters_for_naming.items()
+                                    ]
+                                )
+                                + "/",
+                                dic_mutated_parameters=dic_mutated_parameters,
+                            )
+                        )
+                else:
+                    l_study_str.append(self.generate_render_write(gen, layer_path))
+
         return l_study_str
