@@ -102,7 +102,6 @@ class StudyGen:
         dict_blocks: OrderedDict[str, Block],
         name_merged_function: str | None = None,
     ) -> Block:
-
         # Update arguments of each block to match the merged block specification
         l_blocks = []
         for block in new_block["blocks"]:
@@ -167,7 +166,6 @@ class StudyGen:
     ) -> OrderedDict[str, Block]:
         # Build new blocks
         for new_block_name, new_block in new_blocks.items():
-
             # Compute the new block from merged blocks
             new_block_object = self.build_merged_blocks(new_block_name, new_block, dict_blocks)
 
@@ -268,7 +266,6 @@ class StudyGen:
         return str_parameters
 
     def generate_gen(self: Self, gen: str) -> tuple[str, str, str, str, str]:
-
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
 
@@ -314,7 +311,6 @@ class StudyGen:
         str_main: str,
         str_main_call: str,
     ) -> str:
-
         # Generate generations from template
         environment = Environment(loader=FileSystemLoader(self.path_template))
         template = environment.get_template(self.template_name)
@@ -339,14 +335,19 @@ class StudyGen:
 
     def generate_all(self: Self) -> list[str]:
         l_study_str = []
-        for gen in sorted(self.master.keys()):
-            file_path_gen = f"{gen}.py"
-            str_imports, str_parameters, str_blocks, str_main, str_main_call = self.generate_gen(
-                gen
-            )
-            study_str = self.render(
-                str_imports, str_parameters, str_blocks, str_main, str_main_call
-            )
-            self.write(study_str, file_path_gen)
-            l_study_str.append(study_str)
+        for layer in sorted(self.master["structure"].keys()):
+            for gen in self.master["structure"][layer]["generations"]:
+                file_path_gen = f"{gen}.py"
+                (
+                    str_imports,
+                    str_parameters,
+                    str_blocks,
+                    str_main,
+                    str_main_call,
+                ) = self.generate_gen(gen)
+                study_str = self.render(
+                    str_imports, str_parameters, str_blocks, str_main, str_main_call
+                )
+                self.write(study_str, file_path_gen)
+                l_study_str.append(study_str)
         return l_study_str

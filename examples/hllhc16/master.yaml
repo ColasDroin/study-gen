@@ -1,7 +1,19 @@
 # ==================================================================================================
+# --- Study structure ---
+# ==================================================================================================
+structure:
+  layer_1:
+    generations:
+      - prepare_particles_distribution
+      - build_base_collider
+  layer_2:
+    generations:
+      - configure_collider
+      - track_particles
+# ==================================================================================================
 # --- Base collider generation ---
 # ==================================================================================================
-gen1:
+build_base_collider:
   script:
     prepare_mad_environment:
       args: links
@@ -51,7 +63,7 @@ gen1:
 # ==================================================================================================
 # --- Tailor collider with xsuite generation ---
 # ==================================================================================================
-gen2:
+configure_collider:
   script:
     load_collider_json:
       args: path_base_collider
@@ -117,7 +129,7 @@ gen2:
 # ==================================================================================================
 # --- Particles distribution generation ---
 # ==================================================================================================
-gen3:
+prepare_particles_distribution:
   script:
     build_particles_distribution:
       args: [r_min, r_max, n_r, n_angles, n_split]
@@ -128,7 +140,7 @@ gen3:
 # ==================================================================================================
 # --- Simulation and tracking generation ---
 # ==================================================================================================
-gen4:
+track_particles:
   script:
     get_context:
       args: context_str
