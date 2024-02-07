@@ -35,6 +35,8 @@ class StudyGen:
         else:
             self.path_template = path_template
 
+        self.set_alert_parameters = set()
+
     def load_configuration(self: Self, path_configuration: str) -> dict[str, Any]:
         ryaml = yaml.YAML()
         with open(path_configuration, "r") as f:
@@ -256,7 +258,6 @@ class StudyGen:
         self: Self,
         main_block: Block,
         dic_mutated_parameters: dict[str, Any] = {},
-        idx_scan: int = 0,
     ) -> str:
         def _finditem(obj, key):
             if key in obj:
@@ -280,11 +281,12 @@ class StudyGen:
                     value = dic_mutated_parameters[param]
             else:
                 if param in dic_mutated_parameters:
-                    if idx_scan == 0:
+                    if param not in self.set_alert_parameters:
                         print(
-                            f"Parameter {param} is defined both in the configuration and being"
-                            " scanned. The value from the scan will be used."
+                            f"Parameter {param} is defined in the configuration and being scanned."
+                            " The value from the configuration will be used."
                         )
+                        self.set_alert_parameters.add(param)
                     value = dic_mutated_parameters[param]
                 else:
                     pass
@@ -295,7 +297,7 @@ class StudyGen:
         return str_parameters
 
     def generate_gen(
-        self: Self, gen: str, dic_mutated_parameters: dict[str, Any] = {}, idx_scan: int = 0
+        self: Self, gen: str, dic_mutated_parameters: dict[str, Any] = {}
     ) -> tuple[str, str, str, str, str]:
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
@@ -316,9 +318,7 @@ class StudyGen:
         main_block = self.generate_main_block(gen, dict_blocks)
 
         # Declare parameters
-        str_parameters = self.get_parameters_assignation(
-            main_block, dic_mutated_parameters, idx_scan
-        )
+        str_parameters = self.get_parameters_assignation(main_block, dic_mutated_parameters)
 
         # Get main block string
         str_main = main_block.get_str()
@@ -376,7 +376,6 @@ class StudyGen:
         layer_name: str,
         study_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
-        idx_scan: int = 0,
     ) -> tuple[str, list[str]]:
         directory_path_gen = study_path + f"{layer_name}/"
         file_path_gen = directory_path_gen + f"{gen_name}.py"
@@ -386,7 +385,7 @@ class StudyGen:
             str_blocks,
             str_main,
             str_main_call,
-        ) = self.generate_gen(gen_name, dic_mutated_parameters, idx_scan)
+        ) = self.generate_gen(gen_name, dic_mutated_parameters)
         study_str = self.render(str_imports, str_parameters, str_blocks, str_main, str_main_call)
         self.write(study_str, file_path_gen)
         return study_str, [directory_path_gen]
@@ -463,12 +462,10 @@ class StudyGen:
                     "",
                     path,
                     dic_mutated_parameters=dic_mutated_parameters,
-                    idx_scan=idx_scan,
                 )
             )
         return l_study_str, l_study_path
 
-    # ! Fix layering
     def create_study(self: Self) -> list[str]:
         l_study_str = []
         l_study_path = [self.master["name"] + "/"]
