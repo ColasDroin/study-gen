@@ -275,11 +275,12 @@ class StudyGen:
                 else:
                     value = dic_mutated_parameters[param]
             else:
-                if param in dic_mutated_parameters and idx_scan == 0:
-                    print(
-                        f"Parameter {param} is defined both in the configuration and being scanned."
-                        " The value from the scan will be used."
-                    )
+                if param in dic_mutated_parameters:
+                    if idx_scan == 0:
+                        print(
+                            f"Parameter {param} is defined both in the configuration and being"
+                            " scanned. The value from the scan will be used."
+                        )
                     value = dic_mutated_parameters[param]
                 else:
                     pass
@@ -368,11 +369,13 @@ class StudyGen:
     def generate_render_write(
         self: Self,
         gen_name: str,
-        layer_path: str,
+        layer_name: str,
+        study_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
         idx_scan: int = 0,
-    ):
-        file_path_gen = f"{gen_name}.py"
+    ) -> tuple[str, list[str]]:
+        directory_path_gen = study_path + f"{layer_name}/"
+        file_path_gen = directory_path_gen + f"{gen_name}.py"
         (
             str_imports,
             str_parameters,
@@ -381,8 +384,8 @@ class StudyGen:
             str_main_call,
         ) = self.generate_gen(gen_name, dic_mutated_parameters, idx_scan)
         study_str = self.render(str_imports, str_parameters, str_blocks, str_main, str_main_call)
-        self.write(study_str, layer_path + file_path_gen)
-        return study_str
+        self.write(study_str, file_path_gen)
+        return study_str, [directory_path_gen]
 
     def get_dic_parametric_scans(self: Self, layer) -> tuple[dict[str, Any], dict[str, Any]]:
         dic_parameter_lists = {}
@@ -420,12 +423,15 @@ class StudyGen:
 
         return dic_parameter_lists, dic_parameter_lists_for_naming
 
-    def create_scans(self: Self, gen: str, layer: str, layer_path: str) -> list[str]:
+    def create_scans(
+        self: Self, gen: str, layer: str, layer_path: str
+    ) -> tuple[list[str], list[str]]:
         # Get dictionnary of parametric values being scanned
         dic_parameter_lists, dic_parameter_lists_for_naming = self.get_dic_parametric_scans(layer)
 
         # Generate render write for cartesian product of all parameters
         l_study_str = []
+        l_study_path = []
         for idx_scan, (l_values, l_values_for_naming) in enumerate(
             zip(
                 itertools.product(*dic_parameter_lists.values()),
@@ -436,33 +442,51 @@ class StudyGen:
             dic_mutated_parameters_for_naming = dict(
                 zip(dic_parameter_lists.keys(), l_values_for_naming)
             )
+            path = (
+                layer_path
+                + "_".join(
+                    [
+                        f"{parameter}_{value}"
+                        for parameter, value in dic_mutated_parameters_for_naming.items()
+                    ]
+                )
+                + "/"
+            )
+            l_study_path.append(path)
             l_study_str.append(
                 self.generate_render_write(
                     gen,
-                    layer_path
-                    + "_".join(
-                        [
-                            f"{parameter}_{value}"
-                            for parameter, value in dic_mutated_parameters_for_naming.items()
-                        ]
-                    )
-                    + "/",
+                    "",
+                    path,
                     dic_mutated_parameters=dic_mutated_parameters,
                     idx_scan=idx_scan,
                 )
             )
-        return l_study_str
+        return l_study_str, l_study_path
 
     # ! Fix layering
     def create_study(self: Self) -> list[str]:
         l_study_str = []
-        study_path = self.master["name"] + "/"
-        for layer in sorted(self.master["structure"].keys()):
-            study_path_with_layer += f"{layer}/"
-            for gen in self.master["structure"][layer]["generations"]:
-                if "scans" in self.master["structure"][layer]:
-                    l_study_str.extend(self.create_scans(gen, layer, study_path))
-                else:
-                    l_study_str.append(self.generate_render_write(gen, study_path_with_layer))
+        l_study_path = [self.master["name"] + "/"]
+        for idx, layer in enumerate(sorted(self.master["structure"].keys())):
+            for study_path in l_study_path:
+                # Each generaration inside of a layer should yield the same l_study_path_next_layer
+                l_study_path_next_layer = []
+                for gen in self.master["structure"][layer]["generations"]:
+                    if "scans" in self.master["structure"][layer]:
+                        l_study_scan_str, l_study_path_next_layer = self.create_scans(
+                            gen, layer, study_path
+                        )
+                        l_study_str.extend(l_study_scan_str)
+                    else:
+                        # First generation is named as the study, not the layer
+                        layer_temp = "" if idx == 0 else layer
+                        study_str, l_study_path_next_layer = self.generate_render_write(
+                            gen, layer_temp, study_path
+                        )
+                        l_study_str.append(study_str)
+
+                # Update study path for next later
+                l_study_path = l_study_path_next_layer
 
         return l_study_str

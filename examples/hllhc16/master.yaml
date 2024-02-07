@@ -10,14 +10,19 @@ structure:
   layer_2:
     generations:
       - configure_collider
-      - track_particles
     scans:
       qx:
-        linspace: [62.31, 62.32, 11]
+        linspace: [62.31, 62.32, 2]
         for_each_beam: true
       qy:
         list: [60.32, 60.33]
         for_each_beam: true
+  layer_3:
+    generations:
+      - track_particles
+    scans:
+      n_turns:
+        list: [1000, 2000]
 
 # ==================================================================================================
 # --- Base collider generation ---
