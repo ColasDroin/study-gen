@@ -156,7 +156,7 @@ class Block:
         # Update output
         self._dict_output = dict_output
 
-    def set_outputs_names(self: Self, l_outputs_names: list[str]):
+    def set_outputs_names(self: Self, l_outputs_names: list[str]|str|None):
         # Ensure that l_outputs_names is not just a string
         if not isinstance(l_outputs_names, list):
             # Ensure the user did not provide a string with a comma
