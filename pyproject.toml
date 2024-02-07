@@ -19,6 +19,9 @@ xmask = "^0.3.6"
 black = "^24.1.1"
 
 
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
