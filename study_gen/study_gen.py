@@ -22,7 +22,7 @@ class StudyGen:
         path_configuration: str,
         path_master: str,
         dict_ref_blocks: dict[str, Block],
-        path_template: str = None,
+        path_template: str | None = None,
         template_name: str = "default_template.txt",
     ):
         self.configuration = self.load_configuration(path_configuration)
@@ -391,6 +391,12 @@ class StudyGen:
         return study_str, [directory_path_gen]
 
     def get_dic_parametric_scans(self: Self, layer) -> tuple[dict[str, Any], dict[str, Any]]:
+        def test_convert_for_each_beam(parameter_dict: dict, parameter_list: list) -> list:
+            if "for_each_beam" in parameter_dict:
+                if parameter_dict["for_each_beam"]:
+                    parameter_list = [{"lhcb1": value, "lhcb2": value} for value in parameter_list]
+            return parameter_list
+
         dic_parameter_lists = {}
         dic_parameter_lists_for_naming = {}
         for parameter in self.master["structure"][layer]["scans"]:
@@ -405,24 +411,26 @@ class StudyGen:
                     ),
                     5,
                 )
-                dic_parameter_lists_for_naming[parameter] = parameter_list
-                if "for_each_beam" in self.master["structure"][layer]["scans"][parameter]:
-                    if self.master["structure"][layer]["scans"][parameter]["for_each_beam"]:
-                        parameter_list = [
-                            {"lhcb1": value, "lhcb2": value} for value in parameter_list
-                        ]
-
+            elif "logspace" in self.master["structure"][layer]["scans"][parameter]:
+                l_values_logspace = self.master["structure"][layer]["scans"][parameter]["logspace"]
+                parameter_list = np.round(
+                    np.logspace(
+                        l_values_logspace[0],
+                        l_values_logspace[1],
+                        l_values_logspace[2],
+                        endpoint=True,
+                    ),
+                    5,
+                )
             elif "list" in self.master["structure"][layer]["scans"][parameter]:
                 parameter_list = self.master["structure"][layer]["scans"][parameter]["list"]
-                dic_parameter_lists_for_naming[parameter] = parameter_list
-                if "for_each_beam" in self.master["structure"][layer]["scans"][parameter]:
-                    if self.master["structure"][layer]["scans"][parameter]["for_each_beam"]:
-                        parameter_list = [
-                            {"lhcb1": value, "lhcb2": value} for value in parameter_list
-                        ]
             else:
                 raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
-            dic_parameter_lists[parameter] = parameter_list
+            dic_parameter_lists_for_naming[parameter] = parameter_list
+            parameter_list_updated = test_convert_for_each_beam(
+                self.master["structure"][layer]["scans"][parameter], parameter_list
+            )
+            dic_parameter_lists[parameter] = parameter_list_updated
 
         return dic_parameter_lists, dic_parameter_lists_for_naming
 
