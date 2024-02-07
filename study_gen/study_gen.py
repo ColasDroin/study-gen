@@ -453,15 +453,16 @@ class StudyGen:
             )
         return l_study_str
 
+    # ! Fix layering
     def create_study(self: Self) -> list[str]:
         l_study_str = []
-        layer_path = ""
+        study_path = self.master["name"] + "/"
         for layer in sorted(self.master["structure"].keys()):
-            layer_path += f"{layer}/"
+            study_path_with_layer += f"{layer}/"
             for gen in self.master["structure"][layer]["generations"]:
                 if "scans" in self.master["structure"][layer]:
-                    l_study_str.extend(self.create_scans(gen, layer, layer_path))
+                    l_study_str.extend(self.create_scans(gen, layer, study_path))
                 else:
-                    l_study_str.append(self.generate_render_write(gen, layer_path))
+                    l_study_str.append(self.generate_render_write(gen, study_path_with_layer))
 
         return l_study_str
