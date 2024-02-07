@@ -22,14 +22,18 @@ class StudyGen:
         path_configuration: str,
         path_master: str,
         dict_ref_blocks: dict[str, Block],
-        path_template: str = "templates/",
+        path_template: str = None,
         template_name: str = "default_template.txt",
     ):
         self.configuration = self.load_configuration(path_configuration)
         self.master = self.load_master(path_master)
-        self.path_template = path_template
         self.template_name = template_name
         self.dict_ref_blocks = dict_ref_blocks
+
+        if path_template is None:
+            self.path_template = os.path.dirname(__file__) + "/templates/"
+        else:
+            self.path_template = path_template
 
     def load_configuration(self: Self, path_configuration: str) -> dict[str, Any]:
         ryaml = yaml.YAML()
