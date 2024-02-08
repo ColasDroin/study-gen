@@ -268,6 +268,13 @@ class Block:
             else:
                 l_arguments_names = [l_arguments_names]
 
+        # Ensure that arguments_names has not more elements than the number of parameters
+        if l_arguments_names is not None and len(l_arguments_names) > len(self.dict_parameters):
+            raise ValueError(
+                "Number of arguments is different from number of parameters. Number of parameters:"
+                f" {len(self.dict_parameters)}. Number of arguments: {len(l_arguments_names)}"
+            )
+
         # Only update the names of the parameters, not types (obtain the types from the parameters)
         self._l_arguments = [
             (arg, type_param)
@@ -358,6 +365,18 @@ class Block:
         else:
             if l_external_arguments is None:
                 l_external_arguments = self.get_arguments_names()
+            if len(l_external_arguments) > len(self.dict_parameters):
+                raise ValueError(
+                    "Number of arguments is different from number of parameters. Number of parameters:"
+                    f" {len(self.dict_parameters)}. Number of arguments: {len(l_external_arguments)}"
+                )
+            elif len(l_external_arguments) < len(self.dict_parameters):
+                # Just a warning as some arguments can be optional
+                # logging.warning(
+                #     "Number of arguments is different from number of parameters. Number of parameters:"
+                #     f" {len(self.dict_parameters)}. Number of arguments: {len(l_external_arguments)}"
+                # )
+                pass
             return f"{self.function.__name__}({', '.join(l_external_arguments)})"
 
     def get_assignation_call_str(self: Self) -> str:

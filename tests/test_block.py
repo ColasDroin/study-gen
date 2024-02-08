@@ -238,35 +238,119 @@ def test_dict_output(block_func, output, request):
     assert block.dict_output == output
 
 
-@pytest.mark.parametrize(
-    "block_func",
-    [
-        example_block_with_two_outputs,
-    ],
-)
-def test_dict_output_setter(block_func, request):
-    block = request.getfixturevalue(block_func.__name__)
-
+# Check for output setter
+def test_dict_output_setter(example_block_with_two_outputs):
     # Check for wrong number of outputs
     with pytest.raises(ValueError):
-        block.dict_output = OrderedDict({"output_example_block": float})
+        example_block_with_two_outputs.dict_output = OrderedDict({"output_example_block": float})
 
     # Check for wrong type
     with pytest.raises(ValueError):
-        block.dict_output = OrderedDict(
+        example_block_with_two_outputs.dict_output = OrderedDict(
             [("output_0_example_block", int), ("output_1_example_block", int)]
         )
 
     # Check for proper setting
-    block.dict_output = OrderedDict(
+    example_block_with_two_outputs.dict_output = OrderedDict(
         [("output_0_example_block", float), ("output_1_example_block", int)]
     )
-    assert block.dict_output == OrderedDict(
+    assert example_block_with_two_outputs.dict_output == OrderedDict(
         [("output_0_example_block", float), ("output_1_example_block", int)]
     )
 
+    # Update name of outputs
+    example_block_with_two_outputs.set_outputs_names(["better_name", "even_better_name"])
+    assert example_block_with_two_outputs.dict_output == OrderedDict(
+        [("better_name", float), ("even_better_name", int)]
+    )
+    assert example_block_with_two_outputs.get_outputs_names() == ["better_name", "even_better_name"]
 
-# ! How to test for missing imports?
+
+def test_parameters(example_block_with_two_outputs):
+    # Check for default parameters
+    assert example_block_with_two_outputs.dict_parameters == OrderedDict(
+        [("a", float), ("b", float)]
+    )
+
+    # Check setter for wrong number of parameters
+    with pytest.raises(ValueError):
+        example_block_with_two_outputs.dict_parameters = OrderedDict([("a", float)])
+
+    # Check for setter
+    # ! Bug here, seems to be due to the way the fixture is defined
+    # example_block_with_two_outputs.dict_parameters = OrderedDict([("a", int), ("b", int)])
+
+    # Check for parameter names change
+    # example_block_with_two_outputs.set_parameters_names(["better_name", "even_better_name"])
+    # assert example_block_with_two_outputs.dict_parameters == OrderedDict(
+    #     [("better_name", float), ("even_better_name", float)]
+    # )
+
+
+def test_arguments(example_block_with_two_outputs):
+    # Check for default arguments
+    assert example_block_with_two_outputs.l_arguments == []
+
+    # Check setter for wrong number of arguments
+    with pytest.raises(ValueError):
+        example_block_with_two_outputs.l_arguments = [("a", float)]
+
+    # Check setter for wrong types of arguments
+    with pytest.raises(ValueError):
+        example_block_with_two_outputs.l_arguments = [("a", float), ("b", int)]
+
+    # Check for setter with correct arguments
+    example_block_with_two_outputs.l_arguments = [("a", float), ("b", float)]
+    assert example_block_with_two_outputs.l_arguments == [("a", float), ("b", float)]
+
+    # Check for arguments names change
+    example_block_with_two_outputs.set_arguments_names(["better_name", "even_better_name"])
+    assert example_block_with_two_outputs.get_arguments_names() == [
+        "better_name",
+        "even_better_name",
+    ]
+
+
+def test_docstring(example_block_with_two_outputs):
+    assert (
+        example_block_with_two_outputs.get_docstring()
+        == "Example function to test the block class."
+    )
+
+
+# ! Same problem as for the parameters setter... fixture is defined with two tabs, can't be tested easily
+# def test_get_body(example_block_with_two_outputs):
+#     assert (
+#         example_block_with_two_outputs.get_body_str()
+#         == "\t# Returns a at the power of b\n\treturn np.power(a, math.gamma(b)), int(math.gamma(a))"
+#     )
+
+
+def test_get_output_str(example_block_with_two_outputs):
+    assert (
+        example_block_with_two_outputs.get_output_str()
+        == "output_0_example_block, output_1_example_block"
+    )
+
+
+def test_get_output_type_hint_str(example_block_with_two_outputs):
+    assert example_block_with_two_outputs.get_output_type_hint_str() == "tuple[float, int]"
+
+
+def test_get_call_str(example_block_with_two_outputs):
+    # Must provide the arguments first
+    example_block_with_two_outputs.set_arguments_names(["a", "b"])
+    assert example_block_with_two_outputs.get_call_str() == "example_function(a, b)"
+
+    # Try to provide too many arguments
+    with pytest.raises(ValueError):
+        example_block_with_two_outputs.set_arguments_names(["a", "b", "c"])
+
+    # Providing too few arguments doesn't do anything as some arguments are optional
+    example_block_with_two_outputs.set_arguments_names(["a"])
+
+
+# ! Testing for missing imports is also tricky
 # @pytest.fixture(scope="function")
 # def example_block_with_two_import():
 #     def example_function(a: float, b: float) -> None:

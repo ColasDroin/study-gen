@@ -61,22 +61,6 @@ def build_initial_hllhc_sequence_function(
     return mad
 
 
-def cycle_to_IP3_function(
-    mad: Madx,
-) -> Madx:
-    mad.input(
-        """
-    !Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
-    if (mylhcbeam<3){
-    seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
-    };
-    seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
-    """
-    )
-
-    return mad
-
-
 def incorporate_CC_function(
     mad: Madx,
 ) -> Madx:
@@ -86,6 +70,19 @@ def incorporate_CC_function(
     call, file='acc-models-lhc/toolkit/enable_crabcavities.madx';
     on_crab1 = 0;
     on_crab5 = 0;
+    """
+    )
+
+    return mad
+
+
+def set_twiss_function(
+    mad: Madx,
+) -> Madx:
+    mad.input(
+        """
+    ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
+    exec, twiss_opt;
     """
     )
 
@@ -122,13 +119,16 @@ def apply_acsca_fix_hllhc_function(
     return mad
 
 
-def set_twiss_function(
+def cycle_to_IP3_function(
     mad: Madx,
 ) -> Madx:
     mad.input(
         """
-    ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
-    exec, twiss_opt;
+    !Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
+    if (mylhcbeam<3){
+    seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
+    };
+    seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
     """
     )
 
