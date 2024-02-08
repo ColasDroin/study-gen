@@ -31,6 +31,36 @@ def prepare_mad_environment_function(
     return sequence_name_b1, sequence_name_b2, mad_b1b2, sequence_name_b4, mad_b4
 
 
+def build_initial_hllhc_sequence_function(
+    mad: Madx,
+    beam: int,
+) -> Madx:
+
+    # Select beam
+    mad.input(f"mylhcbeam = {beam}")
+
+    # Build sequence
+    mad.input(
+        """
+    ! Build sequence
+    option, -echo,-warn,-info;
+    if (mylhcbeam==4){
+        call,file="acc-models-lhc/lhcb4.seq";
+    }
+    else {
+        call,file="acc-models-lhc/lhc.seq";
+    };
+    !Install HL-LHC
+    call, file="acc-models-lhc/hllhc_sequence.madx";
+    ! Get the toolkit
+    call,file="acc-models-lhc/toolkit/macro.madx";
+    option, -echo, warn,-info;
+    """
+    )
+
+    return mad
+
+
 def cycle_to_IP3_function(
     mad: Madx,
 ) -> Madx:
@@ -41,6 +71,21 @@ def cycle_to_IP3_function(
     seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
     };
     seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
+    """
+    )
+
+    return mad
+
+
+def incorporate_CC_function(
+    mad: Madx,
+) -> Madx:
+    mad.input(
+        """
+    ! Install crab cavities (they are off)
+    call, file='acc-models-lhc/toolkit/enable_crabcavities.madx';
+    on_crab1 = 0;
+    on_crab5 = 0;
     """
     )
 
@@ -77,6 +122,19 @@ def apply_acsca_fix_hllhc_function(
     return mad
 
 
+def set_twiss_function(
+    mad: Madx,
+) -> Madx:
+    mad.input(
+        """
+    ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
+    exec, twiss_opt;
+    """
+    )
+
+    return mad
+
+
 def initialize_beam_function(
     mad: Madx,
 ) -> Madx:
@@ -91,51 +149,6 @@ def initialize_beam_function(
     return mad
 
 
-def build_initial_hllhc_sequence_function(
-    mad: Madx,
-    beam: int,
-) -> Madx:
-
-    # Select beam
-    mad.input(f"mylhcbeam = {beam}")
-
-    # Build sequence
-    mad.input(
-        """
-    ! Build sequence
-    option, -echo,-warn,-info;
-    if (mylhcbeam==4){
-        call,file="acc-models-lhc/lhcb4.seq";
-    }
-    else {
-        call,file="acc-models-lhc/lhc.seq";
-    };
-    !Install HL-LHC
-    call, file="acc-models-lhc/hllhc_sequence.madx";
-    ! Get the toolkit
-    call,file="acc-models-lhc/toolkit/macro.madx";
-    option, -echo, warn,-info;
-    """
-    )
-
-    return mad
-
-
-def incorporate_CC_function(
-    mad: Madx,
-) -> Madx:
-    mad.input(
-        """
-    ! Install crab cavities (they are off)
-    call, file='acc-models-lhc/toolkit/enable_crabcavities.madx';
-    on_crab1 = 0;
-    on_crab5 = 0;
-    """
-    )
-
-    return mad
-
-
 def slice_sequence_function(
     mad: Madx,
 ) -> Madx:
@@ -143,19 +156,6 @@ def slice_sequence_function(
         """
     ! Slice nominal sequence
     exec, myslice;
-    """
-    )
-
-    return mad
-
-
-def set_twiss_function(
-    mad: Madx,
-) -> Madx:
-    mad.input(
-        """
-    ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
-    exec, twiss_opt;
     """
     )
 

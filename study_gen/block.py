@@ -43,7 +43,6 @@ class Block:
         return self._dict_output
 
     def initial_dic_output_setter_from_signature(self: Self) -> OrderedDict[str, type]:
-
         # Get signature output as str
         signature_output_str = str(self.get_signature())
 
@@ -61,7 +60,6 @@ class Block:
 
         # Check if several outputs are defined
         if "tuple[" in signature_output_str:
-
             # Create each output name and type from the signature
             for type_output in signature_type_hint.__args__:  # type: ignore
                 dict_output[f"output_{len(dict_output)}_{self.name}"] = type_output
@@ -75,7 +73,6 @@ class Block:
     def initial_dic_output_setter_from_output(
         self: Self, dict_output: OrderedDict[str, type]
     ) -> OrderedDict[str, type]:
-
         # Check that the output corresponds to the return statement
         if len(dict_output) == 0 and "return" in self.get_str():
             logging.warning(
@@ -96,7 +93,6 @@ class Block:
 
         # Check if several outputs are defined
         if "tuple[" in signature_output_str:
-
             # Check that the number of outputs is the same
             if len(dict_output) != len(signature_type_hint.__args__):  # type: ignore
                 raise ValueError(
@@ -108,7 +104,7 @@ class Block:
                 # Compare the signature type hint of each output (unpacked) with the provided output type hints
                 for output, type_output in zip(dict_output, signature_type_hint.__args__):  # type: ignore
                     if type_output != dict_output[output]:
-                        logging.warning(
+                        raise ValueError(
                             f"Output {output} has a different type than expected:"
                             f" {type_output.__name__} Instead of:"
                             f" {dict_output[output].__name__} for block {self.name}"
@@ -121,14 +117,14 @@ class Block:
                 )
             elif len(dict_output) == 0:
                 if signature_type_hint is not None:
-                    logging.warning(
+                    raise ValueError(
                         f"No output provided in dict_output for block {self.name}, while signature"
                         f" shows one output of type {signature_type_hint.__name__}"
                     )
             else:
                 # Check that the provided output has the correct type
                 if signature_type_hint != list(dict_output.values())[0]:
-                    logging.warning(
+                    raise ValueError(
                         f"Output {list(dict_output.keys())[0]} has a different type than expected:"
                         f" {signature_type_hint.__name__} Instead of:"
                         f" {list(dict_output.values())[0].__name__} for block {self.name}"
@@ -156,7 +152,7 @@ class Block:
         # Update output
         self._dict_output = dict_output
 
-    def set_outputs_names(self: Self, l_outputs_names: list[str]|str|None):
+    def set_outputs_names(self: Self, l_outputs_names: list[str] | str | None):
         # Ensure that l_outputs_names is not just a string
         if not isinstance(l_outputs_names, list):
             # Ensure the user did not provide a string with a comma
@@ -194,7 +190,6 @@ class Block:
 
     @dict_parameters.setter
     def dict_parameters(self: Self, dict_parameters: OrderedDict[str, type]):
-
         # Ensure that the number of arguments is the same
         if len(dict_parameters) != len(self.dict_parameters):
             raise ValueError(
@@ -242,7 +237,6 @@ class Block:
 
     @l_arguments.setter
     def l_arguments(self: Self, l_arguments: list[tuple[str, type]]):
-
         # Ensure that the number of arguments is the same
         if len(l_arguments) != len(self.dict_parameters):
             raise ValueError(
@@ -263,15 +257,14 @@ class Block:
         # Update list of arguments
         self._l_arguments = l_arguments
 
-    def set_arguments_names(self: Self, l_arguments_names: list[str]):
-
+    def set_arguments_names(self: Self, l_arguments_names: list[str] | None):
         # Ensure that l_arguments_names is not just a string (from bad yaml parsing)
         if not isinstance(l_arguments_names, list):
             # Ensure the user did not provide a string with a comma
             if l_arguments_names is None:
                 l_arguments_names = []
             elif "," in l_arguments_names:
-                l_arguments_names = [x.strip() for x in l_arguments_names.split(",")]
+                l_arguments_names = [x.strip() for x in l_arguments_names.split(",")]  # type: ignore
             else:
                 l_arguments_names = [l_arguments_names]
 
@@ -345,9 +338,8 @@ class Block:
     # Static needed here when the output comes from a merge
     @staticmethod
     def get_external_output_type_hint_str(
-        dict_output: OrderedDict[str, type] = OrderedDict()
+        dict_output: OrderedDict[str, type] = OrderedDict(),
     ) -> str:
-
         if len(dict_output) == 0:
             output_hint_str = "None"
         else:
@@ -408,7 +400,6 @@ class Block:
         docstring: str = "",
         output_str: str | None = None,
     ):
-
         # Write docstring
         if docstring != "":
             docstring = (
@@ -441,7 +432,6 @@ class Block:
         docstring: str | None = None,
         dict_parameters: OrderedDict[str, type] | None = None,
     ) -> tuple[str, str, str]:
-
         # Get output type hint string and output name (can't modify the output type, and output name
         # must be modified through the corresponding setter)
         output_type_hint_str = self.get_output_type_hint_str()
@@ -471,7 +461,6 @@ class Block:
     def write_and_load_temp_block(
         cls, function_str: str, name_function: str, dict_imports: dict[str, str]
     ) -> Callable:
-
         # Write string to temporary file
         tmp = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
 
