@@ -1,6 +1,9 @@
 name: linting_testing
 
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   ruff:
