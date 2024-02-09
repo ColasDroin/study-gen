@@ -36,7 +36,7 @@ def build_particles_distribution_function(
 
 
 def write_particles_distribution_function(
-    particle_list: list[list[tuple[int, float, float]]]
+    particle_list: list[list[tuple[int, float, float]]],
 ) -> None:
     # Write distribution to parquet files
     distributions_folder = "particles"

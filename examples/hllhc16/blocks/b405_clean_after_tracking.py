@@ -6,6 +6,7 @@
 # Standard library imports
 
 # Third party imports
+import contextlib
 import os
 
 # Local imports
@@ -21,11 +22,9 @@ dict_imports = {
 # ==================================================================================================
 def clean_after_tracking_function() -> None:
     # Remote the correction folder, and potential C files remaining
-    try:
+    with contextlib.suppress(Exception):
         os.system("rm -rf correction")
         os.system("rm -f *.cc")
-    except Exception:
-        pass
 
 
 # ==================================================================================================

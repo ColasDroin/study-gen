@@ -17,251 +17,249 @@ from scipy.constants import c as clight
 
 
 def load_collider_json_function(path_base_collider: str) -> xt.Multiline:
-    collider = xt.Multiline.from_json(path_base_collider)
-    return collider
+    return xt.Multiline.from_json(path_base_collider)
 
 
 def generate_orbit_correction_setup_function() -> dict:
-    correction_setup = {}
-    correction_setup["lhcb1"] = {
-        "IR1 left": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.r8.b1",
-            end="e.ds.l1.b1",
-            vary=(
-                "corr_co_acbh14.l1b1",
-                "corr_co_acbh12.l1b1",
-                "corr_co_acbv15.l1b1",
-                "corr_co_acbv13.l1b1",
+    return {
+        "lhcb1": {
+            "IR1 left": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.r8.b1",
+                end="e.ds.l1.b1",
+                vary=(
+                    "corr_co_acbh14.l1b1",
+                    "corr_co_acbh12.l1b1",
+                    "corr_co_acbv15.l1b1",
+                    "corr_co_acbv13.l1b1",
+                ),
+                targets=("e.ds.l1.b1",),
             ),
-            targets=("e.ds.l1.b1",),
-        ),
-        "IR1 right": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.r1.b1",
-            end="s.ds.l2.b1",
-            vary=(
-                "corr_co_acbh13.r1b1",
-                "corr_co_acbh15.r1b1",
-                "corr_co_acbv12.r1b1",
-                "corr_co_acbv14.r1b1",
+            "IR1 right": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.r1.b1",
+                end="s.ds.l2.b1",
+                vary=(
+                    "corr_co_acbh13.r1b1",
+                    "corr_co_acbh15.r1b1",
+                    "corr_co_acbv12.r1b1",
+                    "corr_co_acbv14.r1b1",
+                ),
+                targets=("s.ds.l2.b1",),
             ),
-            targets=("s.ds.l2.b1",),
-        ),
-        "IR5 left": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.r4.b1",
-            end="e.ds.l5.b1",
-            vary=(
-                "corr_co_acbh14.l5b1",
-                "corr_co_acbh12.l5b1",
-                "corr_co_acbv15.l5b1",
-                "corr_co_acbv13.l5b1",
+            "IR5 left": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.r4.b1",
+                end="e.ds.l5.b1",
+                vary=(
+                    "corr_co_acbh14.l5b1",
+                    "corr_co_acbh12.l5b1",
+                    "corr_co_acbv15.l5b1",
+                    "corr_co_acbv13.l5b1",
+                ),
+                targets=("e.ds.l5.b1",),
             ),
-            targets=("e.ds.l5.b1",),
-        ),
-        "IR5 right": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.r5.b1",
-            end="s.ds.l6.b1",
-            vary=(
-                "corr_co_acbh13.r5b1",
-                "corr_co_acbh15.r5b1",
-                "corr_co_acbv12.r5b1",
-                "corr_co_acbv14.r5b1",
+            "IR5 right": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.r5.b1",
+                end="s.ds.l6.b1",
+                vary=(
+                    "corr_co_acbh13.r5b1",
+                    "corr_co_acbh15.r5b1",
+                    "corr_co_acbv12.r5b1",
+                    "corr_co_acbv14.r5b1",
+                ),
+                targets=("s.ds.l6.b1",),
             ),
-            targets=("s.ds.l6.b1",),
-        ),
-        "IP1": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.l1.b1",
-            end="s.ds.r1.b1",
-            vary=(
-                "corr_co_acbch6.l1b1",
-                "corr_co_acbcv5.l1b1",
-                "corr_co_acbch5.r1b1",
-                "corr_co_acbcv6.r1b1",
-                "corr_co_acbyhs4.l1b1",
-                "corr_co_acbyhs4.r1b1",
-                "corr_co_acbyvs4.l1b1",
-                "corr_co_acbyvs4.r1b1",
+            "IP1": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.l1.b1",
+                end="s.ds.r1.b1",
+                vary=(
+                    "corr_co_acbch6.l1b1",
+                    "corr_co_acbcv5.l1b1",
+                    "corr_co_acbch5.r1b1",
+                    "corr_co_acbcv6.r1b1",
+                    "corr_co_acbyhs4.l1b1",
+                    "corr_co_acbyhs4.r1b1",
+                    "corr_co_acbyvs4.l1b1",
+                    "corr_co_acbyvs4.r1b1",
+                ),
+                targets=("ip1", "s.ds.r1.b1"),
             ),
-            targets=("ip1", "s.ds.r1.b1"),
-        ),
-        "IP2": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.l2.b1",
-            end="s.ds.r2.b1",
-            vary=(
-                "corr_co_acbyhs5.l2b1",
-                "corr_co_acbchs5.r2b1",
-                "corr_co_acbyvs5.l2b1",
-                "corr_co_acbcvs5.r2b1",
-                "corr_co_acbyhs4.l2b1",
-                "corr_co_acbyhs4.r2b1",
-                "corr_co_acbyvs4.l2b1",
-                "corr_co_acbyvs4.r2b1",
+            "IP2": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.l2.b1",
+                end="s.ds.r2.b1",
+                vary=(
+                    "corr_co_acbyhs5.l2b1",
+                    "corr_co_acbchs5.r2b1",
+                    "corr_co_acbyvs5.l2b1",
+                    "corr_co_acbcvs5.r2b1",
+                    "corr_co_acbyhs4.l2b1",
+                    "corr_co_acbyhs4.r2b1",
+                    "corr_co_acbyvs4.l2b1",
+                    "corr_co_acbyvs4.r2b1",
+                ),
+                targets=("ip2", "s.ds.r2.b1"),
             ),
-            targets=("ip2", "s.ds.r2.b1"),
-        ),
-        "IP5": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.l5.b1",
-            end="s.ds.r5.b1",
-            vary=(
-                "corr_co_acbch6.l5b1",
-                "corr_co_acbcv5.l5b1",
-                "corr_co_acbch5.r5b1",
-                "corr_co_acbcv6.r5b1",
-                "corr_co_acbyhs4.l5b1",
-                "corr_co_acbyhs4.r5b1",
-                "corr_co_acbyvs4.l5b1",
-                "corr_co_acbyvs4.r5b1",
+            "IP5": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.l5.b1",
+                end="s.ds.r5.b1",
+                vary=(
+                    "corr_co_acbch6.l5b1",
+                    "corr_co_acbcv5.l5b1",
+                    "corr_co_acbch5.r5b1",
+                    "corr_co_acbcv6.r5b1",
+                    "corr_co_acbyhs4.l5b1",
+                    "corr_co_acbyhs4.r5b1",
+                    "corr_co_acbyvs4.l5b1",
+                    "corr_co_acbyvs4.r5b1",
+                ),
+                targets=("ip5", "s.ds.r5.b1"),
             ),
-            targets=("ip5", "s.ds.r5.b1"),
-        ),
-        "IP8": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.l8.b1",
-            end="s.ds.r8.b1",
-            vary=(
-                "corr_co_acbch5.l8b1",
-                "corr_co_acbyhs4.l8b1",
-                "corr_co_acbyhs4.r8b1",
-                "corr_co_acbyhs5.r8b1",
-                "corr_co_acbcvs5.l8b1",
-                "corr_co_acbyvs4.l8b1",
-                "corr_co_acbyvs4.r8b1",
-                "corr_co_acbyvs5.r8b1",
+            "IP8": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.l8.b1",
+                end="s.ds.r8.b1",
+                vary=(
+                    "corr_co_acbch5.l8b1",
+                    "corr_co_acbyhs4.l8b1",
+                    "corr_co_acbyhs4.r8b1",
+                    "corr_co_acbyhs5.r8b1",
+                    "corr_co_acbcvs5.l8b1",
+                    "corr_co_acbyvs4.l8b1",
+                    "corr_co_acbyvs4.r8b1",
+                    "corr_co_acbyvs5.r8b1",
+                ),
+                targets=("ip8", "s.ds.r8.b1"),
             ),
-            targets=("ip8", "s.ds.r8.b1"),
-        ),
+        },
+        "lhcb2": {
+            "IR1 left": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.l1.b2",
+                end="e.ds.r8.b2",
+                vary=(
+                    "corr_co_acbh13.l1b2",
+                    "corr_co_acbh15.l1b2",
+                    "corr_co_acbv12.l1b2",
+                    "corr_co_acbv14.l1b2",
+                ),
+                targets=("e.ds.r8.b2",),
+            ),
+            "IR1 right": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.l2.b2",
+                end="s.ds.r1.b2",
+                vary=(
+                    "corr_co_acbh12.r1b2",
+                    "corr_co_acbh14.r1b2",
+                    "corr_co_acbv13.r1b2",
+                    "corr_co_acbv15.r1b2",
+                ),
+                targets=("s.ds.r1.b2",),
+            ),
+            "IR5 left": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="e.ds.l5.b2",
+                end="e.ds.r4.b2",
+                vary=(
+                    "corr_co_acbh13.l5b2",
+                    "corr_co_acbh15.l5b2",
+                    "corr_co_acbv12.l5b2",
+                    "corr_co_acbv14.l5b2",
+                ),
+                targets=("e.ds.r4.b2",),
+            ),
+            "IR5 right": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.l6.b2",
+                end="s.ds.r5.b2",
+                vary=(
+                    "corr_co_acbh12.r5b2",
+                    "corr_co_acbh14.r5b2",
+                    "corr_co_acbv13.r5b2",
+                    "corr_co_acbv15.r5b2",
+                ),
+                targets=("s.ds.r5.b2",),
+            ),
+            "IP1": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.r1.b2",
+                end="e.ds.l1.b2",
+                vary=(
+                    "corr_co_acbch6.r1b2",
+                    "corr_co_acbcv5.r1b2",
+                    "corr_co_acbch5.l1b2",
+                    "corr_co_acbcv6.l1b2",
+                    "corr_co_acbyhs4.l1b2",
+                    "corr_co_acbyhs4.r1b2",
+                    "corr_co_acbyvs4.l1b2",
+                    "corr_co_acbyvs4.r1b2",
+                ),
+                targets=(
+                    "ip1",
+                    "e.ds.l1.b2",
+                ),
+            ),
+            "IP2": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.r2.b2",
+                end="e.ds.l2.b2",
+                vary=(
+                    "corr_co_acbyhs5.l2b2",
+                    "corr_co_acbchs5.r2b2",
+                    "corr_co_acbyvs5.l2b2",
+                    "corr_co_acbcvs5.r2b2",
+                    "corr_co_acbyhs4.l2b2",
+                    "corr_co_acbyhs4.r2b2",
+                    "corr_co_acbyvs4.l2b2",
+                    "corr_co_acbyvs4.r2b2",
+                ),
+                targets=("ip2", "e.ds.l2.b2"),
+            ),
+            "IP5": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.r5.b2",
+                end="e.ds.l5.b2",
+                vary=(
+                    "corr_co_acbch6.r5b2",
+                    "corr_co_acbcv5.r5b2",
+                    "corr_co_acbch5.l5b2",
+                    "corr_co_acbcv6.l5b2",
+                    "corr_co_acbyhs4.l5b2",
+                    "corr_co_acbyhs4.r5b2",
+                    "corr_co_acbyvs4.l5b2",
+                    "corr_co_acbyvs4.r5b2",
+                ),
+                targets=(
+                    "ip5",
+                    "e.ds.l5.b2",
+                ),
+            ),
+            "IP8": dict(
+                ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
+                start="s.ds.r8.b2",
+                end="e.ds.l8.b2",
+                vary=(
+                    "corr_co_acbchs5.l8b2",
+                    "corr_co_acbyhs5.r8b2",
+                    "corr_co_acbcvs5.l8b2",
+                    "corr_co_acbyvs5.r8b2",
+                    "corr_co_acbyhs4.l8b2",
+                    "corr_co_acbyhs4.r8b2",
+                    "corr_co_acbyvs4.l8b2",
+                    "corr_co_acbyvs4.r8b2",
+                ),
+                targets=(
+                    "ip8",
+                    "e.ds.l8.b2",
+                ),
+            ),
+        },
     }
-
-    correction_setup["lhcb2"] = {
-        "IR1 left": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.l1.b2",
-            end="e.ds.r8.b2",
-            vary=(
-                "corr_co_acbh13.l1b2",
-                "corr_co_acbh15.l1b2",
-                "corr_co_acbv12.l1b2",
-                "corr_co_acbv14.l1b2",
-            ),
-            targets=("e.ds.r8.b2",),
-        ),
-        "IR1 right": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.l2.b2",
-            end="s.ds.r1.b2",
-            vary=(
-                "corr_co_acbh12.r1b2",
-                "corr_co_acbh14.r1b2",
-                "corr_co_acbv13.r1b2",
-                "corr_co_acbv15.r1b2",
-            ),
-            targets=("s.ds.r1.b2",),
-        ),
-        "IR5 left": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="e.ds.l5.b2",
-            end="e.ds.r4.b2",
-            vary=(
-                "corr_co_acbh13.l5b2",
-                "corr_co_acbh15.l5b2",
-                "corr_co_acbv12.l5b2",
-                "corr_co_acbv14.l5b2",
-            ),
-            targets=("e.ds.r4.b2",),
-        ),
-        "IR5 right": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.l6.b2",
-            end="s.ds.r5.b2",
-            vary=(
-                "corr_co_acbh12.r5b2",
-                "corr_co_acbh14.r5b2",
-                "corr_co_acbv13.r5b2",
-                "corr_co_acbv15.r5b2",
-            ),
-            targets=("s.ds.r5.b2",),
-        ),
-        "IP1": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.r1.b2",
-            end="e.ds.l1.b2",
-            vary=(
-                "corr_co_acbch6.r1b2",
-                "corr_co_acbcv5.r1b2",
-                "corr_co_acbch5.l1b2",
-                "corr_co_acbcv6.l1b2",
-                "corr_co_acbyhs4.l1b2",
-                "corr_co_acbyhs4.r1b2",
-                "corr_co_acbyvs4.l1b2",
-                "corr_co_acbyvs4.r1b2",
-            ),
-            targets=(
-                "ip1",
-                "e.ds.l1.b2",
-            ),
-        ),
-        "IP2": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.r2.b2",
-            end="e.ds.l2.b2",
-            vary=(
-                "corr_co_acbyhs5.l2b2",
-                "corr_co_acbchs5.r2b2",
-                "corr_co_acbyvs5.l2b2",
-                "corr_co_acbcvs5.r2b2",
-                "corr_co_acbyhs4.l2b2",
-                "corr_co_acbyhs4.r2b2",
-                "corr_co_acbyvs4.l2b2",
-                "corr_co_acbyvs4.r2b2",
-            ),
-            targets=("ip2", "e.ds.l2.b2"),
-        ),
-        "IP5": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.r5.b2",
-            end="e.ds.l5.b2",
-            vary=(
-                "corr_co_acbch6.r5b2",
-                "corr_co_acbcv5.r5b2",
-                "corr_co_acbch5.l5b2",
-                "corr_co_acbcv6.l5b2",
-                "corr_co_acbyhs4.l5b2",
-                "corr_co_acbyhs4.r5b2",
-                "corr_co_acbyvs4.l5b2",
-                "corr_co_acbyvs4.r5b2",
-            ),
-            targets=(
-                "ip5",
-                "e.ds.l5.b2",
-            ),
-        ),
-        "IP8": dict(
-            ref_with_knobs={"on_corr_co": 0, "on_disp": 0},
-            start="s.ds.r8.b2",
-            end="e.ds.l8.b2",
-            vary=(
-                "corr_co_acbchs5.l8b2",
-                "corr_co_acbyhs5.r8b2",
-                "corr_co_acbcvs5.l8b2",
-                "corr_co_acbyvs5.r8b2",
-                "corr_co_acbyhs4.l8b2",
-                "corr_co_acbyhs4.r8b2",
-                "corr_co_acbyvs4.l8b2",
-                "corr_co_acbyvs4.r8b2",
-            ),
-            targets=(
-                "ip8",
-                "e.ds.l8.b2",
-            ),
-        ),
-    }
-    return correction_setup
 
 
 def dump_orbit_correction_files_function(
@@ -355,7 +353,7 @@ def match_tune_and_chroma_function(
             enable_chromaticity_correction=True,
             knob_names=knob_names,
             targets=targets,
-            line_co_ref=collider[line_name + "_co_ref"],
+            line_co_ref=collider[f"{line_name}_co_ref"],
             co_corr_config=conf_closed_orbit_correction[line_name],
         )
 
@@ -366,17 +364,15 @@ def load_filling_scheme_function(
     filling_scheme_path: str,
 ) -> tuple[np.ndarray, np.ndarray]:
 
-    # Load the filling scheme
-    if filling_scheme_path.endswith(".json"):
-        with open(filling_scheme_path, "r") as fid:
-            filling_scheme = json.load(fid)
-    else:
+    if not filling_scheme_path.endswith(".json"):
         raise ValueError(
             f"Unknown filling scheme file format: {filling_scheme_path}. It you provided a csv"
             " file, it should have been automatically convert when running the script"
             " 001_make_folders.py. Something went wrong."
         )
 
+    with open(filling_scheme_path, "r") as fid:
+        filling_scheme = json.load(fid)
     # Extract booleans beam arrays
     array_b1 = np.array(filling_scheme["beam1"])
     array_b2 = np.array(filling_scheme["beam2"])
@@ -402,11 +398,7 @@ def get_CC_bool_function(
     crab5_val: float,
 ) -> bool:
 
-    # Get crab cavities as boolean
-    crab = False
-    if abs(crab1_val) > 0 or abs(crab5_val) > 0:
-        crab = True
-    return crab
+    return abs(crab1_val) > 0 or abs(crab5_val) > 0
 
 
 def compute_PU_function(
@@ -427,14 +419,13 @@ def luminosity_levelling_ip1_5_function(
     max_bunch_intensity: float,
     target_lumi_ip1_and_5: float,
 ) -> float:
-
     # Get Twiss
     twiss_b1 = collider["lhcb1"].twiss()
     twiss_b2 = collider["lhcb2"].twiss()
 
     # Internal function to optimize
     def f(bunch_intensity: float):
-        luminosity = xt.lumi.luminosity_from_twiss(
+        luminosity = xt.lumi.luminosity_from_twiss(  # type: ignore
             n_colliding_bunches=n_collisions_ip1_and_5,
             num_particles_per_bunch=bunch_intensity,
             ip_name="ip1",
@@ -498,11 +489,10 @@ def luminosity_levelling_ip2_8_function(
     nemitt_y: float,
     num_colliding_bunches_ip8: int,
     additional_targets_lumi: list = [],
-) -> xt.Multiline:
-    for ip_name in config_lumi_leveling_ip2_8.keys():
+) -> xt.Multiline:  # sourcery skip: default-mutable-arg
+    for ip_name, config_this_ip in config_lumi_leveling_ip2_8.items():
         print(f"\n --- Leveling in {ip_name} ---")
 
-        config_this_ip = config_lumi_leveling_ip2_8[ip_name]
         bump_range = config_this_ip["bump_range"]
 
         assert config_this_ip[
@@ -516,8 +506,6 @@ def luminosity_levelling_ip2_8_function(
         f_rev = 1 / (collider.lhcb1.get_length() / (beta0_b1 * clight))
 
         targets = []
-        vary = []
-
         if "luminosity" in config_this_ip.keys() and ip_name == "ip8":
             targets.append(
                 xt.TargetLuminosity(
@@ -556,8 +544,7 @@ def luminosity_levelling_ip2_8_function(
 
         if config_this_ip["impose_separation_orthogonal_to_crossing"]:
             targets.append(xt.TargetSeparationOrthogonalToCrossing(ip_name="ip8"))
-        vary.append(xt.VaryList(config_this_ip["knobs"], step=1e-4))
-
+        vary = [xt.VaryList(config_this_ip["knobs"], step=1e-4)]
         # Target and knobs to rematch the crossing angles and close the bumps
         for line_name in ["lhcb1", "lhcb2"]:
             targets += [
@@ -720,7 +707,7 @@ def record_final_luminosity_and_PU_function(
     ]
     for n_col, ip in zip(l_n_collisions, l_ip):
         try:
-            L = xt.lumi.luminosity_from_twiss(
+            L = xt.lumi.luminosity_from_twiss(  # type: ignore
                 n_colliding_bunches=n_col,
                 num_particles_per_bunch=num_particles_per_bunch,
                 ip_name=ip,
@@ -748,7 +735,7 @@ def dump_collider_json_function(
     collider: xt.Multiline,
     name_collider: str,
 ) -> None:
-    collider.to_json(name_collider + ".json")
+    collider.to_json(f"{name_collider}.json")
 
 
 # ==================================================================================================

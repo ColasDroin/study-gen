@@ -18,7 +18,7 @@ from .b210_compute_PU import compute_PU_function
 dict_imports = {"xt": "import xtrack as xt"}
 
 # Block dependencies
-set_deps = set(["compute_PU"])
+set_deps = {"compute_PU"}
 
 
 # ==================================================================================================
@@ -49,7 +49,7 @@ def record_final_luminosity_and_PU_function(
     ]
     for n_col, ip in zip(l_n_collisions, l_ip):
         try:
-            L = xt.lumi.luminosity_from_twiss(
+            L = xt.lumi.luminosity_from_twiss(  # type: ignore
                 n_colliding_bunches=n_col,
                 num_particles_per_bunch=num_particles_per_bunch,
                 ip_name=ip,

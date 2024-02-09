@@ -19,22 +19,19 @@ import os
 def get_context_function(
     context_str: str,
 ) -> Any:
-
-    if context_str == "cupy":
-        context = xo.ContextCupy()
+    if context_str == "cpu":
+        return xo.ContextCpu()
+    elif context_str == "cupy":
+        return xo.ContextCupy()
     elif context_str == "opencl":
-        context = xo.ContextPyopencl()
-    elif context_str == "cpu":
-        context = xo.ContextCpu()
+        return xo.ContextPyopencl()
     else:
         print("Context not recognized, using cpu")
-        context = xo.ContextCpu()
-    return context
+        return xo.ContextCpu()
 
 
 def load_collider_json_function(path_base_collider: str) -> xt.Multiline:
-    collider = xt.Multiline.from_json(path_base_collider)
-    return collider
+    return xt.Multiline.from_json(path_base_collider)
 
 
 def build_trackers_function(
@@ -128,11 +125,9 @@ def dump_tracked_particles_function(
 
 def clean_after_tracking_function() -> None:
     # Remote the correction folder, and potential C files remaining
-    try:
+    with contextlib.suppress(Exception):
         os.system("rm -rf correction")
         os.system("rm -f *.cc")
-    except Exception:
-        pass
 
 
 # ==================================================================================================

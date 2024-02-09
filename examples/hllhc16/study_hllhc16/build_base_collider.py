@@ -31,51 +31,6 @@ def prepare_mad_environment_function(
     return sequence_name_b1, sequence_name_b2, mad_b1b2, sequence_name_b4, mad_b4
 
 
-def build_initial_hllhc_sequence_function(
-    mad: Madx,
-    beam: int,
-) -> Madx:
-
-    # Select beam
-    mad.input(f"mylhcbeam = {beam}")
-
-    # Build sequence
-    mad.input(
-        """
-    ! Build sequence
-    option, -echo,-warn,-info;
-    if (mylhcbeam==4){
-        call,file="acc-models-lhc/lhcb4.seq";
-    }
-    else {
-        call,file="acc-models-lhc/lhc.seq";
-    };
-    !Install HL-LHC
-    call, file="acc-models-lhc/hllhc_sequence.madx";
-    ! Get the toolkit
-    call,file="acc-models-lhc/toolkit/macro.madx";
-    option, -echo, warn,-info;
-    """
-    )
-
-    return mad
-
-
-def incorporate_CC_function(
-    mad: Madx,
-) -> Madx:
-    mad.input(
-        """
-    ! Install crab cavities (they are off)
-    call, file='acc-models-lhc/toolkit/enable_crabcavities.madx';
-    on_crab1 = 0;
-    on_crab5 = 0;
-    """
-    )
-
-    return mad
-
-
 def set_twiss_function(
     mad: Madx,
 ) -> Madx:
@@ -149,6 +104,51 @@ def initialize_beam_function(
     return mad
 
 
+def build_initial_hllhc_sequence_function(
+    mad: Madx,
+    beam: int,
+) -> Madx:
+
+    # Select beam
+    mad.input(f"mylhcbeam = {beam}")
+
+    # Build sequence
+    mad.input(
+        """
+    ! Build sequence
+    option, -echo,-warn,-info;
+    if (mylhcbeam==4){
+        call,file="acc-models-lhc/lhcb4.seq";
+    }
+    else {
+        call,file="acc-models-lhc/lhc.seq";
+    };
+    !Install HL-LHC
+    call, file="acc-models-lhc/hllhc_sequence.madx";
+    ! Get the toolkit
+    call,file="acc-models-lhc/toolkit/macro.madx";
+    option, -echo, warn,-info;
+    """
+    )
+
+    return mad
+
+
+def incorporate_CC_function(
+    mad: Madx,
+) -> Madx:
+    mad.input(
+        """
+    ! Install crab cavities (they are off)
+    call, file='acc-models-lhc/toolkit/enable_crabcavities.madx';
+    on_crab1 = 0;
+    on_crab5 = 0;
+    """
+    )
+
+    return mad
+
+
 def slice_sequence_function(
     mad: Madx,
 ) -> Madx:
@@ -169,7 +169,6 @@ def build_hllhc_sequence_function(
     cycle_to_IP3: bool,
     incorporate_CC: bool,
 ) -> Madx:
-
     # Get beam number
     if beam_name == "b1b2":
         beam = 1
@@ -193,7 +192,7 @@ def build_hllhc_sequence_function(
         mad = initialize_beam_function(mad)
 
     # Install error placeholders (configured later)
-    xm.lhc.install_errors_placeholders_hllhc(mad)
+    xm.lhc.install_errors_placeholders_hllhc(mad)  # type: ignore
 
     # Get IP3 as position 0
     if cycle_to_IP3:
@@ -294,8 +293,7 @@ def build_collider_function(
     pars_for_imperfections: dict[str, int],
     ver_hllhc_optics: float,
 ) -> xt.Multiline:
-    # Build collider
-    collider = xm.lhc.build_xsuite_collider(
+    return xm.lhc.build_xsuite_collider(  # type: ignore
         sequence_b1=mad_b1b2.sequence.lhcb1,
         sequence_b2=mad_b1b2.sequence.lhcb2,
         sequence_b4=mad_b4.sequence.lhcb2,
@@ -307,8 +305,6 @@ def build_collider_function(
         ver_lhc_run=None,
         ver_hllhc_optics=ver_hllhc_optics,
     )
-
-    return collider
 
 
 def build_trackers_function(
@@ -373,7 +369,7 @@ def dump_collider_json_function(
     collider: xt.Multiline,
     name_collider: str,
 ) -> None:
-    collider.to_json(name_collider + ".json")
+    collider.to_json(f"{name_collider}.json")
 
 
 # ==================================================================================================

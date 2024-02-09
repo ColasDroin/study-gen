@@ -19,8 +19,7 @@ dict_imports = {"xt": "import xtrack as xt"}
 
 
 def load_collider_json_function(path_base_collider: str) -> xt.Multiline:
-    collider = xt.Multiline.from_json(path_base_collider)
-    return collider
+    return xt.Multiline.from_json(path_base_collider)
 
 
 # ==================================================================================================

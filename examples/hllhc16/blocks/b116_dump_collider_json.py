@@ -22,7 +22,7 @@ def dump_collider_json_function(
     collider: xt.Multiline,
     name_collider: str,
 ) -> None:
-    collider.to_json(name_collider + ".json")
+    collider.to_json(f"{name_collider}.json")
 
 
 # ==================================================================================================

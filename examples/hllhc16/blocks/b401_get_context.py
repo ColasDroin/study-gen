@@ -22,17 +22,15 @@ dict_imports = {"xo": "import xobjects as xo", "Any": "from typing import Any"}
 def get_context_function(
     context_str: str,
 ) -> Any:
-
-    if context_str == "cupy":
-        context = xo.ContextCupy()
+    if context_str == "cpu":
+        return xo.ContextCpu()
+    elif context_str == "cupy":
+        return xo.ContextCupy()
     elif context_str == "opencl":
-        context = xo.ContextPyopencl()
-    elif context_str == "cpu":
-        context = xo.ContextCpu()
+        return xo.ContextPyopencl()
     else:
         print("Context not recognized, using cpu")
-        context = xo.ContextCpu()
-    return context
+        return xo.ContextCpu()
 
 
 # ==================================================================================================

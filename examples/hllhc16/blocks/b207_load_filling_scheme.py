@@ -21,17 +21,15 @@ dict_imports = {"json": "import json", "np": "import numpy as np"}
 # ==================================================================================================
 def load_filling_scheme_function(filling_scheme_path: str) -> tuple[np.ndarray, np.ndarray]:
 
-    # Load the filling scheme
-    if filling_scheme_path.endswith(".json"):
-        with open(filling_scheme_path, "r") as fid:
-            filling_scheme = json.load(fid)
-    else:
+    if not filling_scheme_path.endswith(".json"):
         raise ValueError(
             f"Unknown filling scheme file format: {filling_scheme_path}. It you provided a csv"
             " file, it should have been automatically convert when running the script"
             " 001_make_folders.py. Something went wrong."
         )
 
+    with open(filling_scheme_path, "r") as fid:
+        filling_scheme = json.load(fid)
     # Extract booleans beam arrays
     array_b1 = np.array(filling_scheme["beam1"])
     array_b2 = np.array(filling_scheme["beam2"])

@@ -4,7 +4,6 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
 
 # Third party imports
 import xtrack as xt
@@ -23,7 +22,7 @@ dict_imports = {
 }
 
 # Block dependencies
-set_deps = set(["compute_PU"])
+set_deps = {"compute_PU"}
 
 
 # ==================================================================================================
@@ -41,14 +40,13 @@ def luminosity_levelling_ip1_5_function(
     max_bunch_intensity: float,
     target_lumi_ip1_and_5: float,
 ) -> float:
-
     # Get Twiss
     twiss_b1 = collider["lhcb1"].twiss()
     twiss_b2 = collider["lhcb2"].twiss()
 
     # Internal function to optimize
     def f(bunch_intensity: float):
-        luminosity = xt.lumi.luminosity_from_twiss(
+        luminosity = xt.lumi.luminosity_from_twiss( # type: ignore
             n_colliding_bunches=n_collisions_ip1_and_5,
             num_particles_per_bunch=bunch_intensity,
             ip_name="ip1",

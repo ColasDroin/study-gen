@@ -14,8 +14,6 @@ from study_gen.block import Block
 
 # Imports needed for block to work (not detected by linting tools)
 dict_imports = {"numpy": "import numpy as np", "itertools": "import itertools"}
-for module, import_statement in dict_imports.items():
-    exec(import_statement)
 
 
 # ==================================================================================================

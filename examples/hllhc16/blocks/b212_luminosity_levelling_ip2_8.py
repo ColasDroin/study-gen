@@ -31,11 +31,10 @@ def luminosity_levelling_ip2_8_function(
     nemitt_y: float,
     num_colliding_bunches_ip8: int,
     additional_targets_lumi: list = [],
-) -> xt.Multiline:
-    for ip_name in config_lumi_leveling_ip2_8.keys():
+) -> xt.Multiline:  # sourcery skip: default-mutable-arg
+    for ip_name, config_this_ip in config_lumi_leveling_ip2_8.items():
         print(f"\n --- Leveling in {ip_name} ---")
 
-        config_this_ip = config_lumi_leveling_ip2_8[ip_name]
         bump_range = config_this_ip["bump_range"]
 
         assert config_this_ip[
@@ -49,8 +48,6 @@ def luminosity_levelling_ip2_8_function(
         f_rev = 1 / (collider.lhcb1.get_length() / (beta0_b1 * clight))
 
         targets = []
-        vary = []
-
         if "luminosity" in config_this_ip.keys() and ip_name == "ip8":
             targets.append(
                 xt.TargetLuminosity(
@@ -87,8 +84,7 @@ def luminosity_levelling_ip2_8_function(
 
         if config_this_ip["impose_separation_orthogonal_to_crossing"]:
             targets.append(xt.TargetSeparationOrthogonalToCrossing(ip_name="ip8"))
-        vary.append(xt.VaryList(config_this_ip["knobs"], step=1e-4))
-
+        vary = [xt.VaryList(config_this_ip["knobs"], step=1e-4)]
         # Target and knobs to rematch the crossing angles and close the bumps
         for line_name in ["lhcb1", "lhcb2"]:
             targets += [

@@ -47,7 +47,7 @@ def match_tune_and_chroma_function(
             enable_chromaticity_correction=True,
             knob_names=knob_names,
             targets=targets,
-            line_co_ref=collider[line_name + "_co_ref"],
+            line_co_ref=collider[f"{line_name}_co_ref"],
             co_corr_config=conf_closed_orbit_correction[line_name],
         )
 

@@ -36,8 +36,7 @@ def build_collider_function(
     pars_for_imperfections: dict[str, int],
     ver_hllhc_optics: float,
 ) -> xt.Multiline:
-    # Build collider
-    collider = xm.lhc.build_xsuite_collider(
+    return xm.lhc.build_xsuite_collider(  # type: ignore
         sequence_b1=mad_b1b2.sequence.lhcb1,
         sequence_b2=mad_b1b2.sequence.lhcb2,
         sequence_b4=mad_b4.sequence.lhcb2,
@@ -49,8 +48,6 @@ def build_collider_function(
         ver_lhc_run=None,
         ver_hllhc_optics=ver_hllhc_optics,
     )
-
-    return collider
 
 
 # ==================================================================================================

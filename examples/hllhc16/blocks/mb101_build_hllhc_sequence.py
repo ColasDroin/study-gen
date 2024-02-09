@@ -4,7 +4,6 @@
 # helpful to declare them here for linting.
 # ==================================================================================================
 # Standard library imports
-from collections import OrderedDict
 
 # Third party imports
 import xmask as xm
@@ -26,17 +25,15 @@ from .b107_set_twiss import set_twiss_function
 dict_imports = {"Madx": "from cpymad.madx import Madx", "xm": "import xmask as xm"}
 
 # Block dependencies
-set_deps = set(
-    [
-        "apply_acsca_fix_hllhc",
-        "build_initial_hllhc_sequence",
-        "cycle_to_IP3",
-        "incorporate_CC",
-        "initialize_beam",
-        "set_twiss",
-        "slice_sequence",
-    ]
-)
+set_deps = {
+    "apply_acsca_fix_hllhc",
+    "build_initial_hllhc_sequence",
+    "cycle_to_IP3",
+    "incorporate_CC",
+    "initialize_beam",
+    "set_twiss",
+    "slice_sequence",
+}
 
 
 # ==================================================================================================
@@ -49,7 +46,6 @@ def build_hllhc_sequence_function(
     cycle_to_IP3: bool,
     incorporate_CC: bool,
 ) -> Madx:
-
     # Get beam number
     if beam_name == "b1b2":
         beam = 1
@@ -73,7 +69,7 @@ def build_hllhc_sequence_function(
         mad = initialize_beam_function(mad)
 
     # Install error placeholders (configured later)
-    xm.lhc.install_errors_placeholders_hllhc(mad)
+    xm.lhc.install_errors_placeholders_hllhc(mad)  # type: ignore
 
     # Get IP3 as position 0
     if cycle_to_IP3:
