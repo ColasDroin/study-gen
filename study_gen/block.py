@@ -121,7 +121,7 @@ class Block:
         elif signature_type_hint != list(dict_output.values())[0]:
             raise ValueError(
                 f"Output {list(dict_output.keys())[0]} has a different type than expected:"
-                f" {signature_type_hint.__name__} Instead of:"
+                f" {signature_type_hint.__name__} Instead of:"  # type: ignore
                 f" {list(dict_output.values())[0].__name__} for block {self.name}"
             )
 

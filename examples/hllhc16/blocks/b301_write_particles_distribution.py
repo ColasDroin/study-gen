@@ -28,7 +28,7 @@ def write_particles_distribution_function(
     for idx_chunk, my_list in enumerate(particle_list):
         pd.DataFrame(
             my_list,
-            columns=["particle_id", "normalized amplitude in xy-plane", "angle in xy-plane [deg]"],
+            columns=["particle_id", "normalized amplitude in xy-plane", "angle in xy-plane [deg]"],  # type: ignore
         ).to_parquet(f"{distributions_folder}/{idx_chunk:02}.parquet")
 
 
