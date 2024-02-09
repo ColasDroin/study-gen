@@ -63,10 +63,9 @@ class Block:
             # Create each output name and type from the signature
             for type_output in signature_type_hint.__args__:  # type: ignore
                 dict_output[f"output_{len(dict_output)}_{self.name}"] = type_output
-        else:
-            if signature_type_hint is not None:
-                # Create output name and type from the signature
-                dict_output[f"output_{self.name}"] = signature_type_hint
+        elif signature_type_hint is not None:
+            # Create output name and type from the signature
+            dict_output[f"output_{self.name}"] = signature_type_hint
 
         return dict_output
 
@@ -109,26 +108,22 @@ class Block:
                             f" {type_output.__name__} Instead of:"
                             f" {dict_output[output].__name__} for block {self.name}"
                         )
-        else:
-            # Chat that dict_output only has one element
-            if len(dict_output) > 1:
+        elif len(dict_output) > 1:
+            raise ValueError(
+                "Number of outputs differs from type hint signature for block {self.name}."
+            )
+        elif len(dict_output) == 0:
+            if signature_type_hint is not None:
                 raise ValueError(
-                    "Number of outputs differs from type hint signature for block {self.name}."
+                    f"No output provided in dict_output for block {self.name}, while signature"
+                    f" shows one output of type {signature_type_hint.__name__}"
                 )
-            elif len(dict_output) == 0:
-                if signature_type_hint is not None:
-                    raise ValueError(
-                        f"No output provided in dict_output for block {self.name}, while signature"
-                        f" shows one output of type {signature_type_hint.__name__}"
-                    )
-            else:
-                # Check that the provided output has the correct type
-                if signature_type_hint != list(dict_output.values())[0]:
-                    raise ValueError(
-                        f"Output {list(dict_output.keys())[0]} has a different type than expected:"
-                        f" {signature_type_hint.__name__} Instead of:"
-                        f" {list(dict_output.values())[0].__name__} for block {self.name}"
-                    )
+        elif signature_type_hint != list(dict_output.values())[0]:
+            raise ValueError(
+                f"Output {list(dict_output.keys())[0]} has a different type than expected:"
+                f" {signature_type_hint.__name__} Instead of:"
+                f" {list(dict_output.values())[0].__name__} for block {self.name}"
+            )
 
         return dict_output
 
@@ -164,12 +159,7 @@ class Block:
                 l_outputs_names = [l_outputs_names]
 
         # Only update the names of the outputs, not types
-        self.dict_output = OrderedDict(
-            [
-                (output, type_output)
-                for output, type_output in zip(l_outputs_names, self.dict_output.values())
-            ]
-        )
+        self.dict_output = OrderedDict(list(zip(l_outputs_names, self.dict_output.values())))
 
     def get_outputs_names(self: Self) -> list[str]:
         return [output for output, _ in self.dict_output.items()]
@@ -177,13 +167,12 @@ class Block:
     @property
     def dict_parameters(self: Self) -> OrderedDict[str, type]:
         signature = self.get_signature()
-        dict_parameters = OrderedDict(
+        return OrderedDict(
             [
                 (parameter, signature.parameters[parameter].annotation)
                 for parameter in signature.parameters
             ]
         )
-        return dict_parameters
 
     def get_dict_parameters_names(self: Self) -> list[str]:
         return list(self.dict_parameters.keys())
@@ -223,10 +212,7 @@ class Block:
 
         # Only update the names of the parameters, not types
         self.dict_parameters = OrderedDict(
-            [
-                (param, type_param)
-                for param, type_param in zip(l_parameters_names, self.dict_parameters.values())
-            ]
+            list(zip(l_parameters_names, self.dict_parameters.values()))
         )
 
     @property
@@ -276,10 +262,7 @@ class Block:
             )
 
         # Only update the names of the parameters, not types (obtain the types from the parameters)
-        self._l_arguments = [
-            (arg, type_param)
-            for arg, type_param in zip(l_arguments_names, self.dict_parameters.values())
-        ]
+        self._l_arguments = list(zip(l_arguments_names, self.dict_parameters.values()))
 
     def get_arguments_names(self: Self) -> list[str]:
         return [arg for arg, _ in self.l_arguments]
@@ -288,56 +271,44 @@ class Block:
         return OrderedDict(self.l_arguments)
 
     def get_str(self: Self) -> str:
-        if self.function is None:
-            return ""
-        else:
-            return inspect.getsource(self.function)
+        return "" if self.function is None else inspect.getsource(self.function)
 
     def get_name_function_str(self: Self) -> str:
-        if self.function is None:
-            return ""
-        else:
-            return self.function.__name__
+        return "" if self.function is None else self.function.__name__
 
     def get_docstring(self: Self) -> str:
         if self.function is None:
             return ""
-        else:
-            doc = inspect.getdoc(self.function)
-            if doc is None:
-                return ""
-            else:
-                return doc
+        doc = inspect.getdoc(self.function)
+        return "" if doc is None else doc
 
     def get_body_str(self: Self) -> str:
         if self.function is None:
             return ""
-        else:
-            body = inspect.getsource(self.function)
-            # Remove header
-            body = "\n".join(body.split(":\n")[1:])
-            if self.get_docstring() != "":
-                # Remove docstring
-                body = body.replace(self.get_docstring(), "")
-                # Remove remaining quotes
-                body = body.replace('"""', "")
-                body = body.replace("'''", "")
+        body = inspect.getsource(self.function)
+        # Remove header
+        body = "\n".join(body.split(":\n")[1:])
+        if self.get_docstring() != "":
+            # Remove docstring
+            body = body.replace(self.get_docstring(), "")
+            # Remove remaining quotes
+            body = body.replace('"""', "")
+            body = body.replace("'''", "")
 
-            return body
+        return body
 
     def get_output_str(self: Self) -> str:
         l_outputs = self.get_outputs_names()
         return self.get_external_output_str(l_outputs)
 
     @staticmethod
-    def get_external_output_str(l_outputs: list[str] = []) -> str:
-        if len(l_outputs) == 0:
+    def get_external_output_str(l_outputs: list[str] | None = None) -> str:
+        if l_outputs is None:
+            l_outputs = []
+        if not l_outputs:
             return ""
         else:
-            if len(l_outputs) == 1:
-                return l_outputs[0]
-            else:
-                return ", ".join(l_outputs)
+            return l_outputs[0] if len(l_outputs) == 1 else ", ".join(l_outputs)
 
     def get_output_type_hint_str(self: Self):
         return self.get_external_output_type_hint_str(self.dict_output)
@@ -348,15 +319,12 @@ class Block:
         dict_output: OrderedDict[str, type] = OrderedDict(),
     ) -> str:
         if len(dict_output) == 0:
-            output_hint_str = "None"
+            return "None"
+        elif len(dict_output) > 1:
+            output_str = ", ".join([x.__name__ for x in dict_output.values()])
+            return f"tuple[{output_str}]"
         else:
-            if len(dict_output) > 1:
-                output_str = ", ".join([x.__name__ for x in dict_output.values()])
-                output_hint_str = f"tuple[{output_str}]"
-            else:
-                output_hint_str = list(dict_output.values())[0].__name__
-
-        return output_hint_str
+            return list(dict_output.values())[0].__name__
 
     def get_call_str(self: Self, l_external_arguments: list[str] | None = None) -> str:
         if self.function is None:
@@ -370,13 +338,6 @@ class Block:
                     "Number of arguments is different from number of parameters. Number of parameters:"
                     f" {len(self.dict_parameters)}. Number of arguments: {len(l_external_arguments)}"
                 )
-            elif len(l_external_arguments) < len(self.dict_parameters):
-                # Just a warning as some arguments can be optional
-                # logging.warning(
-                #     "Number of arguments is different from number of parameters. Number of parameters:"
-                #     f" {len(self.dict_parameters)}. Number of arguments: {len(l_external_arguments)}"
-                # )
-                pass
             return f"{self.function.__name__}({', '.join(l_external_arguments)})"
 
     def get_assignation_call_str(self: Self) -> str:
@@ -389,18 +350,16 @@ class Block:
             return f"{output_str} = {function_call_str}"
 
     def get_signature(self: Self) -> inspect.Signature:
-        if self.function is None:
-            logging.warning("No function defined for this block")
-            return inspect.Signature()
-        else:
+        if self.function is not None:
             return inspect.signature(self.function)
+        logging.warning("No function defined for this block")
+        return inspect.Signature()
 
     def get_output_type_from_signature(self: Self) -> type | None:
-        if self.function is None:
-            logging.warning("No function defined for this block")
-            return None
-        else:
+        if self.function is not None:
             return self.get_signature().return_annotation
+        logging.warning("No function defined for this block")
+        return None
 
     def get_l_imports_str(self: Self) -> str:
         return self.get_external_l_imports_str(self.dict_imports)
@@ -440,10 +399,7 @@ class Block:
         # Write full function
         function_str = "\n".join([function_header, docstring, function_body, function_output])
 
-        # Replace tabs by spaces to prevent inconsistent indentation
-        function_str = function_str.replace("\t", "    ")
-
-        return function_str
+        return function_str.replace("\t", "    ")
 
     def prepare_function_str(
         self,
