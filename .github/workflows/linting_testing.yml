@@ -1,6 +1,6 @@
-name: test
+name: linting_testing
 
-on: pull_request
+on: push
 
 jobs:
   linting:
@@ -34,7 +34,6 @@ jobs:
       matrix:
         os: [ "ubuntu-latest", "macos-latest" ]
         python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
-        django-version: [ "4", "5" ]
     runs-on: ${{ matrix.os }}
     steps:
       #----------------------------------------------
@@ -78,10 +77,6 @@ jobs:
       #----------------------------------------------
       #    add matrix specifics and run test suite
       #----------------------------------------------
-      - name: Install django ${{ matrix.django-version }}
-        run: |
-          source .venv/bin/activate
-          pip install "Django==${{ matrix.django-version }}"
       - name: Run tests
         run: |
           source .venv/bin/activate
