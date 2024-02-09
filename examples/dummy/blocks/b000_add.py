@@ -1,8 +1,11 @@
 # ==================================================================================================
 # --- Imports ---
 # ==================================================================================================
-from collections import OrderedDict
+# Standard library imports
 
+# Third party imports
+
+# Local imports
 from study_gen.block import Block
 
 
@@ -19,4 +22,4 @@ def add_function(a: float, b: float) -> float:
 # --- Block object ---
 # ==================================================================================================
 
-add = Block("add", add_function, dict_output=OrderedDict([("output_add", float)]))
+add = Block("add", add_function)

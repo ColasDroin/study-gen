@@ -1,6 +1,21 @@
-# Compute (a+b*c)!
-# Scan a and b
-gen1:
+# ==================================================================================================
+# --- Study structure ---
+# ==================================================================================================
+name: study_dummy
+structure:
+  layer_1:
+    generations:
+      - some_dummy_computations
+  layer_2:
+    generations:
+      - some_more_computations
+    scans:
+      a:
+        linspace: [1, 2, 2]
+      b:
+        list: [1, 2]
+
+some_dummy_computations:
   script:
     multiply:
       args: [b, c]
@@ -15,17 +30,7 @@ gen1:
       args: [fact_a_bc, path_fact_a_bc]
       output:
 
-  # parameters:
-  #   a:
-  #     range: [1, 100]
-  #     steps: 3
-  #   b:
-  #     range: [10, 20]
-  #     steps: 2
-
-# Compute fact_a_bc * (a * (b**c + c) + (d + c**c))
-# Scan d from 0 to 1
-gen2:
+some_more_computations:
   new_blocks:
     add_power:
       docstring: "This is a merge test."
@@ -78,8 +83,3 @@ gen2:
     save_pkl:
       args: [result, path_result]
       output:
-
-  # parameters:
-  #   d:
-  #     range: [0, 1]
-  #     steps: 4

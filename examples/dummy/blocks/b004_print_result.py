@@ -1,24 +1,23 @@
 # ==================================================================================================
 # --- Imports ---
 # ==================================================================================================
-from collections import OrderedDict
+# Standard library imports
 
+# Third party imports
+
+# Local imports
 from study_gen.block import Block
 
 
 # ==================================================================================================
 # --- Block function ---
 # ==================================================================================================
-def multiply_function(a: float, b: float) -> float:
-
-    # Multiply a and b
-    return a * b
+def print_result_function(d: float) -> None:
+    print(f"Result: {float}")
 
 
 # ==================================================================================================
 # --- Block object ---
 # ==================================================================================================
 
-multiply = Block(
-    "multiply", multiply_function, dict_output=OrderedDict([("output_multiply", float)])
-)
+print_result = Block("print_result", print_result_function)

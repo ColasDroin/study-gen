@@ -1,15 +1,15 @@
 # ==================================================================================================
 # --- Imports ---
 # ==================================================================================================
-import importlib
-from collections import OrderedDict
+# Standard library imports
+import math
 
+# Third party imports
+# Local imports
 from study_gen.block import Block
 
 # This is needed to get the import and the import statement for code generation
 dict_imports = {"math": "import math"}
-for module, import_statement in dict_imports.items():
-    exec(import_statement)
 
 
 # ==================================================================================================
@@ -29,5 +29,4 @@ gamma = Block(
     "gamma_function",
     gamma_function,
     dict_imports=dict_imports,
-    dict_output=OrderedDict([("output_gamma", float)]),
 )
