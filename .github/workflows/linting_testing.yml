@@ -57,7 +57,7 @@ jobs:
           pylance-version: latest-release
 
   test:
-    needs: ruff
+    needs: [ruff, pyright]
     strategy:
       fail-fast: true
       matrix:
