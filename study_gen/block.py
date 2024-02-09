@@ -450,6 +450,6 @@ class Block:
         spec = importlib.util.spec_from_file_location("mod", tmp.name)
         mod = importlib.util.module_from_spec(spec)  # type: ignore
         sys.modules["mod"] = mod
-        spec.loader.exec_module(mod)
+        spec.loader.exec_module(mod)  # type: ignore
 
         return getattr(mod, name_function)

@@ -5,14 +5,12 @@ from ..block import Block
 
 
 def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, type]:
-
     # Start with empty dictionnary of parameters
     dict_parameters = OrderedDict()
 
     # Progressively merge all parameters (two by two)
     for idx, block1 in enumerate(l_blocks):
         for block2 in l_blocks[idx + 1 :]:
-
             # Check that identical parameters have identical type
             dict_arguments_block1 = block1.get_arguments_as_dict()
             dict_arguments_block2 = block2.get_arguments_as_dict()
@@ -61,7 +59,6 @@ def _build_external_merge_str(
     dict_output: OrderedDict[str, type] = OrderedDict(),
     dict_parameters: OrderedDict[str, type] = OrderedDict(),
 ) -> str:
-
     # Get output type hint string
     output_type_hint_str = Block.get_external_output_type_hint_str(dict_output)
 
@@ -74,12 +71,9 @@ def _build_external_merge_str(
     )
     function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
 
-    # Build function string
-    function_str = Block.build_function_str(
+    return Block.build_function_str(
         l_blocks, function_header, docstring=docstring, output_str=output_str
     )
-
-    return function_str
 
 
 def get_multiple_merge_str(
@@ -88,23 +82,16 @@ def get_multiple_merge_str(
     docstring: str = "",
     dict_output: OrderedDict[str, type] = OrderedDict(),
 ) -> str:
-
     # Get merged parameters
     dict_parameters = _get_multiple_merge_parameters(l_blocks)
 
     # Ensure that the output is accessible
     _check_external_merge_output(l_blocks, dict_parameters, dict_output)
 
-    # Build function string
-    function_str = _build_external_merge_str(
+    return _build_external_merge_str(
         l_blocks, name_function, docstring, dict_output, dict_parameters
     )
 
-    return function_str
-
 
 def merge_dependencies(l_blocks: list[Block]) -> set[str]:
-    set_deps = set()
-    for block in l_blocks:
-        set_deps.add(block.name)
-    return set_deps
+    return {block.name for block in l_blocks}

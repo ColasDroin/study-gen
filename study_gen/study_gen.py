@@ -31,7 +31,7 @@ class StudyGen:
         self.dict_ref_blocks = dict_ref_blocks
 
         if path_template is None:
-            self.path_template = os.path.dirname(__file__) + "/templates/"
+            self.path_template = f"{os.path.dirname(__file__)}/templates/"
         else:
             self.path_template = path_template
 
@@ -74,18 +74,17 @@ class StudyGen:
                 # Don't want to declare twice the same block
                 continue
             if block not in set_new_blocks:
-                if block in self.dict_ref_blocks:
-                    # Get dependencies of the block first
-                    for dep in self.dict_ref_blocks[block].set_deps:
-                        if dep not in dict_blocks:
-                            dict_blocks[dep] = self.dict_ref_blocks[dep]
-                    # Then get the block itself
-                    dict_blocks[block] = self.dict_ref_blocks[block]
-                else:
+                if block not in self.dict_ref_blocks:
                     raise ValueError(
                         f"Block {block} is in the master file but not in the reference blocks."
                     )
 
+                # Get dependencies of the block first
+                for dep in self.dict_ref_blocks[block].set_deps:
+                    if dep not in dict_blocks:
+                        dict_blocks[dep] = self.dict_ref_blocks[dep]
+                # Then get the block itself
+                dict_blocks[block] = self.dict_ref_blocks[block]
         # Get blocks objects used for new blocks
         for new_block in set_new_blocks:
             for block in self.master[gen]["new_blocks"][new_block]["blocks"]:
@@ -117,11 +116,7 @@ class StudyGen:
         # Update arguments of each block to match the merged block specification
         l_blocks = []
         for block in new_block["blocks"]:
-            if "__" in block:
-                # Don't want to declare twice the same block
-                true_block = block.split("__")[0]
-            else:
-                true_block = block
+            true_block = block.split("__")[0] if "__" in block else block
             block_to_update = copy.deepcopy(dict_blocks[true_block])
 
             # Get arguments
@@ -162,15 +157,13 @@ class StudyGen:
         if name_merged_function is None:
             name_merged_function = f"{new_block_name}_function"
 
-        new_block_function = merge.merge_blocks(
+        return merge.merge_blocks(
             new_block_name,
             l_blocks,
             name_merged_function,
             docstring=new_block["docstring"],
             dict_output=dict_outputs_final,  # type: ignore
         )
-
-        return new_block_function
 
     def incorporate_merged_blocks(
         self: Self, new_blocks: OrderedDict[str, Any], dict_blocks: OrderedDict[str, Block]
@@ -217,11 +210,11 @@ class StudyGen:
                 if block_name not in dict_blocks:
                     try:
                         dict_blocks[block_name] = self.dict_ref_blocks[block_name]
-                    except AttributeError:
+                    except AttributeError as e:
                         raise ValueError(
                             f"Block {block_name} is used in block {new_block_name} but is not"
                             " defined anywhere."
-                        )
+                        ) from e
             # Ensure that the new block is not already defined
             if new_block_name in dict_blocks:
                 raise ValueError(
@@ -243,16 +236,14 @@ class StudyGen:
         script = self.master[gen]["script"]
 
         # Convert script format to new_block format
-        main_block_dict = OrderedDict([(str("blocks"), script)])
+        main_block_dict = OrderedDict([("blocks", script)])
 
-        main_block = self.build_merged_blocks(
+        return self.build_merged_blocks(
             new_block_name="main",
-            new_block=main_block_dict,
+            new_block=main_block_dict,  # type: ignore
             dict_blocks=dict_blocks,
             name_merged_function="main",
         )
-
-        return main_block
 
     def get_parameters_assignation(
         self: Self,
@@ -288,17 +279,15 @@ class StudyGen:
                         )
                         self.set_alert_parameters.add(param)
                     value = dic_mutated_parameters[param]
-                else:
-                    pass
             if isinstance(value, str):
                 value = f'"{value}"'
-            str_parameters += param + f" = {value}\n"
+            str_parameters += f"{param} = {value}\n"
 
         return str_parameters
 
     def generate_gen(
         self: Self, gen: str, dic_mutated_parameters: dict[str, Any] = {}
-    ) -> tuple[str, str, str, str, str]:
+    ) -> tuple[str, str, str, str, str]:  # sourcery skip: default-mutable-arg
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
 
@@ -348,15 +337,13 @@ class StudyGen:
         environment = Environment(loader=FileSystemLoader(self.path_template))
         template = environment.get_template(self.template_name)
 
-        # Render template
-        study_str = template.render(
+        return template.render(
             imports=str_imports,
             parameters=str_parameters,
             blocks=str_blocks,
             main=str_main,
             main_call=str_main_call,
         )
-        return study_str
 
     def write(self: Self, study_str: str, file_path: str, format_with_black: bool = True):
         if format_with_black:
@@ -376,9 +363,9 @@ class StudyGen:
         layer_name: str,
         study_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
-    ) -> tuple[str, list[str]]:
-        directory_path_gen = study_path + f"{layer_name}/"
-        file_path_gen = directory_path_gen + f"{gen_name}.py"
+    ) -> tuple[str, list[str]]:  # sourcery skip: default-mutable-arg
+        directory_path_gen = f"{study_path}{layer_name}/"
+        file_path_gen = f"{directory_path_gen}{gen_name}.py"
         (
             str_imports,
             str_parameters,
@@ -392,9 +379,8 @@ class StudyGen:
 
     def get_dic_parametric_scans(self: Self, layer) -> tuple[dict[str, Any], dict[str, Any]]:
         def test_convert_for_each_beam(parameter_dict: dict, parameter_list: list) -> list:
-            if "for_each_beam" in parameter_dict:
-                if parameter_dict["for_each_beam"]:
-                    parameter_list = [{"lhcb1": value, "lhcb2": value} for value in parameter_list]
+            if "for_each_beam" in parameter_dict and parameter_dict["for_each_beam"]:
+                parameter_list = [{"lhcb1": value, "lhcb2": value} for value in parameter_list]
             return parameter_list
 
         dic_parameter_lists = {}
@@ -443,11 +429,9 @@ class StudyGen:
         # Generate render write for cartesian product of all parameters
         l_study_str = []
         l_study_path = []
-        for idx_scan, (l_values, l_values_for_naming) in enumerate(
-            zip(
-                itertools.product(*dic_parameter_lists.values()),
-                itertools.product(*dic_parameter_lists_for_naming.values()),
-            )
+        for l_values, l_values_for_naming in zip(
+            itertools.product(*dic_parameter_lists.values()),
+            itertools.product(*dic_parameter_lists_for_naming.values()),
         ):
             dic_mutated_parameters = dict(zip(dic_parameter_lists.keys(), l_values))
             dic_mutated_parameters_for_naming = dict(
