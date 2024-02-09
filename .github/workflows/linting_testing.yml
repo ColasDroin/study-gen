@@ -3,7 +3,7 @@ name: linting_testing
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   ruff:
