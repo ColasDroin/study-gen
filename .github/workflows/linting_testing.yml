@@ -53,6 +53,8 @@ jobs:
       - run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
 
       - uses: jakebailey/pyright-action@v2
+        with:
+          pylance-version: latest-release
 
   test:
     needs: ruff
