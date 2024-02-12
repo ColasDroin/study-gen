@@ -9,10 +9,12 @@ from typing import Any, Self
 import numpy as np
 from black import FileMode, format_str
 from jinja2 import Environment, FileSystemLoader
+from rich import print
 from ruamel import yaml
 
 # Local imports
 from . import merge
+from ._nested_dicts import nested_get, nested_set
 from .block import Block
 
 
@@ -458,28 +460,43 @@ class StudyGen:
             )
         return l_study_str, l_study_path
 
-    def create_study(self: Self) -> list[str]:
+    def create_study(self: Self, tree_file: bool = False) -> list[str]:
         l_study_str = []
         l_study_path = [self.master["name"] + "/"]
+        dictionary_tree = {}
         for idx, layer in enumerate(sorted(self.master["structure"].keys())):
+            # Each generaration inside of a layer should yield the same l_study_path_next_layer
+            l_study_path_next_layer = []
             for study_path in l_study_path:
-                # Each generaration inside of a layer should yield the same l_study_path_next_layer
-                l_study_path_next_layer = []
                 for gen in self.master["structure"][layer]["generations"]:
                     if "scans" in self.master["structure"][layer]:
                         l_study_scan_str, l_study_path_next_layer = self.create_scans(
                             gen, layer, study_path
                         )
                         l_study_str.extend(l_study_scan_str)
+
                     else:
-                        # First generation is named as the study, not the layer
-                        layer_temp = "" if idx == 0 else layer
+                        layer_temp = "base" if idx == 0 else layer
                         study_str, l_study_path_next_layer = self.generate_render_write(
                             gen, layer_temp, study_path
                         )
                         l_study_str.append(study_str)
 
-                # Update study path for next later
-                l_study_path = l_study_path_next_layer
+                    # Complete tree dictionnary
+                    for path_next in l_study_path_next_layer:
+                        nested_set(
+                            dictionary_tree,
+                            path_next.split("/")[1:-1] + [gen],
+                            {"file": f"{path_next}{gen}.py"},
+                        )
 
+            # Update study path for next later
+            l_study_path = l_study_path_next_layer
+
+        print(dictionary_tree)
+        if tree_file:
+            ryaml = yaml.YAML()
+            with open("tree.yaml", "w") as yaml_file:
+                ryaml.indent(sequence=4, offset=2)
+                ryaml.dump(dictionary_tree, yaml_file)
         return l_study_str
