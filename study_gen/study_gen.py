@@ -10,7 +10,6 @@ from typing import Any, Self
 import numpy as np
 from black import FileMode, format_str
 from jinja2 import Environment, FileSystemLoader
-from rich import print
 from ruamel import yaml
 
 # Local imports
@@ -507,7 +506,6 @@ class StudyGen:
             # Update study path for next later
             l_study_path = l_study_path_next_layer
 
-        print(dictionary_tree)
         if tree_file:
             ryaml = yaml.YAML()
             with open(self.master["name"] + "/" + "tree.yaml", "w") as yaml_file:
