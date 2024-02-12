@@ -1,5 +1,5 @@
 # study-gen
 
-A package for automatic parametric-based generation of particle tracking studies.
+Study-gen is a package for programmatic generation of parametric studies.
 
 To be updated.

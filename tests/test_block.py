@@ -447,7 +447,7 @@ def test_parameters(example_block_with_two_outputs):
     # )
 
 
-# ! Testing for missing imports is also tricky
+# ! Testing for missing imports is tricky
 # @pytest.fixture(scope="function")
 # def example_block_with_two_import():
 #     def example_function(a: float, b: float) -> None:
