@@ -20,6 +20,15 @@ black = "^24.1.1"
 [tool.poetry.group.test.dependencies]
 pytest = "^8.0.0"
 
+
+[tool.poetry.group.examples]
+optional = true
+
+[tool.poetry.group.examples.dependencies]
+xsuite = "^0.6.0"
+cpymad = "^0.10.3"
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
