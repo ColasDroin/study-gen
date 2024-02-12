@@ -348,6 +348,29 @@ def test_get_assignation_call_str(block_func, expected_assignation_call, request
     assert block.get_assignation_call_str() == expected_assignation_call
 
 
+@pytest.mark.parametrize(
+    "block_func, expected_signature",
+    list(
+        zip(
+            [
+                example_block_with_no_output,
+                example_block_with_two_outputs,
+            ],
+            [
+                "() -> None",
+                "(a: float, b: float) -> tuple[float, int]",
+            ],
+        )
+    ),
+)
+def test_get_signature(block_func, expected_signature, request):
+    block = request.getfixturevalue(block_func.__name__)
+    # Easier to test as string
+    assert str(block.get_signature()) == expected_signature
+
+
+# ! TODO
+def get_output_type_from_signature
 # ==================================================================================================
 # --- Problematic tests
 # ==================================================================================================
