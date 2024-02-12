@@ -369,6 +369,37 @@ class Block:
         # Write import statements (do not check for import repetitions across blocks)
         return "\n".join([import_statement for package, import_statement in dict_imports.items()])
 
+    def prepare_function_str(
+        self,
+        name_function: str | None = None,
+        docstring: str | None = None,
+        dict_parameters: OrderedDict[str, type] | None = None,
+    ) -> tuple[str, str, str]:
+        # Get output type hint string and output name (can't modify the output type, and output name
+        # must be modified through the corresponding setter)
+        output_type_hint_str = self.get_output_type_hint_str()
+
+        # Get function names and parameters
+        if name_function is None:
+            name_function = self.get_name_function_str()
+        if dict_parameters is None:
+            dict_parameters = self.dict_parameters
+
+        # Get function header with the (potentially updated) function name and parameters
+        parameters_header = ", ".join(
+            [f"{parameter}: {dict_parameters[parameter].__name__}" for parameter in dict_parameters]
+        )
+        function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
+
+        # Get potentially updated docstring
+        if docstring is None:
+            docstring = self.get_docstring()
+
+        # Get function body (including return statement)
+        function_body = self.get_body_str()
+
+        return function_header, function_body, docstring
+
     @classmethod
     def build_function_str(
         cls,
@@ -400,37 +431,6 @@ class Block:
         function_str = "\n".join([function_header, docstring, function_body, function_output])
 
         return function_str.replace("\t", "    ")
-
-    def prepare_function_str(
-        self,
-        name_function: str | None = None,
-        docstring: str | None = None,
-        dict_parameters: OrderedDict[str, type] | None = None,
-    ) -> tuple[str, str, str]:
-        # Get output type hint string and output name (can't modify the output type, and output name
-        # must be modified through the corresponding setter)
-        output_type_hint_str = self.get_output_type_hint_str()
-
-        # Get function names and parameters
-        if name_function is None:
-            name_function = self.get_name_function_str()
-        if dict_parameters is None:
-            dict_parameters = self.dict_parameters
-
-        # Get function header with the (potentially updated) function name and parameters
-        parameters_header = ", ".join(
-            [f"{parameter}: {dict_parameters[parameter].__name__}" for parameter in dict_parameters]
-        )
-        function_header = f"def {name_function}({parameters_header}) -> {output_type_hint_str}:"
-
-        # Get potentially updated docstring
-        if docstring is None:
-            docstring = self.get_docstring()
-
-        # Get function body (including return statement)
-        function_body = self.get_body_str()
-
-        return function_header, function_body, docstring
 
     @classmethod
     def write_and_load_temp_block(

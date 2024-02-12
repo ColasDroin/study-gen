@@ -296,6 +296,14 @@ def test_docstring(example_block_with_two_outputs):
     )
 
 
+def test_get_body(example_block_with_two_outputs):
+    # Need to adapt the string for wrong fixture tabbing
+    assert (
+        example_block_with_two_outputs.get_body_str()
+        == "        \n        # Returns a at the power of b\n        return np.power(a, math.gamma(b)), int(math.gamma(a))\n"
+    )
+
+
 def test_get_output_str(example_block_with_two_outputs):
     assert (
         example_block_with_two_outputs.get_output_str()
@@ -369,8 +377,50 @@ def test_get_signature(block_func, expected_signature, request):
     assert str(block.get_signature()) == expected_signature
 
 
-# ! TODO
-def get_output_type_from_signature
+@pytest.mark.parametrize(
+    "block_func, expected_signature",
+    list(
+        zip(
+            [
+                example_block_with_no_output,
+                example_block_with_two_outputs,
+            ],
+            [
+                None,
+                tuple[float, int],
+            ],
+        )
+    ),
+)
+def test_get_output_type_fromsignature(block_func, expected_signature, request):
+    block = request.getfixturevalue(block_func.__name__)
+    # Easier to test as string
+    assert block.get_output_type_from_signature() == expected_signature
+
+
+def test_get_l_imports_str(example_block_with_two_outputs):
+    assert example_block_with_two_outputs.get_l_imports_str() == "import math\nimport numpy as np"
+
+
+def test_prepare_function_str(example_block_with_two_outputs):
+    function_header, function_body, docstring = example_block_with_two_outputs.prepare_function_str(
+        name_function="test_function",
+        docstring="Let's test this function",
+        dict_parameters={"aa": int, "bb": float},
+    )
+
+    assert function_header == "def test_function(aa: int, bb: float) -> tuple[float, int]:"
+    # Need to adapt tabbing for fixture
+    assert (
+        function_body
+        == """        \n        # Returns a at the power of b
+        return np.power(a, math.gamma(b)), int(math.gamma(a))\n"""
+    )
+    assert docstring == """Let's test this function"""
+
+
+# ? block.build_function_str()is tested in test_study_gen.py
+
 # ==================================================================================================
 # --- Problematic tests
 # ==================================================================================================
@@ -395,14 +445,6 @@ def test_parameters(example_block_with_two_outputs):
     # assert example_block_with_two_outputs.dict_parameters == OrderedDict(
     #     [("better_name", float), ("even_better_name", float)]
     # )
-
-
-# ! Same problem as for the parameters setter... fixture is defined with two tabs, can't be tested easily
-# def test_get_body(example_block_with_two_outputs):
-#     assert (
-#         example_block_with_two_outputs.get_body_str()
-#         == "\t# Returns a at the power of b\n\treturn np.power(a, math.gamma(b)), int(math.gamma(a))"
-#     )
 
 
 # ! Testing for missing imports is also tricky
