@@ -49,7 +49,7 @@ jobs:
       # install your root project, if required
       #----------------------------------------------
       - name: Install library
-        run: poetry install --no-interaction
+        run: poetry install --with examples --no-interaction
       - run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
 
       - uses: jakebailey/pyright-action@v2
@@ -97,12 +97,12 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
+        run: poetry install --with examples --no-interaction --no-root
       #----------------------------------------------
       # install your root project, if required
       #----------------------------------------------
       - name: Install library
-        run: poetry install --no-interaction
+        run: poetry install --with examples --no-interaction
       #----------------------------------------------
       #    add matrix specifics and run test suite
       #----------------------------------------------

@@ -243,6 +243,64 @@ test = ["Pillow", "contourpy[test-no-images]", "matplotlib"]
 test-no-images = ["pytest", "pytest-cov", "pytest-xdist", "wurlitzer"]
 
 [[package]]
+name = "cpymad"
+version = "1.15.0"
+description = "Cython binding to MAD-X"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "cpymad-1.15.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9430ba433c629300f425f997c993499a040bc547b0f28b9c47f0315d31243347"},
+    {file = "cpymad-1.15.0-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:a7055c589ecd81be43f0a17ca86175001392c00dd656e0f870d1c747c7fa0b91"},
+    {file = "cpymad-1.15.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9a1b825e241b88e6a86f079601431495c584b2900e0c0e80181b10ba944cdaa9"},
+    {file = "cpymad-1.15.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1cc5278d3303bf6d0cd378c83aa32d0f4703229911acbf9e7833fcecc7ad3c48"},
+    {file = "cpymad-1.15.0-cp310-cp310-win_amd64.whl", hash = "sha256:8fc4ed36f7d60d4736740f7d0d996e8a6aa8ca11fc94016de85e6af0c68dec1b"},
+    {file = "cpymad-1.15.0-cp311-cp311-macosx_10_14_universal2.whl", hash = "sha256:89a39e93788afb6fa17e9fb514f492e85859b8a57d61e854be5a436dd86ed977"},
+    {file = "cpymad-1.15.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d9cf379010ac171bf43d50f7d5f96e589b2d75d07bbcb95807ebe58ee5c6310c"},
+    {file = "cpymad-1.15.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:19da71cb6bf2d7e1109428294f86eb251a8d95bd7df0fc6814f08f115956cc16"},
+    {file = "cpymad-1.15.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:55b3c1318b98ce5f521a4c8013af5d91fa6a6cd7ce581ccd4c5a32253e29b8df"},
+    {file = "cpymad-1.15.0-cp311-cp311-win_amd64.whl", hash = "sha256:92d765d6fa2dd1b602e07bb6417fed9187dac2d8dd04fe1f25acbafeefbb00be"},
+    {file = "cpymad-1.15.0-cp312-cp312-macosx_10_14_universal2.whl", hash = "sha256:004fd81012396be6e279b29fe4676cfe8afec29b756b60ed0da2cdca61317906"},
+    {file = "cpymad-1.15.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:4ca3ccd89f4a17dc52800a1fd7a5ee66fc8b2e3fba6b65d69c6b26dde6facbfc"},
+    {file = "cpymad-1.15.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b4f85631ad49c73afae0e9ed9f0739016fd8faf0e6507271abaf55f5f8607f66"},
+    {file = "cpymad-1.15.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9c4a5e8da49d12588c5d09dd5c388be8a1687ee5a82059e1cdbb75d72f553781"},
+    {file = "cpymad-1.15.0-cp312-cp312-win_amd64.whl", hash = "sha256:2b3beecfd58806a32980addf2aaa0b14e5384c74b1a637cb0dfd6f77181b9b73"},
+    {file = "cpymad-1.15.0-cp35-cp35m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:4fa8f6e14edc194001d085afe9852e7e18d50cf4e77bd435888015ed36d390dd"},
+    {file = "cpymad-1.15.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:bc5c4e854aa19a2df314c51c748b270f320ef3d400ee00a340d9c1282dd89678"},
+    {file = "cpymad-1.15.0-cp36-cp36m-macosx_11_0_arm64.whl", hash = "sha256:603e8dc203cad62571ef7dd6278c98e17b33dbecfc634bdb98c85e36dbfbae93"},
+    {file = "cpymad-1.15.0-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:191798f50e016afedd8b8b8198ea145be5f53e39ae56f2876552b92b5c201c13"},
+    {file = "cpymad-1.15.0-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:717057706a349ca7932e36a39b26d7e80879823a5777218ad27dcb1634870014"},
+    {file = "cpymad-1.15.0-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:d8a11cd7b60f8788f8f27f12f87baaa498d2dd7bdaf6bba5675fab48d3dfae39"},
+    {file = "cpymad-1.15.0-cp36-cp36m-win_amd64.whl", hash = "sha256:f1ca966640e9c6df292fd730add8687b0456b3005760769639d192180d921371"},
+    {file = "cpymad-1.15.0-cp37-cp37m-macosx_11_0_arm64.whl", hash = "sha256:70271eeae7678454d807ed5fd08b11c85988f53b450dbb58fd8bc8075da2ceed"},
+    {file = "cpymad-1.15.0-cp37-cp37m-macosx_11_0_x86_64.whl", hash = "sha256:4b9e3c61032c06a7722ff862b238515aa0dac10c1a4a2423fec673277a770143"},
+    {file = "cpymad-1.15.0-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:da7d21c419746638e613bfefc357f68da11fa7c319d81e588a67e61806af3012"},
+    {file = "cpymad-1.15.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fdef8ccf6f9a53f8f4679bced4fa646cdf582f8127ac206609bbe1650b8ae6b6"},
+    {file = "cpymad-1.15.0-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:863867ac5f3142f5e9a469d56112a9d5bb2518ccb1714808b64cf162c2708779"},
+    {file = "cpymad-1.15.0-cp37-cp37m-win_amd64.whl", hash = "sha256:2a100843fa2fbc46e0db4e94f9a1b6985f2ae3245ecf9d64fd40f0c4c2538c14"},
+    {file = "cpymad-1.15.0-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:39e06c72e6efc26874d026ee8ed4c659724930f232ae8b8c6328bb5311d56752"},
+    {file = "cpymad-1.15.0-cp38-cp38-macosx_11_0_x86_64.whl", hash = "sha256:3bc8fa29f7ad1a2e6a48458634e3003748966076ed1cd43e4c16cba86162e41c"},
+    {file = "cpymad-1.15.0-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bac297e38305720ee5aa5c10806483c70f42b58a0e3f365f63d0a9395264e3a6"},
+    {file = "cpymad-1.15.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f6ccd4196a66d4882081d2bc27dc12b27c9aa1c8ec19b9fc85d5e88a006d5c3c"},
+    {file = "cpymad-1.15.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:2425f50d0b01e7483b08ed7cdc9323a89088032868ee222273ed20e03958bc25"},
+    {file = "cpymad-1.15.0-cp38-cp38-win_amd64.whl", hash = "sha256:c4ffa72e48f862d5d755ddfda825d7d281669b15b027502ff73a605efe378a30"},
+    {file = "cpymad-1.15.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:0505e7d7919b014a0d6cc47f31499c562b42ce0e39f0f47d634355dd42a783c9"},
+    {file = "cpymad-1.15.0-cp39-cp39-macosx_11_0_x86_64.whl", hash = "sha256:ef045a8d774f7370b6e0ae7181ceef93386e63a823a960bbdd947978dc83f4c2"},
+    {file = "cpymad-1.15.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5bd22a293364571b38d5f7f0ece3efabef9f908eaae92c105ac1da8a94404731"},
+    {file = "cpymad-1.15.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4d18d5012b6c1239fc5ce9649b97667475ac5a4db36ac5543801b8d285e541bd"},
+    {file = "cpymad-1.15.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:fafbf317cadccb79458e8d9e4066a588fed6cc53bb3877ff486636ec0752d217"},
+    {file = "cpymad-1.15.0-cp39-cp39-win_amd64.whl", hash = "sha256:0ec67d2565812999c775a2a5dadcd482e80fd1a6a6d4690718405725a4bb893e"},
+    {file = "cpymad-1.15.0.tar.gz", hash = "sha256:8c54546b326dd183644025898e768f2e6953403d5189504460ecac88f5ddce22"},
+]
+
+[package.dependencies]
+minrpc = ">=0.0.8"
+numpy = "*"
+
+[package.extras]
+dev = ["cython", "flake8", "pytest"]
+doc = ["pandas", "sphinx", "sphinx-autodoc-typehints", "sphinx-automodapi", "sphinx-rtd-theme", "sphinx-substitution-extensions"]
+
+[[package]]
 name = "cycler"
 version = "0.12.1"
 description = "Composable style cycles"
@@ -858,6 +916,17 @@ files = [
 
 [package.dependencies]
 traitlets = "*"
+
+[[package]]
+name = "minrpc"
+version = "0.1.0"
+description = "Minimalistic RPC utility (DO NOT USE!)"
+optional = false
+python-versions = ">=2.7"
+files = [
+    {file = "minrpc-0.1.0-py2.py3-none-any.whl", hash = "sha256:4b6c99f16d982be722e3583df33e4f537311513aaf9434eeab3de27ab95ad9bf"},
+    {file = "minrpc-0.1.0.tar.gz", hash = "sha256:ec3e58a506411e8fe62d70c73c3c067eb2227ecc35319763d556ef1b2b76d719"},
+]
 
 [[package]]
 name = "mypy-extensions"
@@ -1802,6 +1871,24 @@ xobjects = "*"
 tests = ["PyHEADTAIL", "cpymad", "pytest"]
 
 [[package]]
+name = "xsuite"
+version = "0.6.0"
+description = "Integrated suite for particle accelerator simulations"
+optional = false
+python-versions = "*"
+files = [
+    {file = "xsuite-0.6.0.tar.gz", hash = "sha256:742508affc5bec60a820afb359627336cfb37bc52b5b9288254643044fecda88"},
+]
+
+[package.dependencies]
+numpy = ">=1.0"
+xdeps = "*"
+xfields = "*"
+xobjects = "*"
+xpart = "*"
+xtrack = "*"
+
+[[package]]
 name = "xtrack"
 version = "0.49.0"
 description = "Tracking library for particle accelerators"
@@ -1825,4 +1912,4 @@ tests = ["NAFFlib", "PyHEADTAIL", "cpymad", "pytest", "pytest-mock"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "08318760c9a41dac0858a30b0040ad7d51e58d25a55e7d086108ba3afc2e6d6e"
+content-hash = "5a2215427ea88d1320563637b99667ffde1fdec71015b8331ddd65e8ca2342c3"

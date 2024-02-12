@@ -26,7 +26,7 @@ optional = true
 
 [tool.poetry.group.examples.dependencies]
 xsuite = "^0.6.0"
-cpymad = "^0.10.3"
+cpymad = "^1.15.0"
 
 
 [build-system]
