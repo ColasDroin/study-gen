@@ -510,7 +510,7 @@ class StudyGen:
         print(dictionary_tree)
         if tree_file:
             ryaml = yaml.YAML()
-            with open("tree.yaml", "w") as yaml_file:
+            with open(self.master["name"] + "/" + "tree.yaml", "w") as yaml_file:
                 ryaml.indent(sequence=4, offset=2)
                 ryaml.dump(dictionary_tree, yaml_file)
         return l_study_str
