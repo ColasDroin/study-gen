@@ -6,36 +6,24 @@ base:
   qx_62.31_qy_60.32:
     configure_collider:
       file: study_hllhc16/base/qx_62.31_qy_60.32/configure_collider.py
-    n_turns_1000:
+    track_particles:
       track_particles:
-        file: study_hllhc16/base/qx_62.31_qy_60.32/n_turns_1000/track_particles.py
-    n_turns_2000:
-      track_particles:
-        file: study_hllhc16/base/qx_62.31_qy_60.32/n_turns_2000/track_particles.py
+        file: study_hllhc16/base/qx_62.31_qy_60.32/track_particles/track_particles.py
   qx_62.31_qy_60.33:
     configure_collider:
       file: study_hllhc16/base/qx_62.31_qy_60.33/configure_collider.py
-    n_turns_1000:
+    track_particles:
       track_particles:
-        file: study_hllhc16/base/qx_62.31_qy_60.33/n_turns_1000/track_particles.py
-    n_turns_2000:
-      track_particles:
-        file: study_hllhc16/base/qx_62.31_qy_60.33/n_turns_2000/track_particles.py
+        file: study_hllhc16/base/qx_62.31_qy_60.33/track_particles/track_particles.py
   qx_62.32_qy_60.32:
     configure_collider:
       file: study_hllhc16/base/qx_62.32_qy_60.32/configure_collider.py
-    n_turns_1000:
+    track_particles:
       track_particles:
-        file: study_hllhc16/base/qx_62.32_qy_60.32/n_turns_1000/track_particles.py
-    n_turns_2000:
-      track_particles:
-        file: study_hllhc16/base/qx_62.32_qy_60.32/n_turns_2000/track_particles.py
+        file: study_hllhc16/base/qx_62.32_qy_60.32/track_particles/track_particles.py
   qx_62.32_qy_60.33:
     configure_collider:
       file: study_hllhc16/base/qx_62.32_qy_60.33/configure_collider.py
-    n_turns_1000:
+    track_particles:
       track_particles:
-        file: study_hllhc16/base/qx_62.32_qy_60.33/n_turns_1000/track_particles.py
-    n_turns_2000:
-      track_particles:
-        file: study_hllhc16/base/qx_62.32_qy_60.33/n_turns_2000/track_particles.py
+        file: study_hllhc16/base/qx_62.32_qy_60.33/track_particles/track_particles.py

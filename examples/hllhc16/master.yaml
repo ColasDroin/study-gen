@@ -20,9 +20,9 @@ structure:
   layer_3:
     generations:
       - track_particles
-    scans:
-      n_turns:
-        list: [1000, 2000]
+    # scans:
+    #   n_turns:
+    #     list: [1000, 2000]
 
 # ==================================================================================================
 # --- Base collider generation ---

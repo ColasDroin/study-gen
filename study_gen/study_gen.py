@@ -2,6 +2,7 @@
 import copy
 import itertools
 import os
+import shutil
 from collections import OrderedDict
 from typing import Any, Self
 
@@ -14,7 +15,7 @@ from ruamel import yaml
 
 # Local imports
 from . import merge
-from ._nested_dicts import nested_get, nested_set
+from ._nested_dicts import nested_set
 from .block import Block
 
 
@@ -460,10 +461,17 @@ class StudyGen:
             )
         return l_study_str, l_study_path
 
-    def create_study(self: Self, tree_file: bool = False) -> list[str]:
+    def create_study(
+        self: Self, tree_file: bool = True, force_overwrite: bool = False
+    ) -> list[str]:
         l_study_str = []
         l_study_path = [self.master["name"] + "/"]
         dictionary_tree = {}
+
+        # Remove existing study if force_overwrite
+        if force_overwrite:
+            shutil.rmtree(self.master["name"])
+
         for idx, layer in enumerate(sorted(self.master["structure"].keys())):
             # Each generaration inside of a layer should yield the same l_study_path_next_layer
             l_study_path_next_layer = []
@@ -476,7 +484,13 @@ class StudyGen:
                         l_study_str.extend(l_study_scan_str)
 
                     else:
-                        layer_temp = "base" if idx == 0 else layer
+                        # Always give the layer the name of the first generation file,
+                        # except if very first layer
+                        layer_temp = (
+                            "base"
+                            if idx == 0
+                            else self.master["structure"][layer]["generations"][0]
+                        )
                         study_str, l_study_path_next_layer = self.generate_render_write(
                             gen, layer_temp, study_path
                         )
