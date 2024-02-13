@@ -24,19 +24,12 @@ class StudyGen:
         path_configuration: str,
         path_master: str,
         dict_ref_blocks: dict[str, Block],
-        path_template: str | None = None,
-        template_name: str = "default_template.txt",
     ):
         self.configuration = self.load_configuration(path_configuration)
         self.master = self.load_master(path_master)
-        self.template_name = template_name
         self.dict_ref_blocks = dict_ref_blocks
-
-        if path_template is None:
-            self.path_template = f"{os.path.dirname(__file__)}/templates/"
-        else:
-            self.path_template = path_template
-
+        self.default_template_path = f"{os.path.dirname(__file__)}/templates/"
+        self.default_template_name = "default_template.txt"
         self.set_alert_parameters = set()
 
     def load_configuration(self: Self, path_configuration: str) -> dict[str, Any]:
@@ -334,10 +327,12 @@ class StudyGen:
         str_blocks: str,
         str_main: str,
         str_main_call: str,
+        template_path: str,
+        template_name: str,
     ) -> str:
         # Generate generations from template
-        environment = Environment(loader=FileSystemLoader(self.path_template))
-        template = environment.get_template(self.template_name)
+        environment = Environment(loader=FileSystemLoader(template_path))
+        template = environment.get_template(template_name)
 
         return template.render(
             imports=str_imports,
@@ -364,6 +359,8 @@ class StudyGen:
         gen_name: str,
         layer_name: str,
         study_path: str,
+        template_name: str,
+        template_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
     ) -> tuple[str, list[str]]:  # sourcery skip: default-mutable-arg
         directory_path_gen = f"{study_path}{layer_name}/"
@@ -375,7 +372,15 @@ class StudyGen:
             str_main,
             str_main_call,
         ) = self.generate_gen(gen_name, dic_mutated_parameters)
-        study_str = self.render(str_imports, str_parameters, str_blocks, str_main, str_main_call)
+        study_str = self.render(
+            str_imports,
+            str_parameters,
+            str_blocks,
+            str_main,
+            str_main_call,
+            template_name=template_name,
+            template_path=template_path,
+        )
         self.write(study_str, file_path_gen)
         return study_str, [directory_path_gen]
 
@@ -423,7 +428,12 @@ class StudyGen:
         return dic_parameter_lists, dic_parameter_lists_for_naming
 
     def create_scans(
-        self: Self, gen: str, layer: str, layer_path: str
+        self: Self,
+        gen: str,
+        layer: str,
+        layer_path: str,
+        template_name: str,
+        template_path: str,
     ) -> tuple[list[str], list[str]]:
         # Get dictionnary of parametric values being scanned
         dic_parameter_lists, dic_parameter_lists_for_naming = self.get_dic_parametric_scans(layer)
@@ -455,10 +465,57 @@ class StudyGen:
                     gen,
                     "",
                     path,
+                    template_name,
+                    template_path,
                     dic_mutated_parameters=dic_mutated_parameters,
                 )
             )
         return l_study_str, l_study_path
+
+    def complete_tree(
+        self: Self, dictionary_tree: dict, l_study_path_next_layer: list[str], gen: str
+    ) -> dict:
+        for path_next in l_study_path_next_layer:
+            nested_set(
+                dictionary_tree,
+                path_next.split("/")[1:-1] + [gen],
+                {"file": f"{path_next}{gen}.py"},
+            )
+
+        return dictionary_tree
+
+    def write_tree(self: Self, dictionary_tree: dict):
+        ryaml = yaml.YAML()
+        with open(self.master["name"] + "/" + "tree.yaml", "w") as yaml_file:
+            ryaml.indent(sequence=4, offset=2)
+            ryaml.dump(dictionary_tree, yaml_file)
+
+    def create_study_for_current_gen(
+        self: Self, idx_layer: int, layer: str, gen: str, study_path: str, dictionary_tree: dict
+    ) -> tuple[list[str], list[str]]:
+        template_name = self.master[gen].get("template_name", self.default_template_name)
+        template_path = self.master[gen].get("template_path", self.default_template_path)
+        if "scans" in self.master["structure"][layer]:
+            l_study_scan_str, l_study_path_next_layer = self.create_scans(
+                gen, layer, study_path, template_name, template_path
+            )
+            return l_study_scan_str, l_study_path_next_layer
+            # l_study_str.extend(l_study_scan_str)
+        else:
+            # Always give the layer the name of the first generation file,
+            # except if very first layer
+            layer_temp = (
+                "base" if idx_layer == 0 else self.master["structure"][layer]["generations"][0]
+            )
+            study_str, l_study_path_next_layer = self.generate_render_write(
+                gen,
+                layer_temp,
+                study_path,
+                template_name,
+                template_path,
+            )
+            # l_study_str.append(study_str)
+            return [study_str], l_study_path_next_layer
 
     def create_study(
         self: Self, tree_file: bool = True, force_overwrite: bool = False
@@ -476,39 +533,18 @@ class StudyGen:
             l_study_path_next_layer = []
             for study_path in l_study_path:
                 for gen in self.master["structure"][layer]["generations"]:
-                    if "scans" in self.master["structure"][layer]:
-                        l_study_scan_str, l_study_path_next_layer = self.create_scans(
-                            gen, layer, study_path
-                        )
-                        l_study_str.extend(l_study_scan_str)
-
-                    else:
-                        # Always give the layer the name of the first generation file,
-                        # except if very first layer
-                        layer_temp = (
-                            "base"
-                            if idx == 0
-                            else self.master["structure"][layer]["generations"][0]
-                        )
-                        study_str, l_study_path_next_layer = self.generate_render_write(
-                            gen, layer_temp, study_path
-                        )
-                        l_study_str.append(study_str)
-
-                    # Complete tree dictionnary
-                    for path_next in l_study_path_next_layer:
-                        nested_set(
-                            dictionary_tree,
-                            path_next.split("/")[1:-1] + [gen],
-                            {"file": f"{path_next}{gen}.py"},
-                        )
+                    l_curr_study_str, l_study_path_next_layer = self.create_study_for_current_gen(
+                        idx, layer, gen, study_path, dictionary_tree
+                    )
+                    l_study_str.extend(l_curr_study_str)
+                    dictionary_tree = self.complete_tree(
+                        dictionary_tree, l_study_path_next_layer, gen
+                    )
 
             # Update study path for next later
             l_study_path = l_study_path_next_layer
 
         if tree_file:
-            ryaml = yaml.YAML()
-            with open(self.master["name"] + "/" + "tree.yaml", "w") as yaml_file:
-                ryaml.indent(sequence=4, offset=2)
-                ryaml.dump(dictionary_tree, yaml_file)
+            self.write_tree(dictionary_tree)
+
         return l_study_str

@@ -74,6 +74,7 @@ build_base_collider:
     dump_collider_json:
       args: collider, path_base_collider
       output:
+
 # ==================================================================================================
 # --- Tailor collider with xsuite generation ---
 # ==================================================================================================
@@ -151,6 +152,7 @@ prepare_particles_distribution:
     write_particles_distribution:
       args: particle_list
       output:
+
 # ==================================================================================================
 # --- Simulation and tracking generation ---
 # ==================================================================================================
@@ -177,3 +179,5 @@ track_particles:
     clean_after_tracking:
       args:
       output:
+
+  template_name: with_context.txt

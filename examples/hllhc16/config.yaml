@@ -270,7 +270,7 @@ config_simulation:
   beam_sequence: lhcb1 #lhcb1 or lhcb2
 
   # Context for the simulation
-  context_str: "cpu" # 'cupy' # 'opencl'
+  context_str: None # Defined here, but parsed from the terminal when running the main script
 
   # Optimize for tracking (often doesn't work)
   optimize_for_tracking: false

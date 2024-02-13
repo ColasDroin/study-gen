@@ -37,7 +37,7 @@ parser.add_argument(
     type=str,
     help="The context used for HPC submission. Choose between 'cpu', 'cupy' and 'opencl'.",
 )
-context = parser.parse_args().context
+context_str = parser.parse_args().context
 # ==================================================================================================
 # --- Script
 # ==================================================================================================
