@@ -85,7 +85,7 @@ a_float:
   d: 0.5
 
 some_paths:
-  path_fact_a_bc: "fact_a_bc.npy"
+  path_fact_a_bc: "../fact_a_bc.npy"
   path_result: "result.pkl"
 ```
 
