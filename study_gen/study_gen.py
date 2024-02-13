@@ -468,7 +468,7 @@ class StudyGen:
         dictionary_tree = {}
 
         # Remove existing study if force_overwrite
-        if force_overwrite:
+        if force_overwrite and os.path.exists(self.master["name"]):
             shutil.rmtree(self.master["name"])
 
         for idx, layer in enumerate(sorted(self.master["structure"].keys())):
