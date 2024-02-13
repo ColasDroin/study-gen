@@ -29,7 +29,7 @@ class StudyGen:
         self.master = self.load_master(path_master)
         self.dict_ref_blocks = dict_ref_blocks
         self.default_template_path = f"{os.path.dirname(__file__)}/templates/"
-        self.default_template_name = "default_template.txt"
+        self.default_template_name = "default.txt"
         self.set_alert_parameters = set()
 
     def load_configuration(self: Self, path_configuration: str) -> dict[str, Any]:
@@ -381,6 +381,7 @@ class StudyGen:
             template_name=template_name,
             template_path=template_path,
         )
+
         self.write(study_str, file_path_gen)
         return study_str, [directory_path_gen]
 
