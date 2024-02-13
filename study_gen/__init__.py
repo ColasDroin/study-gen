@@ -12,6 +12,6 @@ __all__ = ["Block", "merge_blocks", "merge_imports", "StudyGen"]
 # --- Package version
 # ==================================================================================================
 try:
-    __version__ = importlib.metadata.version("collider-dashboard")
+    __version__ = importlib.metadata.version("study-gen")
 except importlib.metadata.PackageNotFoundError:
     __version__ = "unknown"
