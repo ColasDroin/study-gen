@@ -11,6 +11,9 @@ structure:
     generations:
       - configure_collider
     scans:
+      path_input_distribution:
+        path_list:
+          [../1_build_distr_and_collider/particles/____.parquet, 0, n_split]
       qx:
         linspace: [62.31, 62.32, 2]
         for_each_beam: true

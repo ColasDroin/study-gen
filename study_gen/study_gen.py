@@ -1,4 +1,5 @@
 # Standard library imports
+import contextlib
 import copy
 import itertools
 import os
@@ -240,11 +241,7 @@ class StudyGen:
             name_merged_function="main",
         )
 
-    def get_parameters_assignation(
-        self: Self,
-        main_block: Block,
-        dic_mutated_parameters: dict[str, Any] = {},
-    ) -> str:
+    def get_parameters(self: Self, param: str, dic_mutated_parameters: dict[str, Any] = {}):
         def _finditem(obj, key):
             if key in obj:
                 return obj[key]
@@ -254,28 +251,37 @@ class StudyGen:
                     if item is not None:
                         return item
 
+        value = _finditem(self.configuration, param)
+        if value is None:
+            if param not in dic_mutated_parameters:
+                raise ValueError(
+                    f"Parameter {param} is not defined in the configuration, nor being scanned"
+                )
+            else:
+                value = dic_mutated_parameters[param]
+        else:
+            if param in dic_mutated_parameters:
+                if param not in self.set_alert_parameters:
+                    print(
+                        f"Parameter {param} is defined in the configuration and being scanned."
+                        " The value from the configuration will be used."
+                    )
+                    self.set_alert_parameters.add(param)
+                value = dic_mutated_parameters[param]
+        if isinstance(value, str):
+            value = f'"{value}"'
+
+        return value
+
+    def get_parameters_assignation(
+        self: Self,
+        main_block: Block,
+        dic_mutated_parameters: dict[str, Any] = {},
+    ) -> str:  # sourcery skip: default-mutable-arg
         str_parameters = "# Declare parameters\n"
         for param in main_block.dict_parameters:
             # Look recursively for the corresponding parameter value in the configuration
-            value = _finditem(self.configuration, param)
-            if value is None:
-                if param not in dic_mutated_parameters:
-                    raise ValueError(
-                        f"Parameter {param} is not defined in the configuration, nor being scanned"
-                    )
-                else:
-                    value = dic_mutated_parameters[param]
-            else:
-                if param in dic_mutated_parameters:
-                    if param not in self.set_alert_parameters:
-                        print(
-                            f"Parameter {param} is defined in the configuration and being scanned."
-                            " The value from the configuration will be used."
-                        )
-                        self.set_alert_parameters.add(param)
-                    value = dic_mutated_parameters[param]
-            if isinstance(value, str):
-                value = f'"{value}"'
+            value = self.get_parameters(param, dic_mutated_parameters)
             str_parameters += f"{param} = {value}\n"
 
         return str_parameters
@@ -391,11 +397,18 @@ class StudyGen:
                 parameter_list = [{"lhcb1": value, "lhcb2": value} for value in parameter_list]
             return parameter_list
 
+        def convert_variables_to_values(l_values: list) -> list:
+            for idx, param in enumerate(l_values):
+                with contextlib.suppress(ValueError):
+                    l_values[idx] = self.get_parameters(param)
+            return l_values
+
         dic_parameter_lists = {}
         dic_parameter_lists_for_naming = {}
         for parameter in self.master["structure"][layer]["scans"]:
             if "linspace" in self.master["structure"][layer]["scans"][parameter]:
                 l_values_linspace = self.master["structure"][layer]["scans"][parameter]["linspace"]
+                l_values_linspace = convert_variables_to_values(l_values_linspace)
                 parameter_list = np.round(
                     np.linspace(
                         l_values_linspace[0],
@@ -407,6 +420,7 @@ class StudyGen:
                 )
             elif "logspace" in self.master["structure"][layer]["scans"][parameter]:
                 l_values_logspace = self.master["structure"][layer]["scans"][parameter]["logspace"]
+                l_values_logspace = convert_variables_to_values(l_values_logspace)
                 parameter_list = np.round(
                     np.logspace(
                         l_values_logspace[0],
@@ -416,8 +430,19 @@ class StudyGen:
                     ),
                     5,
                 )
+            elif "path_list" in self.master["structure"][layer]["scans"][parameter]:
+                l_values_path_list = self.master["structure"][layer]["scans"][parameter][
+                    "path_list"
+                ]
+                l_values_path_list = convert_variables_to_values(l_values_path_list)
+                parameter_list = [
+                    l_values_path_list[0].replace("____", f"{n:02d}")
+                    for n in range(l_values_path_list[1], l_values_path_list[2])
+                ]
+            # ! Fix this
             elif "list" in self.master["structure"][layer]["scans"][parameter]:
                 parameter_list = self.master["structure"][layer]["scans"][parameter]["list"]
+                parameter_list = convert_variables_to_values(parameter_list)
             else:
                 raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
             dic_parameter_lists_for_naming[parameter] = parameter_list
