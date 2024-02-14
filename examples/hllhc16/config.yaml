@@ -4,10 +4,14 @@
 config_mad:
   # Links to be made for tools and scripts
   links:
-    acc-models-lhc: ../../../modules/hllhc16
+    value:
+      acc-models-lhc: modules/hllhc16
+    external_dependency: true
 
-  # Optics file
-  optics_file: acc-models-lhc/strengths/flat/opt_flathv_500_2000_thin.madx
+  # Optics file (internal dependency as it is copied from hllhc16)
+  optics_file:
+    value: acc-models-lhc/strengths/flat/opt_flathv_500_2000_thin.madx
+    internal_dependency: true
 
   # Beam parameters
   beam_config:
@@ -55,8 +59,9 @@ config_mad:
   apply_acsca_fix: true
   cycle_to_IP3: true
   incorporate_CC: true
-  path_base_collider: base_collider.json
-
+  path_base_collider:
+    value: base_collider.json
+    internal_dependency: true
 # ==================================================================================================
 # --- Knobs and tuning xsuite collider configuration ---
 # ==================================================================================================
@@ -105,8 +110,10 @@ config_collider:
       i_oct_b2: 60. # [A]
 
     closed_orbit_correction:
-      lhcb1: correction/corr_co_lhcb1.json
-      lhcb2: correction/corr_co_lhcb2.json
+      value:
+        lhcb1: correction/corr_co_lhcb1.json
+        lhcb2: correction/corr_co_lhcb2.json
+      interal_dependency: true
 
     # Tunes and chromaticities
     qx:
@@ -156,7 +163,9 @@ config_collider:
     nemitt_x: 2.5e-6
     nemitt_y: 2.5e-6
     mask_with_filling_pattern:
-      pattern_fname: ../filling_scheme/8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
+      pattern_fname:
+        value: ../filling_scheme/8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
+        external_dependency: true
       i_bunch_b1: 1963 # If not specified, the bunch with the worst schedule is chosen
       i_bunch_b2: 1963 # Same. A value for i_bunch_b1 and i_bunch_b2 must be specified if pattern_fname is specified
 
@@ -238,7 +247,9 @@ config_collider:
     # ================================================================================================
     # --- Additional parameters for xsuite collider configuration ---
     # ================================================================================================
-    path_configured_collider: configured_collider.json
+    path_configured_collider:
+      value: configured_collider.json
+      internal_dependency: true
 
 # ==================================================================================================
 # --- Particle_distribution configuration ---
@@ -254,11 +265,12 @@ config_particles:
 # ==================================================================================================
 
 config_simulation:
-  # Collider file
-  # collider_file: ../1_build_distr_and_collider/collider/collider.json
-
   # Distribution in the normalized xy space
-  path_input_distribution: ../1_build_distr_and_collider/particles/00.parquet
+  path_input_distribution:
+    value: ../1_build_distr_and_collider/particles/
+    internal_dependency: true
+  chunk_input_distribution:
+    value: # This is scanned
 
   # Initial off-momentum
   delta_max: 27.e-5
@@ -277,5 +289,9 @@ config_simulation:
 
   # Save particles files
   save_input_particles: true
-  path_input_particles: input_particles.parquet
-  path_output_particles: output_particles.parquet
+  path_input_particles:
+    value: input_particles.parquet
+    internal_dependency: true
+  path_output_particles:
+    value: output_particles.parquet
+    internal_dependency: true

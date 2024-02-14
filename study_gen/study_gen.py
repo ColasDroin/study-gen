@@ -264,10 +264,18 @@ class StudyGen:
                 if param not in self.set_alert_parameters:
                     print(
                         f"Parameter {param} is defined in the configuration and being scanned."
-                        " The value from the configuration will be used."
+                        " The value from the scan will be used."
                     )
                     self.set_alert_parameters.add(param)
                 value = dic_mutated_parameters[param]
+
+        # Handle external/internal dependencies
+        if isinstance(value, dict) and (
+            "external_dependency" in value or "internal_dependency" in value
+        ):
+            value = value["value"]
+
+        # Handle string values
         if isinstance(value, str):
             value = f'"{value}"'
 

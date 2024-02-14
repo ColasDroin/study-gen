@@ -33,11 +33,12 @@ def prepare_distribution_for_tracking_function(
     context: Any,
     beam: str,
     path_input_distribution: str,
+    chunk_input_distribution: str,
     delta_max: float,
     nemitt_x: float,
     nemitt_y: float,
 ) -> tuple[xp.particles.particles.Particles, list[int]]:
-    particle_df = pd.read_parquet(path=path_input_distribution)
+    particle_df = pd.read_parquet(path=path_input_distribution + chunk_input_distribution)
 
     r_vect = particle_df["normalized amplitude in xy-plane"].values
     theta_vect = particle_df["angle in xy-plane [deg]"].values * np.pi / 180  # type: ignore # [rad]

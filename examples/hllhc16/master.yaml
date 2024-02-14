@@ -21,9 +21,8 @@ structure:
     generations:
       - track_particles
     scans:
-      path_input_distribution:
-        path_list:
-          [../1_build_distr_and_collider/particles/____.parquet, 0, n_split]
+      chunk_input_distribution:
+        path_list: [____.parquet, 0, n_split]
 
 # ==================================================================================================
 # --- Base collider generation ---
@@ -169,7 +168,7 @@ track_particles:
       args: collider, context
       output: collider
     prepare_distribution_for_tracking:
-      args: collider, context, beam_sequence, path_input_distribution, delta_max, nemitt_x, nemitt_y
+      args: collider, context, beam_sequence, path_input_distribution, chunk_input_distribution, delta_max, nemitt_x, nemitt_y
       output: particles, particles_id
     track:
       args: collider, particles, beam_sequence, n_turns, save_input_particles, optimize_for_tracking, path_input_particles
