@@ -25,6 +25,18 @@ structure:
         path_list: [____.parquet, 0, n_split]
 
 # ==================================================================================================
+# --- Particles distribution generation ---
+# ==================================================================================================
+prepare_particles_distribution:
+  script:
+    build_particles_distribution:
+      args: [r_min, r_max, n_r, n_angles, n_split]
+      output: particle_list
+    write_particles_distribution:
+      args: particle_list, path_input_distribution
+      output:
+
+# ==================================================================================================
 # --- Base collider generation ---
 # ==================================================================================================
 build_base_collider:
@@ -139,18 +151,6 @@ configure_collider:
       output: lumi_ip1, lumi_ip2, lumi_ip5, lumi_ip8, PU_ip1, PU_ip2, PU_ip5, PU_ip8
     dump_collider_json:
       args: collider, path_configured_collider
-      output:
-
-# ==================================================================================================
-# --- Particles distribution generation ---
-# ==================================================================================================
-prepare_particles_distribution:
-  script:
-    build_particles_distribution:
-      args: [r_min, r_max, n_r, n_angles, n_split]
-      output: particle_list
-    write_particles_distribution:
-      args: particle_list
       output:
 
 # ==================================================================================================

@@ -21,15 +21,15 @@ dict_imports = {"os": "import os", "pandas": "import pandas as pd"}
 # ==================================================================================================
 def write_particles_distribution_function(
     particle_list: list[list[tuple[int, float, float]]],
+    path_input_distribution: str,
 ) -> None:
     # Write distribution to parquet files
-    distributions_folder = "particles"
-    os.makedirs(distributions_folder, exist_ok=True)
+    os.makedirs(path_input_distribution, exist_ok=True)
     for idx_chunk, my_list in enumerate(particle_list):
         pd.DataFrame(
             my_list,
             columns=["particle_id", "normalized amplitude in xy-plane", "angle in xy-plane [deg]"],  # type: ignore
-        ).to_parquet(f"{distributions_folder}/{idx_chunk:02}.parquet")
+        ).to_parquet(f"{path_input_distribution}{idx_chunk:02}.parquet")
 
 
 # ==================================================================================================

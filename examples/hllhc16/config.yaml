@@ -164,7 +164,7 @@ config_collider:
     nemitt_y: 2.5e-6
     mask_with_filling_pattern:
       pattern_fname:
-        value: ../filling_scheme/8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
+        value: filling_scheme/8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
         external_dependency: true
       i_bunch_b1: 1963 # If not specified, the bunch with the worst schedule is chosen
       i_bunch_b2: 1963 # Same. A value for i_bunch_b1 and i_bunch_b2 must be specified if pattern_fname is specified
@@ -267,7 +267,7 @@ config_particles:
 config_simulation:
   # Distribution in the normalized xy space
   path_input_distribution:
-    value: ../1_build_distr_and_collider/particles/
+    value: particles/
     internal_dependency: true
   chunk_input_distribution:
     value: # This is scanned

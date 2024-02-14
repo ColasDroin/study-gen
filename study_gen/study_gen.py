@@ -241,7 +241,12 @@ class StudyGen:
             name_merged_function="main",
         )
 
-    def get_parameters(self: Self, param: str, dic_mutated_parameters: dict[str, Any] = {}):
+    def get_parameters(
+        self: Self,
+        param: str,
+        directory_path_gen: str | None = None,
+        dic_mutated_parameters: dict[str, Any] = {},
+    ):
         def _finditem(obj, key):
             if key in obj:
                 return obj[key]
@@ -284,18 +289,19 @@ class StudyGen:
     def get_parameters_assignation(
         self: Self,
         main_block: Block,
+        directory_path_gen: str,
         dic_mutated_parameters: dict[str, Any] = {},
     ) -> str:  # sourcery skip: default-mutable-arg
         str_parameters = "# Declare parameters\n"
         for param in main_block.dict_parameters:
             # Look recursively for the corresponding parameter value in the configuration
-            value = self.get_parameters(param, dic_mutated_parameters)
+            value = self.get_parameters(param, directory_path_gen, dic_mutated_parameters)
             str_parameters += f"{param} = {value}\n"
 
         return str_parameters
 
     def generate_gen(
-        self: Self, gen: str, dic_mutated_parameters: dict[str, Any] = {}
+        self: Self, gen: str, directory_path_gen: str, dic_mutated_parameters: dict[str, Any] = {}
     ) -> tuple[str, str, str, str, str]:  # sourcery skip: default-mutable-arg
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
@@ -316,7 +322,9 @@ class StudyGen:
         main_block = self.generate_main_block(gen, dict_blocks)
 
         # Declare parameters
-        str_parameters = self.get_parameters_assignation(main_block, dic_mutated_parameters)
+        str_parameters = self.get_parameters_assignation(
+            main_block, directory_path_gen, dic_mutated_parameters
+        )
 
         # Get main block string
         str_main = main_block.get_str()
@@ -379,13 +387,15 @@ class StudyGen:
     ) -> tuple[str, list[str]]:  # sourcery skip: default-mutable-arg
         directory_path_gen = f"{study_path}{layer_name}/"
         file_path_gen = f"{directory_path_gen}{gen_name}.py"
+
+        # Generate render write for current generation
         (
             str_imports,
             str_parameters,
             str_blocks,
             str_main,
             str_main_call,
-        ) = self.generate_gen(gen_name, dic_mutated_parameters)
+        ) = self.generate_gen(gen_name, directory_path_gen, dic_mutated_parameters)
         study_str = self.render(
             str_imports,
             str_parameters,
