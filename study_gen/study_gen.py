@@ -32,6 +32,7 @@ class StudyGen:
         self.default_template_path = f"{os.path.dirname(__file__)}/templates/"
         self.default_template_name = "default.txt"
         self.set_alert_parameters = set()
+        self.dic_internal_external_deps = {}
 
     def load_configuration(self: Self, path_configuration: str) -> dict[str, Any]:
         ryaml = yaml.YAML()
@@ -275,10 +276,38 @@ class StudyGen:
                 value = dic_mutated_parameters[param]
 
         # Handle external/internal dependencies
-        if isinstance(value, dict) and (
-            "external_dependency" in value or "internal_dependency" in value
+        if (
+            isinstance(value, dict)
+            and ("external_dependency" in value or "internal_dependency" in value)
+            and directory_path_gen is not None
         ):
             value = value["value"]
+            # Consider the first time the parameter is used as the reference directory
+            if param not in self.dic_internal_external_deps:
+                self.dic_internal_external_deps[param] = directory_path_gen
+            # Adapt path to the current generation else
+            else:
+                if isinstance(value, dict):
+                    for key, val in value.items():
+                        value[key] = (
+                            "../"
+                            * (
+                                len(self.dic_internal_external_deps[param].split("/"))
+                                - len(directory_path_gen.split("/"))
+                            )
+                            + val
+                        )
+                else:
+                    # Adapt path to the current generation
+                    # ! Need to debug
+                    value = (
+                        "../"
+                        * (
+                            len(self.dic_internal_external_deps[param].split("/"))
+                            - len(directory_path_gen.split("/"))
+                        )
+                        + value
+                    )
 
         # Handle string values
         if isinstance(value, str):
