@@ -418,6 +418,7 @@ class StudyGen:
                     ),
                     5,
                 )
+                dic_parameter_lists_for_naming[parameter] = parameter_list
             elif "logspace" in self.master["structure"][layer]["scans"][parameter]:
                 l_values_logspace = self.master["structure"][layer]["scans"][parameter]["logspace"]
                 l_values_logspace = convert_variables_to_values(l_values_logspace)
@@ -430,6 +431,7 @@ class StudyGen:
                     ),
                     5,
                 )
+                dic_parameter_lists_for_naming[parameter] = parameter_list
             elif "path_list" in self.master["structure"][layer]["scans"][parameter]:
                 l_values_path_list = self.master["structure"][layer]["scans"][parameter][
                     "path_list"
@@ -439,13 +441,16 @@ class StudyGen:
                     l_values_path_list[0].replace("____", f"{n:02d}")
                     for n in range(l_values_path_list[1], l_values_path_list[2])
                 ]
-            # ! Fix this
+                dic_parameter_lists_for_naming[parameter] = [
+                    f"{n:02d}" for n in range(l_values_path_list[1], l_values_path_list[2])
+                ]
             elif "list" in self.master["structure"][layer]["scans"][parameter]:
                 parameter_list = self.master["structure"][layer]["scans"][parameter]["list"]
                 parameter_list = convert_variables_to_values(parameter_list)
+                dic_parameter_lists_for_naming[parameter] = parameter_list
             else:
                 raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
-            dic_parameter_lists_for_naming[parameter] = parameter_list
+
             parameter_list_updated = test_convert_for_each_beam(
                 self.master["structure"][layer]["scans"][parameter], parameter_list
             )
@@ -463,7 +468,6 @@ class StudyGen:
     ) -> tuple[list[str], list[str]]:
         # Get dictionnary of parametric values being scanned
         dic_parameter_lists, dic_parameter_lists_for_naming = self.get_dic_parametric_scans(layer)
-
         # Generate render write for cartesian product of all parameters
         l_study_str = []
         l_study_path = []
