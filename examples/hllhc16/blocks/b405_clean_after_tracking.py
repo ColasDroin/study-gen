@@ -12,9 +12,7 @@ import os
 # Local imports
 from study_gen.block import Block
 
-dict_imports = {
-    "os": "import os",
-}
+dict_imports = {"os": "import os", "contextlib": "import contextlib"}
 
 
 # ==================================================================================================

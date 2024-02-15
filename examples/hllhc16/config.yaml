@@ -244,12 +244,12 @@ config_collider:
         - corr_co_acbyvs5.r8b1
         - corr_co_acbyhs5.r8b1
 
-    # ================================================================================================
-    # --- Additional parameters for xsuite collider configuration ---
-    # ================================================================================================
-    path_configured_collider:
-      value: configured_collider.json
-      internal_dependency: true
+  # ================================================================================================
+  # --- Additional parameters for xsuite collider configuration ---
+  # ================================================================================================
+  path_configured_collider:
+    value: configured_collider.json
+    internal_dependency: true
 
 # ==================================================================================================
 # --- Particle_distribution configuration ---

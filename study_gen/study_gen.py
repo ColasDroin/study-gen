@@ -285,29 +285,23 @@ class StudyGen:
             # Consider the first time the parameter is used as the reference directory
             if param not in self.dic_internal_external_deps:
                 self.dic_internal_external_deps[param] = directory_path_gen
-            # Adapt path to the current generation else
+
             else:
+                # Adapt path to the current generation else
+                number_of_gen_above = len(directory_path_gen.split("/")) - len(
+                    self.dic_internal_external_deps[param].split("/")
+                )
+                if number_of_gen_above < 0:
+                    raise ValueError(
+                        f"Parameter {param} is used in a generation that is not a child of the"
+                        " generation where it was first used."
+                    )
                 if isinstance(value, dict):
                     for key, val in value.items():
-                        value[key] = (
-                            "../"
-                            * (
-                                len(self.dic_internal_external_deps[param].split("/"))
-                                - len(directory_path_gen.split("/"))
-                            )
-                            + val
-                        )
+                        value[key] = "../" * number_of_gen_above + val
                 else:
                     # Adapt path to the current generation
-                    # ! Need to debug
-                    value = (
-                        "../"
-                        * (
-                            len(self.dic_internal_external_deps[param].split("/"))
-                            - len(directory_path_gen.split("/"))
-                        )
-                        + value
-                    )
+                    value = "../" * number_of_gen_above + value
 
         # Handle string values
         if isinstance(value, str):
