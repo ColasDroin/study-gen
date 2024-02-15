@@ -19,7 +19,7 @@ dict_imports = {"os": "import os", "shutil": "import shutil"}
 # ==================================================================================================
 def clean_temp_files_function() -> None:
     # Remove all the temporaty files created in the process of building collider
-    os.remove("mad_collider.log")
+    os.remove("mad_b1b2.log")
     os.remove("mad_b4.log")
     shutil.rmtree("temp")
     os.unlink("errors")
