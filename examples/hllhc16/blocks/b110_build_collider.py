@@ -7,7 +7,7 @@
 from typing import Any
 
 # Third party imports
-import xmask as xm
+import xmask.lhc as xlhc
 import xtrack as xt
 from cpymad.madx import Madx
 
@@ -18,7 +18,7 @@ from study_gen.block import Block
 dict_imports = {
     "Madx": "from cpymad.madx import Madx",
     "Any": "from typing import Any",
-    "xm": "import xmask as xm",
+    "xlhc": "import xmask.lhc as xlhc",
     "xt": "import xtrack as xt",
 }
 
@@ -36,7 +36,7 @@ def build_collider_function(
     pars_for_imperfections: dict[str, int],
     ver_hllhc_optics: float,
 ) -> xt.Multiline:
-    return xm.lhc.build_xsuite_collider(  # type: ignore
+    return xlhc.build_xsuite_collider(  # type: ignore
         sequence_b1=mad_b1b2.sequence.lhcb1,
         sequence_b2=mad_b1b2.sequence.lhcb2,
         sequence_b4=mad_b4.sequence.lhcb2,

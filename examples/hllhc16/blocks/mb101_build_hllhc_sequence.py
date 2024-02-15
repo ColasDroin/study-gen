@@ -6,7 +6,7 @@
 # Standard library imports
 
 # Third party imports
-import xmask as xm
+import xmask.lhc as xlhc
 from cpymad.madx import Madx
 
 # Local imports
@@ -22,7 +22,7 @@ from .b106_incorporate_CC import incorporate_CC_function
 from .b107_set_twiss import set_twiss_function
 
 # Imports needed for block to work (not detected by linting tools)
-dict_imports = {"Madx": "from cpymad.madx import Madx", "xm": "import xmask as xm"}
+dict_imports = {"Madx": "from cpymad.madx import Madx", "xlhc": "import xmask.lhc as xlhc"}
 
 # Block dependencies
 set_deps = {
@@ -69,7 +69,7 @@ def build_hllhc_sequence_function(
         mad = initialize_beam_function(mad)
 
     # Install error placeholders (configured later)
-    xm.lhc.install_errors_placeholders_hllhc(mad)  # type: ignore
+    xlhc.install_errors_placeholders_hllhc(mad)  # type: ignore
 
     # Get IP3 as position 0
     if cycle_to_IP3:
