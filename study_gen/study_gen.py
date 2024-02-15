@@ -281,20 +281,35 @@ class StudyGen:
             and ("external_dependency" in value or "internal_dependency" in value)
             and directory_path_gen is not None
         ):
+            dep = None
+            if "external_dependency" in value:
+                dep = "external_dependency"
+            elif "internal_dependency" in value:
+                dep = "internal_dependency"
+
+            # Get the actual path value
             value = value["value"]
-            # Consider the first time the parameter is used as the reference directory
-            if param not in self.dic_internal_external_deps:
+
+            if param not in self.dic_internal_external_deps and dep == "internal_dependency":
+                # Consider the first time the parameter is used as the reference directory
                 self.dic_internal_external_deps[param] = directory_path_gen
 
             else:
-                # Adapt path to the current generation else
-                number_of_gen_above = len(directory_path_gen.split("/")) - len(
-                    self.dic_internal_external_deps[param].split("/")
-                )
+                number_of_gen_above = -1
+                if dep == "internal_dependency":
+                    # Adapt path to the current generation else
+                    number_of_gen_above = len(directory_path_gen.split("/")) - len(
+                        self.dic_internal_external_deps[param].split("/")
+                    )
+                elif dep == "external_dependency":
+                    # Always take the root folder as reference
+                    number_of_gen_above = len(directory_path_gen.split("/")) - 1
+
                 if number_of_gen_above < 0:
                     raise ValueError(
                         f"Parameter {param} is used in a generation that is not a child of the"
-                        " generation where it was first used."
+                        " generation where it was first used, or there was a problem with the "
+                        " path computation of the parameter."
                     )
                 if isinstance(value, dict):
                     for key, val in value.items():
@@ -408,7 +423,9 @@ class StudyGen:
         template_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
     ) -> tuple[str, list[str]]:  # sourcery skip: default-mutable-arg
-        directory_path_gen = f"{study_path}{layer_name}/"
+        directory_path_gen = f"{study_path}{layer_name}"
+        if not directory_path_gen.endswith("/"):
+            directory_path_gen += "/"
         file_path_gen = f"{directory_path_gen}{gen_name}.py"
 
         # Generate render write for current generation

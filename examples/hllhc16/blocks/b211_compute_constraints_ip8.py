@@ -26,7 +26,13 @@ def compute_constraints_ip8_function(
     additional_targets_lumi = []
     for constraint in l_contraints_ip8:
         obs, beam, sign, val, at = constraint.split("_")
-        target = xt.TargetInequality(obs, sign, float(val), at=at, line=beam, tol=1e-6)
+        if sign == "<":
+            ineq = xt.LessThan(float(val))
+        elif sign == ">":
+            ineq = xt.GreaterThan(float(val))
+        else:
+            raise ValueError(f"Unsupported sign for luminosity optimization constraint: {sign}")
+        target = xt.Target(obs, ineq, at=at, line=beam, tol=1e-6)        
         additional_targets_lumi.append(target)
 
     return additional_targets_lumi

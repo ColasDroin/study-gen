@@ -5,7 +5,7 @@ config_mad:
   # Links to be made for tools and scripts
   links:
     value:
-      acc-models-lhc: ../../modules/hllhc16
+      acc-models-lhc: modules/hllhc16
     external_dependency: true
 
   # Optics file (internal dependency as it is copied from hllhc16)
@@ -90,8 +90,8 @@ config_collider:
       on_disp: 1 # Value to choose could be optics-dependent
 
       # Crab cavities
-      on_crab1: -190 # [urad]
-      on_crab5: -190 # [urad]
+      on_crab1: 0 # -190 # [urad]
+      on_crab5: 0 # -190 # [urad]
 
       # Magnets of the experiments
       on_alice_normalized: 1
@@ -113,7 +113,7 @@ config_collider:
       value:
         lhcb1: correction/corr_co_lhcb1.json
         lhcb2: correction/corr_co_lhcb2.json
-      interal_dependency: true
+      internal_dependency: true
 
     # Tunes and chromaticities
     qx:
@@ -213,7 +213,7 @@ config_collider:
         - corr_co_acbchs5.r2b1
         - corr_co_acbcvs5.r2b1
     ip8:
-      luminosity: 2.0e+33
+      target_luminosity: 2.0e+33
       num_colliding_bunches: null # This will be set automatically according to the filling scheme
       impose_separation_orthogonal_to_crossing: true
       knobs:
