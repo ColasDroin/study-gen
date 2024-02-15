@@ -160,5 +160,6 @@ cython_debug/
 #.idea/
 
 # Example studies
-study_hllhc16
-study_dummy
+examples/hllhc16/study_hllhc16
+examples/hllhc16/modules
+examples/dummy/study_dummy

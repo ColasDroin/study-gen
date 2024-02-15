@@ -47,9 +47,9 @@ def build_hllhc_sequence_function(
     incorporate_CC: bool,
 ) -> Madx:
     # Get beam number
-    if beam_name == "b1b2":
+    if beam_name == "lhcb1" or beam_name == "lhcb2":
         beam = 1
-    elif beam_name == "b4":
+    elif beam_name == "lhcb4":
         beam = 4
     else:
         raise ValueError("Beam name not recognized.")

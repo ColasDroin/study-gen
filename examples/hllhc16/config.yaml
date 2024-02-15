@@ -5,7 +5,7 @@ config_mad:
   # Links to be made for tools and scripts
   links:
     value:
-      acc-models-lhc: modules/hllhc16
+      acc-models-lhc: ../../modules/hllhc16
     external_dependency: true
 
   # Optics file (internal dependency as it is copied from hllhc16)
