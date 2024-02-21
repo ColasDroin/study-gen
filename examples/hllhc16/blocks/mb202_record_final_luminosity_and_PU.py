@@ -34,7 +34,7 @@ def record_final_luminosity_and_PU_function(
     num_colliding_bunches_ip1_and_5: int,
     num_colliding_bunches_ip2: int,
     num_colliding_bunches_ip8: int,
-) -> tuple[float, ...]:
+) -> tuple[list[float], list[float]]:
     # Get the final luminoisty in all IPs
     twiss_b1 = collider["lhcb1"].twiss()
     twiss_b2 = collider["lhcb2"].twiss()
@@ -70,7 +70,7 @@ def record_final_luminosity_and_PU_function(
         l_lumi.append(L)
         l_PU.append(PU)
 
-    return tuple(l_lumi + l_PU)
+    return l_lumi, l_PU
 
 
 # ==================================================================================================
