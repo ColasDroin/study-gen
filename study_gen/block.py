@@ -657,7 +657,7 @@ class Block:
     @classmethod
     def build_function_str(
         cls,
-        l_blocks: list["Block"],
+        l_blocks: list[Self],
         function_header: str,
         function_body: str | None = None,
         docstring: str = "",
