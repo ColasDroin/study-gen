@@ -28,10 +28,19 @@ def dump_tracked_particles_function(
 ) -> None:
     # Get particles dictionnary
     particles_dict = particles.to_dict()
-    particles_dict["particle_id"] = particle_id  # type: ignore
+
+    # Convert to dataframe
+    particles_df = pd.DataFrame(particles_dict)
+
+    # ! Very important, otherwise the particles will be mixed in each subset
+    # Sort by parent_particle_id
+    particles_df = particles_df.sort_values("parent_particle_id")
+
+    # Assign the old id to the sorted dataframe
+    particles_df["particle_id"] = particle_id
 
     # Save output
-    pd.DataFrame(particles_dict).to_parquet(path_output_particles)
+    particles_df.to_parquet(path_output_particles)
 
 
 # ==================================================================================================
