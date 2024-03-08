@@ -8,6 +8,28 @@ from typing import Callable, Self
 
 
 class Block:
+    """A class representing a Block object.
+
+    Blocks are used in a study generation framework to define and execute specific functions or operations.
+    Each Block has a name, a function to be executed, optional imports, dependencies, and expected output.
+
+    Args:
+        name (str): The name of the Block.
+        function (Callable): The function to be executed by the Block.
+        dict_imports (dict[str, str], optional): A dictionary of imports required by the function. Defaults to OrderedDict().
+        set_deps (set[str], optional): A set of dependencies required by the function. Defaults to set().
+        dict_output (OrderedDict[str, type] | None, optional): A dictionary specifying the expected output of the function. Defaults to None.
+
+    Attributes:
+        name (str): The name of the Block.
+        _function (Callable): The function to be executed by the Block.
+        dict_imports (dict[str, str]): A dictionary of imports required by the function.
+        set_deps (set[str]): A set of dependencies required by the function.
+        _l_arguments (list[tuple[str, type]]): A list of argument names and types.
+        _dict_output (OrderedDict[str, type]): A dictionary specifying the expected output of the function.
+
+    """
+
     def __init__(
         self,
         name: str,
@@ -29,20 +51,47 @@ class Block:
             self._dict_output = self.initial_dic_output_setter_from_output(dict_output)
 
     @property
-    def function(self: Self) -> Callable:
+    def function(self) -> Callable:
+        """Get the function to be executed by the Block.
+
+        Returns:
+            Callable: The function to be executed.
+
+        """
         if self._function is None:
             logging.warning("No function defined for this block")
         return self._function
 
     @function.setter
-    def function(self: Self, function: Callable):
+    def function(self, function: Callable):
+        """Set the function to be executed by the Block.
+
+        Args:
+            function (Callable): The function to be executed.
+
+        """
         self._function = function
 
     @property
-    def dict_output(self: Self) -> OrderedDict[str, type]:
+    def dict_output(self) -> OrderedDict[str, type]:
+        """Get the dictionary specifying the expected output of the function.
+
+        Returns:
+            OrderedDict[str, type]: The dictionary specifying the expected output.
+
+        """
         return self._dict_output
 
-    def initial_dic_output_setter_from_signature(self: Self) -> OrderedDict[str, type]:
+    def initial_dic_output_setter_from_signature(self) -> OrderedDict[str, type]:
+        """Set the initial dictionary output based on the function signature.
+
+        Returns:
+            OrderedDict[str, type]: The initial dictionary output.
+
+        Raises:
+            ValueError: If the Block has no output signature.
+
+        """
         # Get signature output as str
         signature_output_str = str(self.get_signature())
 
@@ -70,8 +119,21 @@ class Block:
         return dict_output
 
     def initial_dic_output_setter_from_output(
-        self: Self, dict_output: OrderedDict[str, type]
+        self, dict_output: OrderedDict[str, type]
     ) -> OrderedDict[str, type]:
+        """Set the initial dictionary output based on the provided output.
+
+        Args:
+            dict_output (OrderedDict[str, type]): The dictionary specifying the expected output.
+
+        Returns:
+            OrderedDict[str, type]: The initial dictionary output.
+
+        Raises:
+            ValueError: If the number of outputs differs from the type hint signature.
+            ValueError: If the provided output(s) have a different type than expected.
+
+        """
         # Check that the output corresponds to the return statement
         if len(dict_output) == 0 and "return" in self.get_str():
             logging.warning(
@@ -128,7 +190,17 @@ class Block:
         return dict_output
 
     @dict_output.setter
-    def dict_output(self: Self, dict_output: OrderedDict[str, type]):
+    def dict_output(self, dict_output: OrderedDict[str, type]):
+        """Set the dictionary specifying the expected output of the function.
+
+        Args:
+            dict_output (OrderedDict[str, type]): The dictionary specifying the expected output.
+
+        Raises:
+            ValueError: If the number of outputs is different from the previous number of outputs.
+            ValueError: If the provided output(s) have a different type than the previous output(s).
+
+        """
         # Ensure that the number of arguments is the same
         if len(dict_output) != len(self._dict_output):
             raise ValueError(
@@ -147,7 +219,13 @@ class Block:
         # Update output
         self._dict_output = dict_output
 
-    def set_outputs_names(self: Self, l_outputs_names: list[str] | str | None):
+    def set_outputs_names(self, l_outputs_names: list[str] | str | None):
+        """Set the names of the outputs.
+
+        Args:
+            l_outputs_names (list[str] | str | None): The names of the outputs.
+
+        """
         # Ensure that l_outputs_names is not just a string
         if not isinstance(l_outputs_names, list):
             # Ensure the user did not provide a string with a comma
@@ -161,11 +239,23 @@ class Block:
         # Only update the names of the outputs, not types
         self.dict_output = OrderedDict(list(zip(l_outputs_names, self.dict_output.values())))
 
-    def get_outputs_names(self: Self) -> list[str]:
+    def get_outputs_names(self) -> list[str]:
+        """Get the names of the outputs.
+
+        Returns:
+            list[str]: The names of the outputs.
+
+        """
         return [output for output, _ in self.dict_output.items()]
 
     @property
-    def dict_parameters(self: Self) -> OrderedDict[str, type]:
+    def dict_parameters(self) -> OrderedDict[str, type]:
+        """Get the dictionary specifying the parameters of the function.
+
+        Returns:
+            OrderedDict[str, type]: The dictionary specifying the parameters.
+
+        """
         signature = self.get_signature()
         return OrderedDict(
             [
@@ -174,11 +264,27 @@ class Block:
             ]
         )
 
-    def get_dict_parameters_names(self: Self) -> list[str]:
+    def get_dict_parameters_names(self) -> list[str]:
+        """Get the names of the parameters.
+
+        Returns:
+            list[str]: The names of the parameters.
+
+        """
         return list(self.dict_parameters.keys())
 
     @dict_parameters.setter
-    def dict_parameters(self: Self, dict_parameters: OrderedDict[str, type]):
+    def dict_parameters(self, dict_parameters: OrderedDict[str, type]):
+        """Set the dictionary specifying the parameters of the function.
+
+        Args:
+            dict_parameters (OrderedDict[str, type]): The dictionary specifying the parameters.
+
+        Raises:
+            ValueError: If the number of arguments is different from the number of parameters.
+            ValueError: If the provided arguments have a different type than expected.
+
+        """
         # Ensure that the number of arguments is the same
         if len(dict_parameters) != len(self.dict_parameters):
             raise ValueError(
@@ -205,7 +311,13 @@ class Block:
             function_str, self.get_name_function_str(), self.dict_imports
         )
 
-    def set_parameters_names(self: Self, l_parameters_names: list[str]):
+    def set_parameters_names(self, l_parameters_names: list[str]):
+        """Set the names of the parameters.
+
+        Args:
+            l_parameters_names (list[str]): The names of the parameters.
+
+        """
         # Ensure that l_parameters_names is not just a string (from bad yaml parsing)
         if not isinstance(l_parameters_names, list):
             l_parameters_names = [l_parameters_names]
@@ -216,13 +328,27 @@ class Block:
         )
 
     @property
-    def l_arguments(self: Self) -> list[tuple[str, type]]:
-        # if self._l_arguments == []:
-        #     logging.warning(f"No arguments defined for this block ({self.name})")
+    def l_arguments(self) -> list[tuple[str, type]]:
+        """Get the list of argument names and types.
+
+        Returns:
+            list[tuple[str, type]]: The list of argument names and types.
+
+        """
         return self._l_arguments
 
     @l_arguments.setter
-    def l_arguments(self: Self, l_arguments: list[tuple[str, type]]):
+    def l_arguments(self, l_arguments: list[tuple[str, type]]):
+        """Set the list of argument names and types.
+
+        Args:
+            l_arguments (list[tuple[str, type]]): The list of argument names and types.
+
+        Raises:
+            ValueError: If the number of arguments is different from the number of parameters.
+            ValueError: If the provided arguments have a different type than expected.
+
+        """
         # Ensure that the number of arguments is the same
         if len(l_arguments) != len(self.dict_parameters):
             raise ValueError(
@@ -243,7 +369,13 @@ class Block:
         # Update list of arguments
         self._l_arguments = l_arguments
 
-    def set_arguments_names(self: Self, l_arguments_names: list[str] | None):
+    def set_arguments_names(self, l_arguments_names: list[str] | None):
+        """Set the names of the arguments.
+
+        Args:
+            l_arguments_names (list[str] | None): The names of the arguments.
+
+        """
         # Ensure that l_arguments_names is not just a string (from bad yaml parsing)
         if not isinstance(l_arguments_names, list):
             # Ensure the user did not provide a string with a comma
@@ -264,25 +396,61 @@ class Block:
         # Only update the names of the parameters, not types (obtain the types from the parameters)
         self._l_arguments = list(zip(l_arguments_names, self.dict_parameters.values()))
 
-    def get_arguments_names(self: Self) -> list[str]:
+    def get_arguments_names(self) -> list[str]:
+        """Get the names of the arguments.
+
+        Returns:
+            list[str]: The names of the arguments.
+
+        """
         return [arg for arg, _ in self.l_arguments]
 
-    def get_arguments_as_dict(self: Self) -> OrderedDict[str, type]:
+    def get_arguments_as_dict(self) -> OrderedDict[str, type]:
+        """Get the arguments as a dictionary.
+
+        Returns:
+            OrderedDict[str, type]: The arguments as a dictionary.
+
+        """
         return OrderedDict(self.l_arguments)
 
-    def get_str(self: Self) -> str:
+    def get_str(self) -> str:
+        """Get the string representation of the function.
+
+        Returns:
+            str: The string representation of the function.
+
+        """
         return "" if self.function is None else inspect.getsource(self.function)
 
-    def get_name_function_str(self: Self) -> str:
+    def get_name_function_str(self) -> str:
+        """Get the name of the function.
+
+        Returns:
+            str: The name of the function.
+
+        """
         return "" if self.function is None else self.function.__name__
 
-    def get_docstring(self: Self) -> str:
+    def get_docstring(self) -> str:
+        """Get the docstring of the function.
+
+        Returns:
+            str: The docstring of the function.
+
+        """
         if self.function is None:
             return ""
         doc = inspect.getdoc(self.function)
         return "" if doc is None else doc
 
-    def get_body_str(self: Self) -> str:
+    def get_body_str(self) -> str:
+        """Get the body of the function.
+
+        Returns:
+            str: The body of the function.
+
+        """
         if self.function is None:
             return ""
         body = inspect.getsource(self.function)
@@ -297,12 +465,27 @@ class Block:
 
         return body
 
-    def get_output_str(self: Self) -> str:
+    def get_output_str(self) -> str:
+        """Get the string representation of the output.
+
+        Returns:
+            str: The string representation of the output.
+
+        """
         l_outputs = self.get_outputs_names()
         return self.get_external_output_str(l_outputs)
 
     @staticmethod
     def get_external_output_str(l_outputs: list[str] | None = None) -> str:
+        """Get the string representation of the external output.
+
+        Args:
+            l_outputs (list[str] | None, optional): The names of the outputs. Defaults to None.
+
+        Returns:
+            str: The string representation of the external output.
+
+        """
         if l_outputs is None:
             l_outputs = []
         if not l_outputs:
@@ -310,7 +493,13 @@ class Block:
         else:
             return l_outputs[0] if len(l_outputs) == 1 else ", ".join(l_outputs)
 
-    def get_output_type_hint_str(self: Self):
+    def get_output_type_hint_str(self):
+        """Get the string representation of the output type hint.
+
+        Returns:
+            str: The string representation of the output type hint.
+
+        """
         return self.get_external_output_type_hint_str(self.dict_output)
 
     # Static needed here when the output comes from a merge
@@ -318,6 +507,15 @@ class Block:
     def get_external_output_type_hint_str(
         dict_output: OrderedDict[str, type] = OrderedDict(),
     ) -> str:
+        """Get the string representation of the external output type hint.
+
+        Args:
+            dict_output (OrderedDict[str, type], optional): The dictionary specifying the expected output. Defaults to OrderedDict().
+
+        Returns:
+            str: The string representation of the external output type hint.
+
+        """
         if len(dict_output) == 0:
             return "None"
         elif len(dict_output) > 1:
@@ -326,7 +524,19 @@ class Block:
         else:
             return list(dict_output.values())[0].__name__
 
-    def get_call_str(self: Self, l_external_arguments: list[str] | None = None) -> str:
+    def get_call_str(self, l_external_arguments: list[str] | None = None) -> str:
+        """Get the string representation of the function call.
+
+        Args:
+            l_external_arguments (list[str] | None, optional): The names of the external arguments. Defaults to None.
+
+        Returns:
+            str: The string representation of the function call.
+
+        Raises:
+            ValueError: If the number of arguments is different from the number of parameters.
+
+        """
         if self.function is None:
             logging.warning("No function defined for this block")
             return ""
@@ -340,7 +550,13 @@ class Block:
                 )
             return f"{self.function.__name__}({', '.join(l_external_arguments)})"
 
-    def get_assignation_call_str(self: Self) -> str:
+    def get_assignation_call_str(self) -> str:
+        """Get the string representation of the function call with output assignment.
+
+        Returns:
+            str: The string representation of the function call with output assignment.
+
+        """
         function_call_str = self.get_call_str()
         output_str = self.get_output_str()
 
@@ -349,23 +565,50 @@ class Block:
         else:
             return f"{output_str} = {function_call_str}"
 
-    def get_signature(self: Self) -> inspect.Signature:
+    def get_signature(self) -> inspect.Signature:
+        """Get the signature of the function.
+
+        Returns:
+            inspect.Signature: The signature of the function.
+
+        """
         if self.function is not None:
             return inspect.signature(self.function)
         logging.warning("No function defined for this block")
         return inspect.Signature()
 
-    def get_output_type_from_signature(self: Self) -> type | None:
+    def get_output_type_from_signature(self) -> type | None:
+        """Get the output type from the function signature.
+
+        Returns:
+            type | None: The output type from the function signature.
+
+        """
         if self.function is not None:
             return self.get_signature().return_annotation
         logging.warning("No function defined for this block")
         return None
 
-    def get_l_imports_str(self: Self) -> str:
+    def get_l_imports_str(self) -> str:
+        """Get the string representation of the imports.
+
+        Returns:
+            str: The string representation of the imports.
+
+        """
         return self.get_external_l_imports_str(self.dict_imports)
 
     @staticmethod
     def get_external_l_imports_str(dict_imports: dict[str, str]) -> str:
+        """Get the string representation of the external imports.
+
+        Args:
+            dict_imports (dict[str, str]): The dictionary of imports.
+
+        Returns:
+            str: The string representation of the external imports.
+
+        """
         # Write import statements (do not check for import repetitions across blocks)
         return "\n".join([import_statement for package, import_statement in dict_imports.items()])
 
@@ -375,6 +618,17 @@ class Block:
         docstring: str | None = None,
         dict_parameters: OrderedDict[str, type] | None = None,
     ) -> tuple[str, str, str]:
+        """Prepare the string representation of the function.
+
+        Args:
+            name_function (str | None, optional): The name of the function. Defaults to None.
+            docstring (str | None, optional): The docstring of the function. Defaults to None.
+            dict_parameters (OrderedDict[str, type] | None, optional): The dictionary specifying the parameters. Defaults to None.
+
+        Returns:
+            tuple[str, str, str]: The function header, function body, and docstring.
+
+        """
         # Get output type hint string and output name (can't modify the output type, and output name
         # must be modified through the corresponding setter)
         output_type_hint_str = self.get_output_type_hint_str()
@@ -403,12 +657,25 @@ class Block:
     @classmethod
     def build_function_str(
         cls,
-        l_blocks: list[Self],
+        l_blocks: list["Block"],
         function_header: str,
         function_body: str | None = None,
         docstring: str = "",
         output_str: str | None = None,
     ):
+        """Build the string representation of the function.
+
+        Args:
+            l_blocks (list[Block]): The list of Block objects.
+            function_header (str): The function header.
+            function_body (str | None, optional): The function body. Defaults to None.
+            docstring (str, optional): The docstring. Defaults to "".
+            output_str (str | None, optional): The string representation of the output. Defaults to None.
+
+        Returns:
+            str: The string representation of the function.
+
+        """
         # Write docstring
         if docstring != "":
             docstring = (
@@ -436,6 +703,17 @@ class Block:
     def write_and_load_temp_block(
         cls, function_str: str, name_function: str, dict_imports: dict[str, str]
     ) -> Callable:
+        """Write the function string to a temporary file and load the function.
+
+        Args:
+            function_str (str): The string representation of the function.
+            name_function (str): The name of the function.
+            dict_imports (dict[str, str]): The dictionary of imports.
+
+        Returns:
+            Callable: The loaded function.
+
+        """
         # Write string to temporary file
         tmp = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
 
