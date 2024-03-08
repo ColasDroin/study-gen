@@ -20,6 +20,44 @@ from .block import Block
 
 
 class StudyGen:
+    """
+    A class for generating study files based on a master configuration.
+
+    Args:
+        path_configuration (str): The path to the configuration file.
+        path_master (str): The path to the master file.
+        dict_ref_blocks (dict[str, Block]): A dictionary of reference Block objects.
+
+    Attributes:
+        configuration (dict[str, Any]): The loaded configuration dictionary.
+        master (dict[str, Any]): The loaded master dictionary.
+        dict_ref_blocks (dict[str, Block]): A dictionary of reference Block objects.
+        default_template_path (str): The default path to the templates folder.
+        default_template_name (str): The default name of the template file.
+        set_alert_parameters (set[str]): A set of alerted parameters.
+        dic_internal_external_deps (dict[str, str]): A dictionary of internal and external dependencies.
+
+    Methods:
+        load_configuration: Loads the configuration file.
+        load_master: Loads the master file.
+        get_dict_blocks: Retrieves a dictionary of Block objects.
+        build_merged_blocks: Builds a merged Block object.
+        incorporate_merged_blocks: Incorporates merged blocks into the dictionary of blocks.
+        generate_main_block: Generates the main Block object.
+        get_parameters: Retrieves the value of a parameter.
+        get_parameters_assignation: Generates the string representation of parameter assignments.
+        generate_gen: Generates the string representation of a generation.
+        render: Renders the study file using a template.
+        write: Writes the study file to disk.
+        generate_render_write: Generates, renders, and writes the study file.
+        get_dic_parametric_scans: Retrieves dictionaries of parametric scan values.
+        create_scans: Creates study files for parametric scans.
+        complete_tree: Completes the study tree dictionary.
+        write_tree: Writes the study tree dictionary to a YAML file.
+        create_study_for_current_gen: Creates study files for the current generation.
+        create_study: Creates the study files.
+    """
+
     def __init__(
         self: Self,
         path_configuration: str,
@@ -35,12 +73,30 @@ class StudyGen:
         self.dic_internal_external_deps = {}
 
     def load_configuration(self: Self, path_configuration: str) -> dict[str, Any]:
+        """
+        Loads the configuration file.
+
+        Args:
+            path_configuration (str): The path to the configuration file.
+
+        Returns:
+            dict[str, Any]: The loaded configuration dictionary.
+        """
         ryaml = yaml.YAML()
         with open(path_configuration, "r") as f:
             dict_configuration = ryaml.load(f)
         return dict_configuration
 
     def load_master(self: Self, path_master: str) -> dict[str, Any]:
+        """
+        Loads the master file.
+
+        Args:
+            path_master (str): The path to the master file.
+
+        Returns:
+            dict[str, Any]: The loaded master dictionary.
+        """
         ryaml = yaml.YAML()
         with open(path_master, "r") as f:
             try:
@@ -57,6 +113,15 @@ class StudyGen:
         return master
 
     def get_dict_blocks(self: Self, gen: str) -> OrderedDict[str, Block]:
+        """
+        Retrieves a dictionary of Block objects.
+
+        Args:
+            gen (str): The generation name.
+
+        Returns:
+            OrderedDict[str, Block]: The dictionary of Block objects.
+        """
         # Start with empty dict of blocks
         dict_blocks = OrderedDict()
 
@@ -110,6 +175,18 @@ class StudyGen:
         dict_blocks: OrderedDict[str, Block],
         name_merged_function: str | None = None,
     ) -> Block:
+        """
+        Builds a merged Block object.
+
+        Args:
+            new_block_name (str): The name of the new block.
+            new_block (OrderedDict[str, Any]): The new block specification.
+            dict_blocks (OrderedDict[str, Block]): The dictionary of existing Block objects.
+            name_merged_function (str | None, optional): The name of the merged function. Defaults to None.
+
+        Returns:
+            Block: The merged Block object.
+        """
         # Update arguments of each block to match the merged block specification
         l_blocks = []
         for block in new_block["blocks"]:
@@ -165,6 +242,16 @@ class StudyGen:
     def incorporate_merged_blocks(
         self: Self, new_blocks: OrderedDict[str, Any], dict_blocks: OrderedDict[str, Block]
     ) -> OrderedDict[str, Block]:
+        """
+        Incorporates merged blocks into the dictionary of blocks.
+
+        Args:
+            new_blocks (OrderedDict[str, Any]): The dictionary of new block specifications.
+            dict_blocks (OrderedDict[str, Block]): The dictionary of existing Block objects.
+
+        Returns:
+            OrderedDict[str, Block]: The updated dictionary of Block objects.
+        """
         # Build new blocks
         for new_block_name, new_block in new_blocks.items():
             # Compute the new block from merged blocks
@@ -229,6 +316,16 @@ class StudyGen:
         gen: str,
         dict_blocks: OrderedDict[str, Block],
     ):
+        """
+        Generates the main Block object.
+
+        Args:
+            gen (str): The generation name.
+            dict_blocks (OrderedDict[str, Block]): The dictionary of Block objects.
+
+        Returns:
+            Block: The main Block object.
+        """
         # Get script
         script = self.master[gen]["script"]
 
@@ -248,6 +345,21 @@ class StudyGen:
         directory_path_gen: str | None = None,
         dic_mutated_parameters: dict[str, Any] = {},
     ):
+        """
+        Retrieves the value of a parameter.
+
+        Args:
+            param (str): The name of the parameter to retrieve.
+            directory_path_gen (str | None, optional): The directory path of the current generation. Defaults to None.
+            dic_mutated_parameters (dict[str, Any], optional): A dictionary of mutated parameters. Defaults to {}.
+
+        Returns:
+            Any: The value of the parameter.
+
+        Raises:
+            ValueError: If the parameter is not defined in the configuration or the mutated parameters.
+        """
+
         def _finditem(obj, key):
             if key in obj:
                 return obj[key]
@@ -330,6 +442,17 @@ class StudyGen:
         directory_path_gen: str,
         dic_mutated_parameters: dict[str, Any] = {},
     ) -> str:  # sourcery skip: default-mutable-arg
+        """
+        Generates the string representation of parameter assignments.
+
+        Args:
+            main_block (Block): The main Block object.
+            directory_path_gen (str): The directory path of the current generation.
+            dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters. Defaults to {}.
+
+        Returns:
+            str: The string representation of parameter assignments.
+        """
         str_parameters = "# Declare parameters\n"
         for param in main_block.dict_parameters:
             # Look recursively for the corresponding parameter value in the configuration
@@ -341,6 +464,17 @@ class StudyGen:
     def generate_gen(
         self: Self, gen: str, directory_path_gen: str, dic_mutated_parameters: dict[str, Any] = {}
     ) -> tuple[str, str, str, str, str]:  # sourcery skip: default-mutable-arg
+        """
+        Generates the string representation of a generation.
+
+        Args:
+            gen (str): The generation name.
+            directory_path_gen (str): The directory path of the current generation.
+            dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters. Defaults to {}.
+
+        Returns:
+            tuple[str, str, str, str, str]: The string representations of imports, parameters, blocks, main, and main call.
+        """
         # Get dictionnary of blocks for writing the methods
         dict_blocks = self.get_dict_blocks(gen)
 
@@ -390,6 +524,21 @@ class StudyGen:
         template_path: str,
         template_name: str,
     ) -> str:
+        """
+        Renders the study file using a template.
+
+        Args:
+            str_imports (str): The string representation of imports.
+            str_parameters (str): The string representation of parameters.
+            str_blocks (str): The string representation of blocks.
+            str_main (str): The string representation of the main block.
+            str_main_call (str): The string representation of the main block call.
+            template_path (str): The path to the template file.
+            template_name (str): The name of the template file.
+
+        Returns:
+            str: The rendered study file.
+        """
         # Generate generations from template
         environment = Environment(loader=FileSystemLoader(template_path))
         template = environment.get_template(template_name)
@@ -403,6 +552,14 @@ class StudyGen:
         )
 
     def write(self: Self, study_str: str, file_path: str, format_with_black: bool = True):
+        """
+        Writes the study file to disk.
+
+        Args:
+            study_str (str): The study file string.
+            file_path (str): The path to write the study file.
+            format_with_black (bool, optional): Whether to format the study file with black. Defaults to True.
+        """
         if format_with_black:
             study_str = format_str(study_str, mode=FileMode())
 
@@ -423,6 +580,20 @@ class StudyGen:
         template_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
     ) -> tuple[str, list[str]]:  # sourcery skip: default-mutable-arg
+        """
+        Generates, renders, and writes the study file.
+
+        Args:
+            gen_name (str): The name of the generation.
+            layer_name (str): The name of the layer.
+            study_path (str): The path to the study folder.
+            template_name (str): The name of the template file.
+            template_path (str): The path to the template folder.
+            dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters. Defaults to {}.
+
+        Returns:
+            tuple[str, list[str]]: The study file string and the list of study paths.
+        """
         directory_path_gen = f"{study_path}{layer_name}"
         if not directory_path_gen.endswith("/"):
             directory_path_gen += "/"
@@ -450,6 +621,16 @@ class StudyGen:
         return study_str, [directory_path_gen]
 
     def get_dic_parametric_scans(self: Self, layer) -> tuple[dict[str, Any], dict[str, Any]]:
+        """
+        Retrieves dictionaries of parametric scan values.
+
+        Args:
+            layer: The layer name.
+
+        Returns:
+            tuple[dict[str, Any], dict[str, Any]]: The dictionaries of parametric scan values.
+        """
+
         def test_convert_for_each_beam(parameter_dict: dict, parameter_list: list) -> list:
             if "for_each_beam" in parameter_dict and parameter_dict["for_each_beam"]:
                 parameter_list = [{"lhcb1": value, "lhcb2": value} for value in parameter_list]
@@ -524,6 +705,19 @@ class StudyGen:
         template_name: str,
         template_path: str,
     ) -> tuple[list[str], list[str]]:
+        """
+        Creates study files for parametric scans.
+
+        Args:
+            gen (str): The generation name.
+            layer (str): The layer name.
+            layer_path (str): The path to the layer folder.
+            template_name (str): The name of the template file.
+            template_path (str): The path to the template folder.
+
+        Returns:
+            tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
+        """
         # Get dictionnary of parametric values being scanned
         dic_parameter_lists, dic_parameter_lists_for_naming = self.get_dic_parametric_scans(layer)
         # Generate render write for cartesian product of all parameters
@@ -563,6 +757,17 @@ class StudyGen:
     def complete_tree(
         self: Self, dictionary_tree: dict, l_study_path_next_layer: list[str], gen: str
     ) -> dict:
+        """
+        Completes the tree structure of the study dictionary.
+
+        Args:
+            dictionary_tree (dict): The dictionary representing the study tree structure.
+            l_study_path_next_layer (list[str]): The list of study paths for the next layer.
+            gen (str): The generation name.
+
+        Returns:
+            dict: The updated dictionary representing the study tree structure.
+        """
         for path_next in l_study_path_next_layer:
             nested_set(
                 dictionary_tree,
@@ -573,6 +778,12 @@ class StudyGen:
         return dictionary_tree
 
     def write_tree(self: Self, dictionary_tree: dict):
+        """
+        Writes the study tree structure to a YAML file.
+
+        Args:
+            dictionary_tree (dict): The dictionary representing the study tree structure.
+        """
         ryaml = yaml.YAML()
         with open(self.master["name"] + "/" + "tree.yaml", "w") as yaml_file:
             ryaml.indent(sequence=4, offset=2)
@@ -581,6 +792,19 @@ class StudyGen:
     def create_study_for_current_gen(
         self: Self, idx_layer: int, layer: str, gen: str, study_path: str, dictionary_tree: dict
     ) -> tuple[list[str], list[str]]:
+        """
+        Creates study files for the current generation.
+
+        Args:
+            idx_layer (int): The index of the current layer.
+            layer (str): The name of the current layer.
+            gen (str): The name of the current generation.
+            study_path (str): The path to the study folder.
+            dictionary_tree (dict): The dictionary representing the study tree structure.
+
+        Returns:
+            tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
+        """
         template_name = self.master[gen].get("template_name", self.default_template_name)
         template_path = self.master[gen].get("template_path", self.default_template_path)
         if "scans" in self.master["structure"][layer]:
@@ -611,7 +835,16 @@ class StudyGen:
         l_study_str = []
         l_study_path = [self.master["name"] + "/"]
         dictionary_tree = {}
+        """
+        Creates study files for the entire study.
 
+        Args:
+            tree_file (bool, optional): Whether to write the study tree structure to a YAML file. Defaults to True.
+            force_overwrite (bool, optional): Whether to overwrite existing study files. Defaults to False.
+
+        Returns:
+            list[str]: The list of study file strings.
+        """
         # Remove existing study if force_overwrite
         if force_overwrite and os.path.exists(self.master["name"]):
             shutil.rmtree(self.master["name"])

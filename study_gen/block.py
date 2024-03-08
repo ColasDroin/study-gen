@@ -28,6 +28,18 @@ class Block:
         _l_arguments (list[tuple[str, type]]): A list of argument names and types.
         _dict_output (OrderedDict[str, type]): A dictionary specifying the expected output of the function.
 
+    Methods:
+        function: Get the function to be executed by the block.
+        dict_output: Get the dictionary specifying the expected output of the function.
+        set_outputs_names: Set the names of the outputs.
+        get_outputs_names: Get the names of the outputs.
+        dict_parameters: Get the dictionary specifying the parameters of the function.
+        get_dict_parameters_names: Get the names of the parameters.
+        set_parameters_names: Set the names of the parameters.
+        l_arguments: Get the list of argument names and types.
+        set_arguments_names: Set the names of the arguments.
+        get_arguments_names: Get the names of the arguments.
+        get_arguments_as_dict
     """
 
     def __init__(

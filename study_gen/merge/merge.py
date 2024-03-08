@@ -5,7 +5,18 @@ from ._merge_blocks import get_multiple_merge_str, merge_dependencies
 
 
 def merge_imports(l_blocks: list[Block]) -> OrderedDict[str, str]:
+    """
+    Merges the imports from multiple blocks, ensuring there are no conflicts.
 
+    Args:
+        l_blocks (list[Block]): A list of Block objects to be merged.
+
+    Returns:
+        OrderedDict[str, str]: A dictionary of merged imports, where the keys are module names and the values are import statements.
+
+    Raises:
+        ValueError: If there is an import conflict for a module, where import statements are not consistent.
+    """
     # Merge imports, ensuring that there are no conflicts
     dict_imports = OrderedDict()
     for block in l_blocks:
@@ -28,7 +39,27 @@ def merge_blocks(
     docstring: str = "",
     dict_output: OrderedDict[str, type] = OrderedDict(),
 ) -> Block:
+    """
+    Merges multiple blocks into a single Block object.
 
+    Args:
+        name_merged_block (str): The name of the merged Block.
+        l_blocks (list[Block]): A list of Block objects to be merged.
+        name_merged_function (str): The name of the merged function.
+        docstring (str, optional): The docstring for the merged function. Defaults to "".
+        dict_output (OrderedDict[str, type], optional): A dictionary of output names and types for the merged function. Defaults to OrderedDict().
+
+    Returns:
+        Block: The merged Block object.
+
+    Examples:
+        name_merged_block = "merged_block"
+        l_blocks = [block1, block2, block3]
+        name_merged_function = "merged_function"
+        docstring = "This is a merged function."
+        dict_output = OrderedDict([('output1', int), ('output2', str)])
+        merged_block = merge_blocks(name_merged_block, l_blocks, name_merged_function, docstring, dict_output)
+    """
     # Build function string
     function_str = get_multiple_merge_str(l_blocks, name_merged_function, docstring, dict_output)
 

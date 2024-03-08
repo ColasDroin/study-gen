@@ -5,6 +5,18 @@ from ..block import Block
 
 
 def _get_multiple_merge_parameters(l_blocks: list[Block]) -> OrderedDict[str, type]:
+    """
+    Merges the parameters of multiple blocks.
+
+    Args:
+        l_blocks (list[Block]): A list of Block objects to be merged.
+
+    Returns:
+        OrderedDict[str, type]: A dictionary of merged parameters.
+
+    Raises:
+        ValueError: If identical parameters have different types in the blocks.
+    """
     # Start with empty dictionnary of parameters
     dict_parameters = OrderedDict()
 
@@ -37,6 +49,17 @@ def _check_external_merge_output(
     dict_parameters: OrderedDict[str, type],
     dict_output: OrderedDict[str, type],
 ):
+    """
+    Checks the consistency of the output in the merged blocks.
+
+    Args:
+        l_blocks (list[Block]): A list of Block objects to be merged.
+        dict_parameters (OrderedDict[str, type]): A dictionary of merged parameters.
+        dict_output (OrderedDict[str, type]): A dictionary of output names and types.
+
+    Raises:
+        ValueError: If an output is not in the parameters or the outputs.
+    """
     # If the output is not None, ensure that the elements in it are either
     # - in the parameters (inplace operation)
     # - in the outputs
@@ -59,6 +82,19 @@ def _build_external_merge_str(
     dict_output: OrderedDict[str, type] = OrderedDict(),
     dict_parameters: OrderedDict[str, type] = OrderedDict(),
 ) -> str:
+    """
+    Builds the string representation of the merged function.
+
+    Args:
+        l_blocks (list[Block]): A list of Block objects to be merged.
+        name_function (str): The name of the merged function.
+        docstring (str, optional): The docstring for the merged function. Defaults to "".
+        dict_output (OrderedDict[str, type], optional): A dictionary of output names and types for the merged function. Defaults to OrderedDict().
+        dict_parameters (OrderedDict[str, type], optional): A dictionary of merged parameters. Defaults to OrderedDict().
+
+    Returns:
+        str: The string representation of the merged function.
+    """
     # Get output type hint string
     output_type_hint_str = Block.get_external_output_type_hint_str(dict_output)
 
@@ -82,6 +118,19 @@ def get_multiple_merge_str(
     docstring: str = "",
     dict_output: OrderedDict[str, type] = OrderedDict(),
 ) -> str:
+    """
+    Generates the string representation of a merged function.
+
+    Args:
+        l_blocks (list[Block]): A list of Block objects to be merged.
+        name_function (str): The name of the merged function.
+        docstring (str, optional): The docstring for the merged function. Defaults to "".
+        dict_output (OrderedDict[str, type], optional): A dictionary of output names and types for the merged function. Defaults to OrderedDict().
+
+    Returns:
+        str: The string representation of the merged function.
+    """
+
     # Get merged parameters
     dict_parameters = _get_multiple_merge_parameters(l_blocks)
 
@@ -94,4 +143,13 @@ def get_multiple_merge_str(
 
 
 def merge_dependencies(l_blocks: list[Block]) -> set[str]:
+    """
+    Merges the dependencies from multiple blocks into a set.
+
+    Args:
+        l_blocks (list[Block]): A list of Block objects to be merged.
+
+    Returns:
+        set[str]: A set of merged dependencies.
+    """
     return {block.name for block in l_blocks}
