@@ -194,16 +194,10 @@ More advanced uses are also possible. For instance, to avoid repeating sequences
 
 The approach used in study-gen has several advantages:
 
-- The building blocks can be reused in different studies, and easily shared between different users.
-- The building blocks can be combined in different ways and/or with different parameter values, to build different studies.
-- The building blocks can be tested individually, and the tests can be reused in different studies.
-- A study made from a set of standardized building blocks is easier to understand and maintain than a study made from a set of ad-hoc scripts.
-- A study made from a set of standardized building blocks is easily reproducible.
-- A study made from a set of standardized building blocks can be easily  modified or extended with new building blocks (which any user can implement in a matter of minutes).
+- Building blocks can be reused in different studies, and easily shared between different users.
+- Building blocks can be combined in different ways and/or with different parameter values, to build different studies.
+- Building blocks can be tested individually, and the tests can be reused in different studies.
+- A study made from a set of standardized building blocks is easier to understand, reproduce, and maintain than a study made from a set of ad-hoc scripts.
 - A study generated from a set of standardized building blocks remains explicit (no internal functions or classes are hidden), and can be easily inspected and modified.
 
 Finally, if a user doesn't want to code 'blocks' because it feels too complicated, he can just generate a template study from the set of available blocks, and personalize it the way he wants.
-
-## Documentation
-
-A proper documentation will be provided in the future. For now, the best way to understand how to use study-gen is to look at the examples provided in the ```example_folder```.
